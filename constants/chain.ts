@@ -5,6 +5,7 @@ import { Chain } from '../model/chain'
 
 import { RPC_URL } from './rpc-urls'
 import { monadTestnet } from './monad-testnet-chain'
+import { riseSepolia } from './rise-sepolia'
 
 export const DEFAULT_CHAIN_ID = base.id
 
@@ -14,9 +15,13 @@ export const supportChains: Chain[] = [
     ...monadTestnet,
     icon: '/monad.png',
   },
+  {
+    ...riseSepolia,
+    icon: '/rise.svg',
+  },
 ]
 
-export const testnetChainIds: number[] = [monadTestnet.id]
+export const testnetChainIds: number[] = [monadTestnet.id, riseSepolia.id]
 
 export const findSupportChain = (chainId: number): Chain | undefined =>
   supportChains.find((chain) => chain.id === chainId)

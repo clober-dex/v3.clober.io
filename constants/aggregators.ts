@@ -32,4 +32,10 @@ export const AGGREGATORS: {
       findSupportChain(CHAIN_IDS.MONAD_TESTNET.valueOf())!,
     ),
   ],
+  [CHAIN_IDS.RISE_SEPOLIA]: [
+    new CloberV2Aggregator(
+      getContractAddresses({ chainId: CHAIN_IDS.RISE_SEPOLIA }).Controller,
+      findSupportChain(CHAIN_IDS.RISE_SEPOLIA.valueOf())!,
+    ),
+  ],
 }

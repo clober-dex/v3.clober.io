@@ -55,4 +55,5 @@ export const VAULT_KEY_INFOS: {
       },
     },
   ],
+  [CHAIN_IDS.RISE_SEPOLIA]: [],
 }
