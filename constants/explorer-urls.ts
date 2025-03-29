@@ -5,5 +5,5 @@ export const EXPLORER_URL: {
 } = {
   [CHAIN_IDS.BASE]: `https://basescan.org`,
   [CHAIN_IDS.MONAD_TESTNET]: `https://monad-testnet.socialscan.io`,
-  [CHAIN_IDS.RISE_SEPOLIA]: `https://testnet-explorer.riselabs.xyz`,
+  [CHAIN_IDS.RISE_SEPOLIA]: `https://explorer.testnet.riselabs.xyz`,
 }
