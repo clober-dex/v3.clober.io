@@ -19,6 +19,7 @@ import { monadTestnet } from '../constants/monad-testnet-chain'
 import { CONTRACT_ADDRESSES } from '../constants/future/contracts'
 import { fetchPythPrice } from '../apis/price'
 import { EXTRA_PRICE_FEED_ID_LIST } from '../constants/currency'
+import { riseSepolia } from '../constants/rise-sepolia'
 
 import { useChainContext } from './chain-context'
 
@@ -140,13 +141,21 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
     queryFn: async () => {
       if (selectedChain.id === monadTestnet.id) {
         const [pythPrices, prices] = await Promise.all([
-          fetchPythPrice(monadTestnet.id, EXTRA_PRICE_FEED_ID_LIST),
+          fetchPythPrice(
+            monadTestnet.id,
+            EXTRA_PRICE_FEED_ID_LIST[monadTestnet.id],
+          ),
           fetchPrices(AGGREGATORS[selectedChain.id]),
         ])
         return {
           ...prices,
           ...pythPrices,
         } as Prices
+      } else if (selectedChain.id === riseSepolia.id) {
+        return fetchPythPrice(
+          riseSepolia.id,
+          EXTRA_PRICE_FEED_ID_LIST[riseSepolia.id],
+        )
       }
       return fetchPrices(AGGREGATORS[selectedChain.id])
     },

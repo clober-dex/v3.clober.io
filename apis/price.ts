@@ -2,6 +2,7 @@ import { getQuoteToken } from '@clober/v2-sdk'
 import { getAddress, isAddressEqual, parseUnits } from 'viem'
 import BigNumber from 'bignumber.js'
 import { EvmPriceServiceConnection, PriceFeed } from '@pythnetwork/pyth-evm-js'
+import { monadTestnet } from 'viem/chains'
 
 import { AGGREGATORS } from '../constants/aggregators'
 import { formatUnits } from '../utils/bigint'
@@ -54,7 +55,7 @@ export const fetchPythPrice = async (
     'https://hermes.pyth.network',
   )
   const priceFeedIdList = [
-    ...(await fetchFutureAssets(chainId))
+    ...(chainId === monadTestnet.id ? await fetchFutureAssets(chainId) : [])
       .map((asset) => [
         {
           priceFeedId: asset.currency.priceFeedId,

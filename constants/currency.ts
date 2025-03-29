@@ -3,28 +3,52 @@ import { CHAIN_IDS } from '@clober/v2-sdk'
 
 import { Currency } from '../model/currency'
 
-export const EXTRA_PRICE_FEED_ID_LIST = [
-  {
-    address: '0x836047a99e11f376522b447bffb6e3495dd0637c', // oWETH
-    priceFeedId:
-      '0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace',
-  },
-  {
-    address: '0xA296f47E8Ff895Ed7A092b4a9498bb13C46ac768', // wWETH
-    priceFeedId:
-      '0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace',
-  },
-  {
-    address: '0xB5a30b0FDc5EA94A52fDc42e3E9760Cb8449Fb37', // WETH
-    priceFeedId:
-      '0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace',
-  },
-  {
-    address: '0x88b8E2161DEDC77EF4ab7585569D2415a1C1055D', // USDT
-    priceFeedId:
-      '0x2b89b9dc8fdf9f34709a5b106b472f0f39bb6ca9ce04b0fd7f2e971688e2e53b',
-  },
-]
+export const EXTRA_PRICE_FEED_ID_LIST: {
+  [chain in number]: {
+    address: `0x${string}`
+    priceFeedId: `0x${string}`
+  }[]
+} = {
+  [CHAIN_IDS.MONAD_TESTNET]: [
+    {
+      address: '0x836047a99e11f376522b447bffb6e3495dd0637c', // oWETH
+      priceFeedId:
+        '0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace',
+    },
+    {
+      address: '0xA296f47E8Ff895Ed7A092b4a9498bb13C46ac768', // wWETH
+      priceFeedId:
+        '0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace',
+    },
+    {
+      address: '0xB5a30b0FDc5EA94A52fDc42e3E9760Cb8449Fb37', // WETH
+      priceFeedId:
+        '0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace',
+    },
+    {
+      address: '0x88b8E2161DEDC77EF4ab7585569D2415a1C1055D', // USDT
+      priceFeedId:
+        '0x2b89b9dc8fdf9f34709a5b106b472f0f39bb6ca9ce04b0fd7f2e971688e2e53b',
+    },
+  ],
+  [CHAIN_IDS.RISE_SEPOLIA]: [
+    {
+      address: '0x0000000000000000000000000000000000000000', // ETH
+      priceFeedId:
+        '0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace',
+    },
+    {
+      address: '0x4200000000000000000000000000000000000006', // WETH
+      priceFeedId:
+        '0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace',
+    },
+    {
+      address: '0xA985e387dDF21b87c1Fe8A0025D827674040221E', // cUSDC
+      priceFeedId:
+        '0x2b89b9dc8fdf9f34709a5b106b472f0f39bb6ca9ce04b0fd7f2e971688e2e53b',
+    },
+  ],
+}
 
 export const WETH: {
   [chain in number]: Currency
@@ -39,6 +63,12 @@ export const WETH: {
     address: '0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701',
     name: 'Wrapped Monad Token',
     symbol: 'WMON',
+    decimals: 18,
+  },
+  [CHAIN_IDS.RISE_SEPOLIA]: {
+    address: '0x4200000000000000000000000000000000000006',
+    name: 'Wrapped ETH',
+    symbol: 'WETH',
     decimals: 18,
   },
 }
@@ -211,6 +241,21 @@ export const WHITELISTED_CURRENCIES: {
       icon: 'https://imagedelivery.net/cBNDGgkrsEA-b_ixIp9SkQ/I_t8rg_V_400x400.jpg/public',
     },
   ],
+  [CHAIN_IDS.RISE_SEPOLIA]: [
+    ETH,
+    {
+      address: '0x4200000000000000000000000000000000000006',
+      name: 'Wrapped ETH',
+      symbol: 'WETH',
+      decimals: 18,
+    },
+    {
+      address: '0xA985e387dDF21b87c1Fe8A0025D827674040221E',
+      name: 'Clober USDC',
+      symbol: 'cUSDC',
+      decimals: 6,
+    },
+  ],
 }
 
 export const DEFAULT_INPUT_CURRENCY: {
@@ -229,6 +274,7 @@ export const DEFAULT_INPUT_CURRENCY: {
     decimals: 18,
     icon: '/monad.png',
   },
+  [CHAIN_IDS.RISE_SEPOLIA]: ETH,
 }
 
 export const DEFAULT_OUTPUT_CURRENCY: {
@@ -244,6 +290,12 @@ export const DEFAULT_OUTPUT_CURRENCY: {
     address: '0xf817257fed379853cDe0fa4F97AB987181B1E5Ea',
     name: 'USD Coin',
     symbol: 'USDC',
+    decimals: 6,
+  },
+  [CHAIN_IDS.RISE_SEPOLIA]: {
+    address: '0xA985e387dDF21b87c1Fe8A0025D827674040221E',
+    name: 'Clober USDC',
+    symbol: 'cUSDC',
     decimals: 6,
   },
 }
