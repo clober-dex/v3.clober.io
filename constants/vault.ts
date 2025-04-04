@@ -8,6 +8,7 @@ export const WHITELISTED_VAULTS: {
     salt: `0x${string}`
     key: `0x${string}`
     hasDashboard: boolean
+    hasCloberPoint: boolean
     startLPInfo: {
       quoteAmount: number
       baseAmount: number
@@ -25,6 +26,7 @@ export const WHITELISTED_VAULTS: {
       salt: zeroHash,
       key: '0xc8cbe608c82ee9c4c30f01d7c0eefd977538ac396ed34430aa3993bfe0d363ae',
       hasDashboard: true,
+      hasCloberPoint: true,
       startLPInfo: {
         quoteAmount: 271.254,
         baseAmount: 0.1,
@@ -41,6 +43,7 @@ export const WHITELISTED_VAULTS: {
       salt: zeroHash,
       key: '0xad46920833ad7a1ba8e74cc241faf9ae4fd3dc4616ad9648b13160f8453e444f',
       hasDashboard: false,
+      hasCloberPoint: true,
       startLPInfo: {
         quoteAmount: 405000,
         baseAmount: 25000,
@@ -55,6 +58,7 @@ export const WHITELISTED_VAULTS: {
       salt: zeroHash,
       key: '0xf3c347e880b6a775f4f69f6db22860636351a70f18857fab2c56dc32835a1627',
       hasDashboard: false,
+      hasCloberPoint: false,
       startLPInfo: {
         quoteAmount: 10031,
         baseAmount: 10000,
@@ -69,6 +73,7 @@ export const WHITELISTED_VAULTS: {
       salt: zeroHash,
       key: '0xebadcf03683413b3fc72a0d16a0a02902db04ee7a3b439de5033e825c1d79380',
       hasDashboard: false,
+      hasCloberPoint: false,
       startLPInfo: {
         quoteAmount: 1000,
         baseAmount: 1000,

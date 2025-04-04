@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useAccount } from 'wagmi'
 import { useRouter } from 'next/router'
 import { base } from 'viem/chains'
+import { isAddressEqual, zeroAddress } from 'viem'
 
 import { useVaultContext } from '../../contexts/vault/vault-context'
 import { useChainContext } from '../../contexts/chain-context'
@@ -9,14 +10,26 @@ import { toCommaSeparated } from '../../utils/number'
 import { VaultCard } from '../../components/card/vault-card'
 import { formatUnits } from '../../utils/bigint'
 import { VaultPositionCard } from '../../components/card/vault-position-card'
+import { shortAddress } from '../../utils/address'
 
 export const VaultContainer = () => {
   const router = useRouter()
   const { address: userAddress } = useAccount()
-  const { vaults, vaultLpBalances } = useVaultContext()
+  const { vaults, vaultLpBalances, vaultPoints } = useVaultContext()
   const { selectedChain } = useChainContext()
 
-  const [tab, setTab] = React.useState<'my-liquidity' | 'vault'>('vault')
+  const [tab, setTab] = React.useState<'my-liquidity' | 'vault' | 'point'>(
+    'vault',
+  )
+
+  const myRank = useMemo(
+    () =>
+      userAddress &&
+      vaultPoints.find((rank) =>
+        isAddressEqual(rank.userAddress as `0x${string}`, userAddress),
+      ),
+    [userAddress, vaultPoints],
+  )
 
   return (
     <div className="w-full flex flex-col text-white mb-4">
@@ -57,32 +70,27 @@ export const VaultContainer = () => {
             </div>
           </div>
           <div className="flex w-full mt-8 sm:mt-0 sm:mr-auto px-4">
-            <div className="w-full sm:w-[328px] h-[40px] sm:h-[56px] items-center flex">
+            <div className="w-full sm:w-[378px] h-[40px] sm:h-[56px] items-center flex">
               <button
                 onClick={() => setTab('vault')}
                 disabled={tab === 'vault'}
                 className="flex flex-1 gap-2 items-center justify-center w-full h-full text-gray-500 disabled:text-white disabled:bg-gray-800 bg-transparent rounded-tl-2xl rounded-tr-2xl"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className="w-4 h-4 sm:w-6 sm:h-6"
-                >
-                  <path
-                    d="M2 20C2.22717 20.3165 2.52797 20.5729 2.87642 20.7472C3.22488 20.9214 3.6105 21.0082 4 21C4.3895 21.0082 4.77512 20.9214 5.12358 20.7472C5.47203 20.5729 5.77283 20.3165 6 20C6.22717 19.6835 6.52797 19.4271 6.87642 19.2528C7.22488 19.0786 7.6105 18.9918 8 19C8.3895 18.9918 8.77512 19.0786 9.12358 19.2528C9.47203 19.4271 9.77283 19.6835 10 20C10.2272 20.3165 10.528 20.5729 10.8764 20.7472C11.2249 20.9214 11.6105 21.0082 12 21C12.3895 21.0082 12.7751 20.9214 13.1236 20.7472C13.472 20.5729 13.7728 20.3165 14 20C14.2272 19.6835 14.528 19.4271 14.8764 19.2528C15.2249 19.0786 15.6105 18.9918 16 19C16.3895 18.9918 16.7751 19.0786 17.1236 19.2528C17.472 19.4271 17.7728 19.6835 18 20C18.2272 20.3165 18.528 20.5729 18.8764 20.7472C19.2249 20.9214 19.6105 21.0082 20 21C20.3895 21.0082 20.7751 20.9214 21.1236 20.7472C21.472 20.5729 21.7728 20.3165 22 20M2 16C2.22717 16.3165 2.52797 16.5729 2.87642 16.7472C3.22488 16.9214 3.6105 17.0082 4 17C4.3895 17.0082 4.77512 16.9214 5.12358 16.7472C5.47203 16.5729 5.77283 16.3165 6 16C6.22717 15.6835 6.52797 15.4271 6.87642 15.2528C7.22488 15.0786 7.6105 14.9918 8 15C8.3895 14.9918 8.77512 15.0786 9.12358 15.2528C9.47203 15.4271 9.77283 15.6835 10 16C10.2272 16.3165 10.528 16.5729 10.8764 16.7472C11.2249 16.9214 11.6105 17.0082 12 17C12.3895 17.0082 12.7751 16.9214 13.1236 16.7472C13.472 16.5729 13.7728 16.3165 14 16C14.2272 15.6835 14.528 15.4271 14.8764 15.2528C15.2249 15.0786 15.6105 14.9918 16 15C16.3895 14.9918 16.7751 15.0786 17.1236 15.2528C17.472 15.4271 17.7728 15.6835 18 16C18.2272 16.3165 18.528 16.5729 18.8764 16.7472C19.2249 16.9214 19.6105 17.0082 20 17C20.3895 17.0082 20.7751 16.9214 21.1236 16.7472C21.472 16.5729 21.7728 16.3165 22 16M15 12V4.5C15 4.10218 15.158 3.72064 15.4393 3.43934C15.7206 3.15804 16.1022 3 16.5 3C16.8978 3 17.2794 3.15804 17.5607 3.43934C17.842 3.72064 18 4.10218 18 4.5M9 12V4.5C9 4.10218 8.84196 3.72064 8.56066 3.43934C8.27936 3.15804 7.89782 3 7.5 3C7.10218 3 6.72064 3.15804 6.43934 3.43934C6.15804 3.72064 6 4.10218 6 4.5M15 5H9M9 10H15"
-                    stroke="white"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
                 <div className="text-center text-sm sm:text-base font-bold">
                   CLV
                 </div>
               </button>
+
+              <button
+                onClick={() => setTab('point')}
+                disabled={tab === 'point'}
+                className="flex flex-1 gap-2 items-center justify-center w-full h-full text-gray-500 disabled:text-white disabled:bg-gray-800 bg-transparent rounded-tl-2xl rounded-tr-2xl"
+              >
+                <div className="text-center text-sm sm:text-base font-bold">
+                  Point
+                </div>
+              </button>
+
               <button
                 onClick={() =>
                   userAddress &&
@@ -94,22 +102,6 @@ export const VaultContainer = () => {
                 disabled={tab === 'my-liquidity'}
                 className="flex flex-1 gap-2 items-center justify-center w-full h-full text-gray-500 disabled:text-white disabled:bg-gray-800 bg-transparent rounded-tl-2xl rounded-tr-2xl"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className="w-4 h-4 sm:w-6 sm:h-6"
-                >
-                  <path
-                    d="M11.9998 17.75L5.82784 20.995L7.00684 14.122L2.00684 9.25495L8.90684 8.25495L11.9928 2.00195L15.0788 8.25495L21.9788 9.25495L16.9788 14.122L18.1578 20.995L11.9998 17.75Z"
-                    stroke="#6B7280"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
                 <div className="text-center text-sm sm:text-base font-bold">
                   My Vaults
                 </div>
@@ -118,10 +110,21 @@ export const VaultContainer = () => {
           </div>
         </div>
       </div>
-      <div className="flex w-auto flex-col items-center mt-6 lg:mt-12 px-4 lg:px-0">
+      <div className="flex w-full flex-col items-center mt-6 px-4 lg:px-0 gap-4 sm:gap-8">
         <div
           className={`flex flex-col w-full lg:w-[${selectedChain.id === base.id ? '1060px' : '960px'}] h-full gap-6`}
         >
+          <div className="w-full sm:ml-auto sm:w-[360px] pl-2 pr-3 py-2 bg-blue-400/20 rounded-lg inline-flex justify-start items-center gap-3">
+            <div className="px-2 bg-[#4c90ff]/30 rounded-md shadow-[0px_0px_8px_0px_rgba(147,197,253,0.25)] inline-flex flex-col justify-center items-center gap-2.5">
+              <div className="self-stretch justify-start text-blue-400 text-base font-bold">
+                P
+              </div>
+            </div>
+            <div className="justify-start text-blue-300 text-[13px] sm:text-sm font-bold text-nowrap">
+              You can earn points through the vault!
+            </div>
+          </div>
+
           {tab === 'vault' ? (
             <>
               <div className="hidden lg:flex self-stretch px-4 justify-start items-center gap-4">
@@ -176,7 +179,7 @@ export const VaultContainer = () => {
                 </div>
               </div>
             </>
-          ) : (
+          ) : tab === 'my-liquidity' ? (
             <div className="w-full h-full items-center flex flex-1 flex-col md:grid md:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-[18px]">
               {Object.entries(vaultLpBalances)
                 .filter(([, amount]) => amount > 0n)
@@ -202,6 +205,93 @@ export const VaultContainer = () => {
                     />
                   )
                 })}
+            </div>
+          ) : (
+            <div className="flex flex-col justify-start items-center gap-3 sm:gap-4 mb-4">
+              <div className="w-full py-3 sm:py-4 bg-[#1d1f27] sm:bg-[#1c1e27] rounded-xl inline-flex flex-col justify-start items-start gap-3">
+                <div className="self-stretch px-4 sm:px-8 inline-flex justify-start items-start gap-1.5 sm:text-xs text-sm">
+                  <div className="w-16 flex justify-start items-center gap-2.5 text-gray-400">
+                    Rank
+                  </div>
+                  <div className="flex w-full">
+                    <div className="flex flex-1 justify-start items-center gap-2.5">
+                      <div className="justify-start text-gray-400">User</div>
+                    </div>
+                    <div className="flex flex-1 justify-start items-center gap-2.5">
+                      <div className="justify-start text-gray-400 text-nowrap">
+                        Lp
+                      </div>
+                    </div>
+                    <div className="flex flex-1 justify-start items-center gap-2.5">
+                      <div className="justify-start text-gray-400">Point</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="self-stretch w-full flex flex-col justify-start items-start gap-1 sm:gap-2 overflow-y-scroll max-h-[500px]">
+                {userAddress && myRank && (
+                  <div className="self-stretch px-4 sm:px-8 min-h-10 bg-[#75b3ff]/20 flex rounded-lg justify-center items-center gap-1.5 sm:text-xs text-sm">
+                    <div className="w-16 flex justify-start items-center gap-2.5 text-white font-bold">
+                      {myRank.rank}
+                    </div>
+                    <div className="flex w-full">
+                      <div className="flex flex-1 justify-start text-blue-400 gap-1">
+                        Me
+                        <span className="hidden sm:flex">
+                          ({shortAddress(userAddress, 6)})
+                        </span>
+                      </div>
+                      <div className="flex flex-1 justify-start text-white font-semibold">
+                        {toCommaSeparated(
+                          myRank.vaultBalances
+                            .reduce((acc, { balance }) => acc + balance, 0)
+                            .toFixed(2),
+                        )}
+                      </div>
+                      <div className="flex flex-1 justify-start text-white font-semibold">
+                        {toCommaSeparated(myRank.point.toFixed(6))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {vaultPoints
+                  .filter((rank) => rank.point > 0.00001)
+                  .slice(0, 100)
+                  .map(({ userAddress, point, vaultBalances, rank }, index) => (
+                    <div
+                      key={`rank-${userAddress}`}
+                      className={`self-stretch px-4 sm:px-8 min-h-10 ${rank === 1 ? 'bg-[#ffce50]/20' : rank === 2 ? 'bg-[#d0d6ec]/20' : rank === 3 ? 'bg-[#ffc581]/20' : 'bg-gray-900'} flex rounded-lg justify-center items-center gap-1.5 sm:text-xs text-sm`}
+                    >
+                      <div
+                        className={`${rank === 1 ? 'text-[#ffe607]' : rank === 2 ? 'text-[#e4e5f5]' : rank === 3 ? 'text-[#ffc038]' : 'text-white'} w-16 flex justify-start items-center gap-2.5 text-white font-bold`}
+                      >
+                        {index + 1}
+                      </div>
+                      <div className="flex w-full">
+                        <div className="flex flex-1 justify-start text-white gap-1">
+                          <span className="flex sm:hidden">
+                            {shortAddress(userAddress, 2)}
+                          </span>
+                          <span className="hidden sm:flex">
+                            {shortAddress(userAddress, 8)}
+                          </span>
+                        </div>
+                        <div className="flex flex-1 justify-start text-white font-semibold">
+                          {toCommaSeparated(
+                            vaultBalances
+                              .reduce((acc, { balance }) => acc + balance, 0)
+                              .toFixed(2),
+                          )}
+                        </div>
+                        <div className="flex flex-1 justify-start text-white font-semibold">
+                          {toCommaSeparated(point.toFixed(6))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
             </div>
           )}
         </div>

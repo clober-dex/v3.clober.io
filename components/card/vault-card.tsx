@@ -21,6 +21,9 @@ export const VaultCard = ({
   const hasDashboard =
     WHITELISTED_VAULTS[chainId].find((info) => info.key === vault.key)
       ?.hasDashboard ?? false
+  const hashCloberPoint =
+    WHITELISTED_VAULTS[chainId].find((info) => info.key === vault.key)
+      ?.hasCloberPoint ?? false
   return (
     <>
       <div
@@ -42,6 +45,14 @@ export const VaultCard = ({
             <div>-</div>
             <div>{vault.currency1.symbol}</div>
           </div>
+
+          {hashCloberPoint && (
+            <div className="px-2 bg-[#4c90ff]/30 rounded-md shadow-[0px_0px_8px_0px_rgba(147,197,253,0.25)] inline-flex flex-col justify-center items-center gap-2.5">
+              <div className="self-stretch justify-start text-blue-400 text-base font-bold">
+                P
+              </div>
+            </div>
+          )}
         </div>
         <div className="w-[140px] text-white text-base font-bold">
           {`${!BigNumber(vault.apy).isNaN() && !BigNumber(vault.apy).isZero() && BigNumber(vault.apy).lt(1000) ? `${vault.apy.toFixed(2)}%` : '-'}`}
