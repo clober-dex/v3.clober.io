@@ -41,7 +41,7 @@ export const VaultCard = ({
           </div>
         </div>
         <div className="w-[140px] text-white text-base font-bold flex flex-row gap-2">
-          {`${!BigNumber(vault.apy).isNaN() && !BigNumber(vault.apy).isZero() && BigNumber(vault.apy).lt(1000) ? `${vault.apy.toFixed(2)}%` : '-'}`}
+          {`${!BigNumber(vault.apy).isNaN() && !BigNumber(vault.apy).isZero() && BigNumber(vault.apy).lt(10000) ? `${vault.apy.toFixed(2)}%` : '-'}`}
         </div>
         <div className="w-[140px] text-white text-base font-bold">
           ${toCommaSeparated(vault.tvl.toFixed(0))}
@@ -150,7 +150,7 @@ export const VaultCard = ({
               </div>
             </div>
             <div className="self-stretch text-white text-sm font-bold">
-              {`${!BigNumber(vault.apy).isNaN() && !BigNumber(vault.apy).isZero() && BigNumber(vault.apy).lt(1000) ? `${vault.apy.toFixed(2)}%` : '-'}`}
+              {`${!BigNumber(vault.apy).isNaN() && !BigNumber(vault.apy).isZero() && BigNumber(vault.apy).lt(10000) ? `${vault.apy.toFixed(2)}%` : '-'}`}
             </div>
           </div>
           <div className="flex w-full flex-col justify-start items-center gap-2">

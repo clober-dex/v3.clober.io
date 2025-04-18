@@ -111,7 +111,7 @@ export async function fetchOffChainVault(
   const historicalPriceIndex = historicalLpPrices.map(
     ({ pnl, lpPrice, time }) => {
       return {
-        values: [lpPrice !== 0 ? lpPrice / initialLpPrice : 0, pnl, 0],
+        values: [lpPrice !== 0 ? lpPrice / initialLpPrice : 0, pnl, lpPrice, 0],
         time,
       }
     },
@@ -123,11 +123,12 @@ export async function fetchOffChainVault(
     .reserve1
   const totalSupply = historicalLpPrices.sort((a, b) => b.time - a.time)[0]
     .totalSupply
-  const totalSpreadProfit = vaultPerformanceData.poolSpreadProfits.reduce(
-    (acc, { accumulatedProfitInUsd }) => acc + Number(accumulatedProfitInUsd),
-    0,
-  )
-
+  const firstHistoricalPriceIndex = [
+    ...historicalPriceIndex.slice(firstNonZeroIndex),
+  ].sort((a, b) => a.time - b.time)[0]
+  const lastHistoricalPriceIndex = [
+    ...historicalPriceIndex.slice(firstNonZeroIndex),
+  ].sort((a, b) => b.time - a.time)[0]
   return {
     key: vaultImmutableInfo.key,
     salt: vaultImmutableInfo.salt,
@@ -145,11 +146,18 @@ export async function fetchOffChainVault(
     reserveA: reserve0,
     reserveB: reserve1,
     tvl,
-    apy: chain.testnet
-      ? calculateApy(1 + totalSpreadProfit / tvl, 24 * 60 * 60)
-      : calculateApy(
+    apy: vaultImmutableInfo.initialLPInfo
+      ? calculateApy(
           historicalLpPrices.sort((a, b) => b.time - a.time)[0].pnl,
           currentTimestampInSeconds - initialLPInfo.timestamp,
+        )
+      : Math.max(
+          calculateApy(
+            lastHistoricalPriceIndex.values[2] /
+              firstHistoricalPriceIndex.values[2],
+            lastHistoricalPriceIndex.time - firstHistoricalPriceIndex.time,
+          ),
+          0,
         ),
     volume24h: vaultPerformanceData.poolVolumes.reduce(
       (acc, { currencyAVolume, currencyBVolume }) =>
@@ -251,7 +259,7 @@ export async function fetchOnChainVault(
   const historicalPriceIndex = historicalLpPrices.map(
     ({ pnl, lpPrice, time }) => {
       return {
-        values: [lpPrice !== 0 ? lpPrice / initialLpPrice : 0, pnl, 0],
+        values: [lpPrice !== 0 ? lpPrice / initialLpPrice : 0, pnl, lpPrice, 0],
         time,
       }
     },
@@ -261,11 +269,12 @@ export async function fetchOnChainVault(
       Number(vault.liquidityA.total.value) +
     (prices[vault.currencyB.address] ?? 0) *
       Number(vault.liquidityB.total.value)
-  const totalSpreadProfit = vaultPerformanceData.poolSpreadProfits.reduce(
-    (acc, { accumulatedProfitInUsd }) => acc + Number(accumulatedProfitInUsd),
-    0,
-  )
-
+  const firstHistoricalPriceIndex = [
+    ...historicalPriceIndex.slice(firstNonZeroIndex),
+  ].sort((a, b) => a.time - b.time)[0]
+  const lastHistoricalPriceIndex = [
+    ...historicalPriceIndex.slice(firstNonZeroIndex),
+  ].sort((a, b) => b.time - a.time)[0]
   return {
     key: vault.key,
     salt: vaultImmutableInfo.salt,
@@ -283,11 +292,18 @@ export async function fetchOnChainVault(
     reserveA: Number(vault.liquidityA.total.value),
     reserveB: Number(vault.liquidityB.total.value),
     tvl,
-    apy: chain.testnet
-      ? calculateApy(1 + totalSpreadProfit / tvl, 24 * 60 * 60)
-      : calculateApy(
+    apy: vaultImmutableInfo.initialLPInfo
+      ? calculateApy(
           historicalLpPrices.sort((a, b) => b.time - a.time)[0].pnl,
           currentTimestampInSeconds - initialLPInfo.timestamp,
+        )
+      : Math.max(
+          calculateApy(
+            lastHistoricalPriceIndex.values[2] /
+              firstHistoricalPriceIndex.values[2],
+            lastHistoricalPriceIndex.time - firstHistoricalPriceIndex.time,
+          ),
+          0,
         ),
     volume24h: vaultPerformanceData.poolVolumes.reduce(
       (acc, { currencyAVolume, currencyBVolume }) =>
