@@ -5,6 +5,7 @@ import { DiscoverPageSvg } from '../components/svg/discover-page-svg'
 import { SwapPageSvg } from '../components/svg/swap-page-svg'
 import { VaultPageSvg } from '../components/svg/vault-page-svg'
 import { LimitPageSvg } from '../components/svg/limit-page-svg'
+import { TradingCompetitionPageSvg } from '../components/svg/trading-competition-page-svg'
 
 import { riseSepolia } from './chains/rise-sepolia'
 
@@ -26,6 +27,12 @@ export const PAGE_BUTTONS = [
     label: 'Earn',
     icon: <VaultPageSvg className="w-4 h-4" />,
     chains: [base.id, monadTestnet.id],
+  },
+  {
+    path: '/trading-competition',
+    label: 'Competition',
+    icon: <TradingCompetitionPageSvg className="w-4 h-4" />,
+    chains: [monadTestnet.id],
   },
   {
     path: '/futures',
