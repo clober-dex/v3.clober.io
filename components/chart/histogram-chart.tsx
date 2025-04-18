@@ -15,12 +15,14 @@ export const HistogramChart = ({
   colors,
   detailData,
   height,
+  prefix,
 }: {
   data: StackedHistogramData[]
   totalKey: string
   colors: string[]
   detailData: { label: string; color: string }[]
   height: number
+  prefix?: string
 }) => {
   const params = {
     data,
@@ -55,13 +57,13 @@ export const HistogramChart = ({
             {(crosshairData) => {
               return (
                 <ChartHeader
-                  value={
+                  value={`${prefix ?? ''}${
                     crosshairData
                       ? toHumanReadableString(
                           crosshairData.values[totalKey] ?? 0,
                         )
                       : toHumanReadableString(last)
-                  }
+                  }`}
                   time={crosshairData?.time}
                   detailData={
                     crosshairData

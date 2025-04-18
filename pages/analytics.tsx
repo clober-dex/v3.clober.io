@@ -91,11 +91,12 @@ export default function Analytics() {
 
             <div className="flex flex-col flex-1">
               <div className="text-white text-sm md:text-base font-bold">
-                Daily Volume ($)
+                Daily Volume
               </div>
 
               <div className="flex w-[350px] sm:w-[500px]">
                 <HistogramChart
+                  prefix={'$ '}
                   data={analytics.map((item) => ({
                     time: item.timestamp as UTCTimestamp,
                     values: {

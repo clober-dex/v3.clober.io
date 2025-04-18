@@ -18,7 +18,7 @@ export const LeaderBoard = ({
   }
 }) => {
   return (
-    <div className="self-stretch w-full flex flex-col justify-start items-start gap-1 sm:gap-2 overflow-y-scroll pb-40">
+    <div className="self-stretch w-full flex flex-col justify-start items-start gap-1 sm:gap-2 overflow-y-scroll pb-30 sm:pb-40">
       {myValue && (
         <div className="self-stretch px-4 sm:px-8 min-h-10 bg-[#75b3ff]/20 flex rounded-lg justify-center items-center gap-1.5 sm:text-sm text-xs">
           <div className="w-16 flex justify-start items-center gap-2.5 text-white font-bold">
