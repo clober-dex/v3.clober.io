@@ -224,7 +224,7 @@ export const TradingCompetitionContainer = () => {
 
   return (
     <div className="w-full flex flex-col text-white mb-4 mt-2 px-4">
-      <div className="flex flex-col gap-3 lg:gap-7 w-full text-center justify-center items-center text-white text-base font-bold">
+      <div className="flex flex-col gap-3 lg:gap-7 w-full text-center justify-center items-center text-white text-base sm:text-2xl font-bold">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="81"
