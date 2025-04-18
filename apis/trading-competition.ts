@@ -16,6 +16,7 @@ export const fetchTradingCompetitionLeaderboard = async (
   prices: Prices,
   userAddress?: `0x${string}`,
 ): Promise<{
+  totalRegisteredUsers: number
   userPnL: TradingCompetitionPnl
   allUsersPnL: {
     [user: `0x${string}`]: TradingCompetitionPnl
@@ -23,6 +24,7 @@ export const fetchTradingCompetitionLeaderboard = async (
 }> => {
   if (!FUTURES_SUBGRAPH_ENDPOINT[chainId]) {
     return {
+      totalRegisteredUsers: 0,
       userPnL: {
         totalPnl: 0,
         trades: [],
@@ -36,6 +38,7 @@ export const fetchTradingCompetitionLeaderboard = async (
       sortedTradesByRealizedPnL,
       sortedTradesByEstimateHolding,
       myTrades,
+      globalState: { totalRegisteredUsers },
     },
   } = await Subgraph.get<{
     data: {
@@ -57,11 +60,12 @@ export const fetchTradingCompetitionLeaderboard = async (
         realizedPnL: string
         estimatedHolding: string
       }>
+      globalState: { totalRegisteredUsers: string }
     }
   }>(
     FUTURES_SUBGRAPH_ENDPOINT[chainId]!,
     'getTrades',
-    'query getTrades($userAddress: String!) { sortedTradesByRealizedPnL: trades( first: 1000 orderBy: realizedPnL orderDirection: desc where: {user_: {isRegistered: true}} ) { user { id } token { id decimals name symbol } realizedPnL estimatedHolding } sortedTradesByEstimateHolding: trades( first: 1000 orderBy: estimatedHolding orderDirection: desc where: {user_: {isRegistered: true}} ) { user { id } token { id decimals name symbol } realizedPnL estimatedHolding } myTrades: trades(where: {user: $userAddress}) { user { id } token { id decimals name symbol } realizedPnL estimatedHolding } }',
+    'query getTrades($userAddress: String!) { sortedTradesByRealizedPnL: trades( first: 1000 orderBy: realizedPnL orderDirection: desc where: {user_: {isRegistered: true}} ) { user { id } token { id decimals name symbol } realizedPnL estimatedHolding } sortedTradesByEstimateHolding: trades( first: 1000 orderBy: estimatedHolding orderDirection: desc where: {user_: {isRegistered: true}} ) { user { id } token { id decimals name symbol } realizedPnL estimatedHolding } myTrades: trades(where: {user: $userAddress}) { user { id } token { id decimals name symbol } realizedPnL estimatedHolding } globalState(id: "state") { totalRegisteredUsers } }',
     {
       userAddress: userAddress ? userAddress.toLowerCase() : '',
     },
@@ -105,6 +109,7 @@ export const fetchTradingCompetitionLeaderboard = async (
     .flat()
 
   return {
+    totalRegisteredUsers: Number(totalRegisteredUsers),
     userPnL: {
       totalPnl: myTrades.reduce((acc, trade) => {
         const token = getAddress(trade.token.id)

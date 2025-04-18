@@ -1,9 +1,8 @@
 import React, { useCallback, useMemo } from 'react'
 import { createPublicClient, getAddress, http } from 'viem'
 import { useAccount, useDisconnect, useWalletClient } from 'wagmi'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import BigNumber from 'bignumber.js'
-import { useQueryClient } from '@tanstack/react-query/build/modern/index'
 
 import { ActionButton } from '../components/button/action-button'
 import { toCommaSeparated } from '../utils/number'
@@ -29,23 +28,25 @@ const Profit = ({
   tokenColorMap: { [address: string]: string }
   trades: TradingCompetitionPnl['trades']
 }) => {
+  const data = useMemo(
+    () =>
+      trades
+        .filter(({ pnl }) => new BigNumber(Math.abs(pnl).toFixed(2)).gt(0))
+        .map(({ currency, pnl }) => ({
+          label: currency.symbol,
+          color: tokenColorMap[getAddress(currency.address)],
+          value: `${pnl === 0 ? '' : pnl > 0 ? '+' : '-'}$${toCommaSeparated(Math.abs(pnl).toFixed(2))}`,
+        })) ?? [],
+    [tokenColorMap, trades],
+  )
+
   return (
     <div className="flex group relative">
-      <div className="hidden group-hover:flex absolute top-8 left-2">
-        <Legend
-          data={
-            trades
-              .filter(({ pnl }) =>
-                new BigNumber(Math.abs(pnl).toFixed(2)).gt(0),
-              )
-              .map(({ currency, pnl }) => ({
-                label: currency.symbol,
-                color: tokenColorMap[getAddress(currency.address)],
-                value: `${pnl === 0 ? '' : pnl > 0 ? '+' : '-'}$${toCommaSeparated(Math.abs(pnl).toFixed(2))}`,
-              })) ?? []
-          }
-        />
-      </div>
+      {data.length > 0 && (
+        <div className="hidden group-hover:flex absolute top-8 left-2">
+          <Legend data={data} />
+        </div>
+      )}
 
       <div
         className={`flex flex-1 justify-start items-center ${profit === 0 ? 'text-white' : profit > 0 ? 'text-green-500' : 'text-red-500'} font-semibold`}
@@ -88,6 +89,7 @@ export const TradingCompetitionContainer = () => {
     },
   }) as {
     data: {
+      totalRegisteredUsers: number
       userPnL: TradingCompetitionPnl
       allUsersPnL: {
         [user: `0x${string}`]: TradingCompetitionPnl
@@ -424,6 +426,19 @@ export const TradingCompetitionContainer = () => {
                 : 'Connect Wallet to Register'
             }
           />
+        </div>
+      </div>
+
+      <div className="w-full md:flex md:justify-center">
+        <div className="md:w-[616px] flex w-full mt-10 sm:mt-16 px-6 sm:px-[62px] py-4 sm:py-6 bg-[#e9edff]/5 rounded-2xl sm:rounded-[20px] flex-col justify-center items-center gap-2 sm:gap-2.5">
+          <div className="w-full flex flex-col justify-start items-center gap-2 sm:gap-4">
+            <div className="self-stretch text-center justify-start text-gray-400 text-[13px] sm:text-base font-bold">
+              Current Participants
+            </div>
+            <div className="self-stretch text-center justify-start text-white/90 text-2xl sm:text-[32px] font-bold">
+              {toCommaSeparated((data?.totalRegisteredUsers ?? 0).toString())}
+            </div>
+          </div>
         </div>
       </div>
 
