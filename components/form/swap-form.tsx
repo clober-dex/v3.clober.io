@@ -1,10 +1,11 @@
 import React, { useCallback, useMemo } from 'react'
 import { isAddressEqual, parseUnits } from 'viem'
+import BigNumber from 'bignumber.js'
 
 import CurrencyAmountInput from '../input/currency-amount-input'
 import { Currency } from '../../model/currency'
 import CurrencySelect from '../selector/currency-select'
-import { toPlacesString } from '../../utils/bignumber'
+import { toPlacesAmountString, toPlacesString } from '../../utils/bignumber'
 import { ActionButton, ActionButtonProps } from '../button/action-button'
 import { Prices } from '../../model/prices'
 import { Balances } from '../../model/balances'
@@ -337,7 +338,12 @@ export const SwapForm = ({
                         </span>
                         =
                         <span className="text-white">
-                          {outputCurrencyAmount} {outputCurrency.symbol}
+                          {toPlacesAmountString(
+                            new BigNumber(outputCurrencyAmount).div(
+                              inputCurrencyAmount,
+                            ),
+                          )}{' '}
+                          {outputCurrency.symbol}
                         </span>
                       </div>
                     )}
