@@ -290,7 +290,7 @@ export const VaultManagerContainer = ({
                 </div>
 
                 <div className="self-stretch inline-flex justify-between items-center">
-                  <div className="flex flex-1 justify-start gap-2 md:gap-4">
+                  <div className="flex flex-1 justify-center gap-2 md:gap-4">
                     <div className="flex items-center gap-1 md:gap-2">
                       <CurrencyIcon
                         chain={selectedChain}
@@ -298,26 +298,26 @@ export const VaultManagerContainer = ({
                         className="w-5 h-5 md:w-6 md:h-6 rounded-full"
                       />
                     </div>
-                    <div className="text-center text-blue-500 text-sm md:text-lg font-bold flex flex-row gap-1 items-center h-full">
+                    <div className="text-blue-500 text-sm md:text-lg font-bold flex flex-col text-left items-center h-full">
                       {toCommaSeparated(
                         toPlacesAmountString(
                           vault.reserveA.toString(),
                           prices[vault.currencyA.address] ?? 0,
                         ),
                       )}
-                      <span className="text-gray-400 font-medium text-xs sm:text-sm">
+                      <span className="text-gray-400 font-medium text-sm">
                         ($
                         {toCommaSeparated(
                           new BigNumber(
                             vault.reserveA *
                               (prices[vault.currencyA.address] ?? 0),
-                          ).toFixed(0),
+                          ).toFixed(2),
                         )}
                         )
                       </span>
                     </div>
                   </div>
-                  <div className="flex flex-1 justify-start gap-2 md:gap-4">
+                  <div className="flex flex-1 justify-center gap-2 md:gap-4">
                     <div className="flex items-center gap-1 md:gap-2">
                       <CurrencyIcon
                         chain={selectedChain}
@@ -325,20 +325,20 @@ export const VaultManagerContainer = ({
                         className="w-5 h-5 md:w-6 md:h-6 rounded-full"
                       />
                     </div>
-                    <div className="text-center text-cyan-400 text-sm md:text-lg font-bold flex flex-row gap-1 items-center h-full">
+                    <div className="text-cyan-400 text-sm md:text-lg font-bold flex flex-col text-left items-center h-full">
                       {toCommaSeparated(
                         toPlacesAmountString(
                           vault.reserveB.toString(),
                           prices[vault.currencyB.address] ?? 0,
                         ),
                       )}
-                      <span className="text-gray-400 font-medium text-xs sm:text-sm">
+                      <span className="text-gray-400 font-medium text-sm">
                         ($
                         {toCommaSeparated(
                           new BigNumber(
                             vault.reserveB *
                               (prices[vault.currencyB.address] ?? 0),
-                          ).toFixed(0),
+                          ).toFixed(2),
                         )}
                         )
                       </span>
