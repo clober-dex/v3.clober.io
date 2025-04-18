@@ -325,7 +325,7 @@ export const VaultManagerContainer = ({
                         className="w-5 h-5 md:w-6 md:h-6 rounded-full"
                       />
                     </div>
-                    <div className="text-center text-blue-500 text-sm md:text-lg font-bold flex flex-row gap-1 items-center h-full">
+                    <div className="text-center text-cyan-400 text-sm md:text-lg font-bold flex flex-row gap-1 items-center h-full">
                       {toCommaSeparated(
                         toPlacesAmountString(
                           vault.reserveB.toString(),
