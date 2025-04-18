@@ -30,13 +30,11 @@ const Profit = ({
 }) => {
   const data = useMemo(
     () =>
-      trades
-        .filter(({ pnl }) => new BigNumber(Math.abs(pnl).toFixed(2)).gt(0))
-        .map(({ currency, pnl }) => ({
-          label: currency.symbol,
-          color: tokenColorMap[getAddress(currency.address)],
-          value: `${pnl === 0 ? '' : pnl > 0 ? '+' : '-'}$${toCommaSeparated(Math.abs(pnl).toFixed(2))}`,
-        })) ?? [],
+      trades.map(({ currency, pnl }) => ({
+        label: currency.symbol,
+        color: tokenColorMap[getAddress(currency.address)],
+        value: `${pnl === 0 ? '' : pnl > 0 ? '+' : '-'}$${toCommaSeparated(Math.abs(pnl).toFixed(4))}`,
+      })) ?? [],
     [tokenColorMap, trades],
   )
 
@@ -52,7 +50,7 @@ const Profit = ({
         className={`flex flex-1 justify-start items-center ${profit === 0 ? 'text-white' : profit > 0 ? 'text-green-500' : 'text-red-500'} font-semibold`}
       >
         {profit === 0 ? ' ' : profit > 0 ? '+' : '-'}$
-        {toCommaSeparated(Math.abs(profit).toFixed(2))}
+        {toCommaSeparated(Math.abs(profit).toFixed(4))}
       </div>
     </div>
   )
