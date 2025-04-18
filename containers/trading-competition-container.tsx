@@ -35,7 +35,7 @@ const Profit = ({
   const data = useMemo(
     () =>
       trades
-        .filter(({ pnl }) => Math.abs(pnl) > 0.001)
+        .filter(({ pnl }) => Math.abs(pnl) > 0.0001)
         .map(({ currency, pnl }) => ({
           label: currency.symbol,
           color: tokenColorMap[getAddress(currency.address)],
