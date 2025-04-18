@@ -43,7 +43,7 @@ const Profit = ({
   return (
     <div className="flex group relative">
       {data.length > 0 && (
-        <div className="hidden group-hover:flex absolute top-8 left-2">
+        <div className="hidden group-hover:flex absolute top-8 -left-20 sm:left-2">
           <Legend data={data} />
         </div>
       )}
