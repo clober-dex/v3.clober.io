@@ -16,13 +16,40 @@ import { LeaderBoard } from '../components/leader-board'
 import { fetchTradingCompetitionLeaderboard } from '../apis/trading-competition'
 import { useCurrencyContext } from '../contexts/currency-context'
 import { TradingCompetitionPnl } from '../model/trading-competition-pnl'
+import { Legend } from '../components/chart/legend'
+import { Prices } from '../model/prices'
 
-const Profit = ({ profit }: { profit: number }) => {
+const Profit = ({
+  profit,
+  tokenColorMap,
+  trades,
+  prices,
+}: {
+  profit: number
+  tokenColorMap: { [address: string]: string }
+  trades: TradingCompetitionPnl['trades']
+  prices: Prices
+}) => {
   return (
-    <div
-      className={`flex flex-1 justify-start items-center ${profit === 0 ? 'text-white' : profit > 0 ? 'text-green-500' : 'text-red-500'} font-semibold`}
-    >
-      {profit > 0 ? '+' : '-'} ${toCommaSeparated(Math.abs(profit).toFixed(2))}
+    <div className="flex group relative">
+      <div className="hidden group-hover:flex absolute top-8 left-2 z-[1000]">
+        <Legend
+          data={
+            trades.map(({ currency, amount }) => ({
+              label: currency.symbol,
+              color: tokenColorMap[getAddress(currency.address)],
+              value: `$${toCommaSeparated((amount * (prices[currency.address] ?? 0)).toFixed(2))}`,
+            })) ?? []
+          }
+        />
+      </div>
+
+      <div
+        className={`flex flex-1 justify-start items-center ${profit === 0 ? 'text-white' : profit > 0 ? 'text-green-500' : 'text-red-500'} font-semibold`}
+      >
+        {profit > 0 ? '+' : '-'} $
+        {toCommaSeparated(Math.abs(profit).toFixed(2))}
+      </div>
     </div>
   )
 }
@@ -131,6 +158,25 @@ export const TradingCompetitionContainer = () => {
     setConfirmation,
     walletClient,
   ])
+
+  const tokenColorMap = useMemo(() => {
+    return Object.fromEntries(
+      [
+        ...new Set(
+          Object.values(data?.allUsersPnL ?? [])
+            .map((item) =>
+              item.trades.map(({ currency }) => getAddress(currency.address)),
+            )
+            .flat(),
+        ),
+      ]
+        .sort()
+        .map((address, index) => [
+          getAddress(address),
+          `hsl(${(index * 137.508) % 360}, 100%, 50%)`,
+        ]),
+    )
+  }, [data?.allUsersPnL])
 
   return (
     <div className="w-full flex flex-col text-white mb-4 mt-2 px-4">
@@ -334,8 +380,8 @@ export const TradingCompetitionContainer = () => {
         </div>
       </div>
 
-      <div className="w-full lg:flex lg:justify-center">
-        <div className="flex flex-col items-center gap-3 sm:gap-4 mt-12 mb-4 lg:w-[616px]">
+      <div className="w-full md:flex md:justify-center">
+        <div className="flex flex-col items-center gap-3 sm:gap-4 mt-12 mb-4 md:w-[616px]">
           <div className="w-full py-3 sm:py-4 bg-[#1d1f27] sm:bg-[#1c1e27] rounded-xl inline-flex flex-col justify-start items-start gap-3">
             <div className="self-stretch px-4 sm:px-8 inline-flex justify-start items-start gap-1.5 sm:text-sm text-xs">
               <div className="w-16 flex justify-start items-center gap-2.5 text-gray-400">
@@ -359,16 +405,30 @@ export const TradingCompetitionContainer = () => {
               userAddress && (data?.userPnL?.totalPnl ?? 0) !== 0
                 ? {
                     address: userAddress,
-                    value: <Profit profit={data?.userPnL?.totalPnl ?? 0} />,
+                    value: (
+                      <Profit
+                        profit={data?.userPnL?.totalPnl ?? 0}
+                        tokenColorMap={tokenColorMap}
+                        trades={data?.userPnL?.trades ?? []}
+                        prices={prices}
+                      />
+                    ),
                   }
                 : undefined
             }
             values={Object.entries(data?.allUsersPnL ?? {})
               .sort(([, a], [, b]) => b.totalPnl - a.totalPnl)
               .slice(0, 100)
-              .map(([address, { totalPnl }], index) => ({
+              .map(([address, { totalPnl, trades }], index) => ({
                 address: getAddress(address),
-                value: <Profit profit={totalPnl} />,
+                value: (
+                  <Profit
+                    profit={totalPnl}
+                    tokenColorMap={tokenColorMap}
+                    trades={trades}
+                    prices={prices}
+                  />
+                ),
                 rank: index + 1,
               }))}
           />
