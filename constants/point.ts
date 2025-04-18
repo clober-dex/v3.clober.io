@@ -5,7 +5,7 @@ export const LIQUIDITY_VAULT_POINT_SUBGRAPH_ENDPOINT: {
 } = {
   [CHAIN_IDS.BASE]: undefined,
   [CHAIN_IDS.MONAD_TESTNET]:
-    'https://api.goldsky.com/api/public/project_clsljw95chutg01w45cio46j0/subgraphs/liquidity-vault-point-monad-testnet/v1.1.6/gn',
+    'https://api.goldsky.com/api/public/project_clsljw95chutg01w45cio46j0/subgraphs/liquidity-vault-point-monad-testnet/latest/gn',
   [CHAIN_IDS.RISE_SEPOLIA]: undefined,
 }
 
