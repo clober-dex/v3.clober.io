@@ -7,6 +7,10 @@ import { Prices } from '../model/prices'
 import { formatUnits } from '../utils/bigint'
 import { TradingCompetitionPnl } from '../model/trading-competition-pnl'
 
+const BLACKLISTED_USER_ADDRESSES = [
+  '0x5F79EE8f8fA862E98201120d83c4eC39D9468D49',
+].map((address) => getAddress(address))
+
 export const fetchTradingCompetitionLeaderboard = async (
   chainId: CHAIN_IDS,
   prices: Prices,
@@ -132,6 +136,13 @@ export const fetchTradingCompetitionLeaderboard = async (
     },
     allUsersPnL: trades.reduce(
       (acc, trade) => {
+        if (
+          BLACKLISTED_USER_ADDRESSES.some((address) =>
+            isAddressEqual(getAddress(trade.user), address),
+          )
+        ) {
+          return acc
+        }
         const user = getAddress(trade.user)
         if (!acc[user]) {
           acc[user] = {
