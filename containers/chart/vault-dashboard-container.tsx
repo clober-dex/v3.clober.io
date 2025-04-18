@@ -41,8 +41,8 @@ export const VaultDashboardContainer = ({
               />
             </svg>
           </button>
-          <div className="absolute left-1/2">
-            <div className="flex items-center relative -left-1/2 w-full h-full gap-2 md:gap-4">
+          <div className="flex w-full items-center justify-center">
+            <div className="flex items-center justify-center relative w-full h-full gap-2 md:gap-4">
               <div className="w-10 h-6 md:w-14 md:h-8 shrink-0 relative">
                 <CurrencyIcon
                   chain={selectedChain}
