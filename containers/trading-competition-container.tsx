@@ -92,6 +92,8 @@ export const TradingCompetitionContainer = () => {
         userAddress,
       )
     },
+    refetchInterval: 5 * 1000, // checked
+    refetchIntervalInBackground: true,
   }) as {
     data: {
       totalRegisteredUsers: number
