@@ -51,7 +51,8 @@ const Profit = ({
       <div
         className={`flex flex-1 justify-start items-center ${profit === 0 ? 'text-white' : profit > 0 ? 'text-green-500' : 'text-red-500'} font-semibold`}
       >
-        {profit > 0 ? '+' : '-'}${toCommaSeparated(Math.abs(profit).toFixed(2))}
+        {profit === 0 ? ' ' : profit > 0 ? '+' : '-'}$
+        {toCommaSeparated(Math.abs(profit).toFixed(2))}
       </div>
     </div>
   )
@@ -464,7 +465,7 @@ export const TradingCompetitionContainer = () => {
 
           <LeaderBoard
             myValue={
-              userAddress && (data?.userPnL?.totalPnl ?? 0) !== 0
+              userAddress && isRegistered
                 ? {
                     address: userAddress,
                     value: (
