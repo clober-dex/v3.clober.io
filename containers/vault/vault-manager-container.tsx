@@ -18,7 +18,6 @@ import { QuestionMarkSvg } from '../../components/svg/question-mark-svg'
 import { AddLiquidityForm } from '../../components/form/vault/add-liquidity-form'
 import { RemoveLiquidityForm } from '../../components/form/vault/remove-liquidity-form'
 import { toCommaSeparated } from '../../utils/number'
-import { dollarValue } from '../../utils/bigint'
 
 import { VaultChartContainer } from './vault-chart-container'
 
