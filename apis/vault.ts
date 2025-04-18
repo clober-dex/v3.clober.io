@@ -34,8 +34,8 @@ export async function fetchOffChainVault(
   const currentTimestampInSeconds = Math.floor(new Date().getTime() / 1000)
   const _5minNormalizedCurrentTimestampInSeconds =
     currentTimestampInSeconds - (currentTimestampInSeconds % (60 * 5))
-  const _1hourNormalizedCurrentTimestampInSeconds =
-    currentTimestampInSeconds - (currentTimestampInSeconds % (60 * 60))
+  const _1minNormalizedCurrentTimestampInSeconds =
+    currentTimestampInSeconds - (currentTimestampInSeconds % 60)
 
   const vaultPerformanceData = await getPoolPerformance({
     chainId: chain.id,
@@ -47,10 +47,9 @@ export async function fetchOffChainVault(
       _5minNormalizedCurrentTimestampInSeconds - 60 * 60 * 24,
     volumeToTimestamp: _5minNormalizedCurrentTimestampInSeconds,
     // performance chart
-    snapshotFromTimestamp:
-      _1hourNormalizedCurrentTimestampInSeconds - 60 * 60 * 24 * 90,
-    snapshotToTimestamp: _1hourNormalizedCurrentTimestampInSeconds,
-    snapshotIntervalType: CHART_LOG_INTERVALS.oneHour,
+    snapshotFromTimestamp: _1minNormalizedCurrentTimestampInSeconds - 24 * 90,
+    snapshotToTimestamp: _1minNormalizedCurrentTimestampInSeconds,
+    snapshotIntervalType: CHART_LOG_INTERVALS.oneMinute,
     // apy
     spreadProfitFromTimestamp:
       _5minNormalizedCurrentTimestampInSeconds - 60 * 60 * 24,
