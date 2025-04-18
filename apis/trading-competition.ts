@@ -62,34 +62,43 @@ export const fetchTradingCompetitionLeaderboard = async (
       userAddress: userAddress ? userAddress.toLowerCase() : '',
     },
   )
-  const intersectionUsers = sortedTradesByRealizedPnL
-    .map((trade) => getAddress(trade.user.id))
-    .filter((user) =>
-      sortedTradesByEstimateHolding.some((trade) =>
-        isAddressEqual(getAddress(trade.user.id), getAddress(user)),
-      ),
-    )
-  const trades = intersectionUsers.map((user) => {
-    const trade = sortedTradesByRealizedPnL.find((trade) =>
-      isAddressEqual(getAddress(trade.user.id), getAddress(user)),
-    )!
-    const token = getAddress(trade.token.id)
-    const amount = formatUnits(
-      BigInt(trade.estimatedHolding),
-      Number(trade.token.decimals),
-    )
-    return {
-      user,
-      currency: {
-        address: token,
-        symbol: trade.token.symbol,
-        name: trade.token.name,
-        decimals: Number(trade.token.decimals),
-      },
-      amount: Number(amount),
-      pnl: Number(trade.realizedPnL) + Number(amount) * prices[token],
-    }
-  })
+  const intersectionUsers = [
+    ...new Set(
+      sortedTradesByRealizedPnL
+        .map((trade) => getAddress(trade.user.id))
+        .filter((user) =>
+          sortedTradesByEstimateHolding.some((trade) =>
+            isAddressEqual(getAddress(trade.user.id), getAddress(user)),
+          ),
+        ),
+    ),
+  ]
+  const trades = intersectionUsers
+    .map((user) => {
+      return sortedTradesByRealizedPnL
+        .filter((trade) =>
+          isAddressEqual(getAddress(trade.user.id), getAddress(user)),
+        )
+        .map((trade) => {
+          const token = getAddress(trade.token.id)
+          const amount = formatUnits(
+            BigInt(trade.estimatedHolding),
+            Number(trade.token.decimals),
+          )
+          return {
+            user,
+            currency: {
+              address: token,
+              symbol: trade.token.symbol,
+              name: trade.token.name,
+              decimals: Number(trade.token.decimals),
+            },
+            amount: Number(amount),
+            pnl: Number(trade.realizedPnL) + Number(amount) * prices[token],
+          }
+        })
+    })
+    .flat()
 
   return {
     userPnL: {
