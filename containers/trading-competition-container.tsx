@@ -2,10 +2,10 @@ import React, { useCallback, useMemo } from 'react'
 import { createPublicClient, getAddress, http } from 'viem'
 import { useAccount, useDisconnect, useWalletClient } from 'wagmi'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import BigNumber from 'bignumber.js'
+import CountUp from 'react-countup'
 
 import { ActionButton } from '../components/button/action-button'
-import { toCommaSeparated } from '../utils/number'
+import { toCommaSeparated, toHumanReadableString } from '../utils/number'
 import { buildTransaction } from '../utils/build-transaction'
 import { RPC_URL } from '../constants/rpc-url'
 import { useChainContext } from '../contexts/chain-context'
@@ -73,6 +73,10 @@ export const TradingCompetitionContainer = () => {
       transport: http(RPC_URL[selectedChain.id]),
     })
   }, [selectedChain])
+
+  const countUpFormatter = useCallback((value: number): string => {
+    return toCommaSeparated(value.toFixed(0))
+  }, [])
 
   const { data } = useQuery({
     queryKey: [
@@ -437,7 +441,13 @@ export const TradingCompetitionContainer = () => {
               Current Participants
             </div>
             <div className="self-stretch text-center justify-start text-white/90 text-2xl sm:text-[32px] font-bold">
-              {toCommaSeparated((data?.totalRegisteredUsers ?? 0).toString())}
+              <CountUp
+                end={data?.totalRegisteredUsers ?? 0}
+                formattingFn={countUpFormatter}
+                preserveValue
+                useEasing={false}
+                duration={1}
+              />
             </div>
           </div>
         </div>
