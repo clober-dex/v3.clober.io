@@ -13,6 +13,7 @@ import { ExchangeSvg } from '../svg/exchange-svg'
 import CloseSvg from '../svg/close-svg'
 import { SlippageToggle } from '../toggle/slippage-toggle'
 import { Chain } from '../../model/chain'
+import { toCommaSeparated } from '../../utils/number'
 
 export const SwapForm = ({
   chain,
@@ -94,6 +95,10 @@ export const SwapForm = ({
     setInputCurrencyAmount,
     setOutputCurrency,
   ])
+  const exchangeRate = useMemo(() => {
+    const rate = new BigNumber(outputCurrencyAmount).div(inputCurrencyAmount)
+    return rate.isNaN() || rate.isZero() ? new BigNumber(0) : rate
+  }, [inputCurrencyAmount, outputCurrencyAmount])
 
   return showInputCurrencySelect ? (
     <CurrencySelect
@@ -338,11 +343,7 @@ export const SwapForm = ({
                         </span>
                         =
                         <span className="text-white">
-                          {toPlacesAmountString(
-                            new BigNumber(outputCurrencyAmount).div(
-                              inputCurrencyAmount,
-                            ),
-                          )}{' '}
+                          {toCommaSeparated(toPlacesAmountString(exchangeRate))}{' '}
                           {outputCurrency.symbol}
                         </span>
                       </div>
