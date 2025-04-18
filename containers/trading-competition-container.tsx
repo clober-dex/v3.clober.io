@@ -93,6 +93,36 @@ export const TradingCompetitionContainer = () => {
     }
   }
 
+  const { data: isRegistered } = useQuery({
+    queryKey: [
+      'is-register-trading-competition',
+      selectedChain.id,
+      userAddress,
+    ],
+    queryFn: async () => {
+      if (!userAddress) {
+        return false
+      }
+      return publicClient.readContract({
+        address:
+          FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!
+            .TradingCompetitionRegistration,
+        abi: [
+          {
+            type: 'function',
+            name: 'isRegistered',
+            inputs: [{ name: '', type: 'address', internalType: 'address' }],
+            outputs: [{ name: '', type: 'bool', internalType: 'bool' }],
+            stateMutability: 'view',
+          },
+        ] as const,
+        functionName: 'isRegistered',
+        args: [userAddress],
+      })
+    },
+    initialData: false,
+  })
+
   const register = useCallback(async () => {
     try {
       if (!walletClient) {
@@ -377,7 +407,17 @@ export const TradingCompetitionContainer = () => {
 
       <div className="flex w-full justify-center mt-8 lg:mt-10">
         <div className="flex text-base lg:text-lg w-full sm:w-[410px]">
-          <ActionButton disabled={false} onClick={register} text="Register" />
+          <ActionButton
+            disabled={!userAddress || isRegistered}
+            onClick={register}
+            text={
+              userAddress
+                ? isRegistered
+                  ? 'Already Registered'
+                  : 'Register'
+                : 'Connect Wallet to Register'
+            }
+          />
         </div>
       </div>
 
