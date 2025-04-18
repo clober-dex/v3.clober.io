@@ -29,6 +29,7 @@ export const Default: Story = {
   args: {
     values: vaules,
     myValue: vaules[120],
+    explorerUrl: '',
   },
 }
 
@@ -36,5 +37,6 @@ export const Public: Story = {
   args: {
     values: vaules,
     myValue: undefined,
+    explorerUrl: '',
   },
 }

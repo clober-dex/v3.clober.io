@@ -1,12 +1,15 @@
 import React from 'react'
 import { isAddressEqual } from 'viem'
+import Link from 'next/link'
 
 import { shortAddress } from '../utils/address'
 
 export const LeaderBoard = ({
+  explorerUrl,
   values,
   myValue,
 }: {
+  explorerUrl: string
   values: {
     rank: number
     value: React.ReactNode
@@ -27,12 +30,17 @@ export const LeaderBoard = ({
             )?.rank ?? '-'}
           </div>
           <div className="flex w-full">
-            <div className="flex flex-1 justify-start items-center text-blue-400 gap-1">
+            <Link
+              target="_blank"
+              href={`${explorerUrl}/address/${myValue.address}`}
+              rel="noreferrer"
+              className="flex flex-1 justify-start items-center text-blue-400 gap-1"
+            >
               Me
               <span className="hidden sm:flex">
                 ({shortAddress(myValue.address, 6)})
               </span>
-            </div>
+            </Link>
             <div className="flex flex-1 justify-start items-center text-white font-semibold">
               {myValue.value}
             </div>
@@ -57,14 +65,19 @@ export const LeaderBoard = ({
               {rank}
             </div>
             <div className="flex w-full">
-              <div className="flex flex-1 justify-start items-center text-white gap-1">
+              <Link
+                target="_blank"
+                href={`${explorerUrl}/address/${address}`}
+                rel="noreferrer"
+                className="flex flex-1 justify-start items-center text-white gap-1"
+              >
                 <span className="flex sm:hidden">
                   {shortAddress(address, 2)}
                 </span>
                 <span className="hidden sm:flex">
                   {shortAddress(address, 8)}
                 </span>
-              </div>
+              </Link>
               <div className="flex flex-1 justify-start items-center text-white font-semibold">
                 {value}
               </div>

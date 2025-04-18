@@ -494,6 +494,7 @@ export const TradingCompetitionContainer = () => {
           </div>
 
           <LeaderBoard
+            explorerUrl={selectedChain.blockExplorers?.default.url ?? ''}
             myValue={
               userAddress && isRegistered
                 ? {

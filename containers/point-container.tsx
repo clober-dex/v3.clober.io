@@ -41,6 +41,7 @@ export const PointContainer = () => {
             </div>
 
             <LeaderBoard
+              explorerUrl="https://clober.io"
               myValue={
                 myVaultPoint && userAddress
                   ? {
