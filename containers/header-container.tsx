@@ -92,7 +92,7 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
         />
       )}
 
-      <div className="flex items-center justify-between h-[46px] md:h-[60px] py-0 px-4">
+      <div className="flex items-center bg-gray-800 bg-opacity-50 justify-between h-[46px] md:h-[60px] py-0 px-4">
         <div className="flex items-center gap-2.5 md:gap-12">
           {router.pathname.includes('/futures') ? (
             <Link
