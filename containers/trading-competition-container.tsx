@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
-import { createPublicClient, getAddress, http, zeroAddress } from 'viem'
+import { createPublicClient, getAddress, http } from 'viem'
 import { useAccount, useDisconnect, useWalletClient } from 'wagmi'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import CountUp from 'react-countup'
@@ -68,7 +68,7 @@ const Profit = ({
               key={`trading-competition-currency-icon-${i}`}
               currency={currency}
               className={`rounded-full ${i > 0 ? 'absolute' : ''} w-[16px] h-[16px]`}
-              style={i > 0 ? { left: `${12 * i}px z-[${i + 1}]` } : undefined}
+              style={i > 0 ? { left: `${12 * i}px`, zIndex: i + 1 } : undefined}
             />
           ))}
       </div>
