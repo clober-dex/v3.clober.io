@@ -27,13 +27,13 @@ export const LeaderBoard = ({
             )?.rank ?? '-'}
           </div>
           <div className="flex w-full">
-            <div className="flex flex-1 justify-start text-blue-400 gap-1">
+            <div className="flex flex-1 justify-start items-center text-blue-400 gap-1">
               Me
               <span className="hidden sm:flex">
                 ({shortAddress(myValue.address, 6)})
               </span>
             </div>
-            <div className="flex flex-1 justify-start text-white font-semibold">
+            <div className="flex flex-1 justify-start items-center text-white font-semibold">
               {myValue.value}
             </div>
           </div>
@@ -57,7 +57,7 @@ export const LeaderBoard = ({
               {rank}
             </div>
             <div className="flex w-full">
-              <div className="flex flex-1 justify-start text-white gap-1">
+              <div className="flex flex-1 justify-start items-center text-white gap-1">
                 <span className="flex sm:hidden">
                   {shortAddress(address, 2)}
                 </span>
@@ -65,7 +65,7 @@ export const LeaderBoard = ({
                   {shortAddress(address, 8)}
                 </span>
               </div>
-              <div className="flex flex-1 justify-start text-white font-semibold">
+              <div className="flex flex-1 justify-start items-center text-white font-semibold">
                 {value}
               </div>
             </div>

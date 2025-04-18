@@ -45,7 +45,7 @@ const Profit = ({
   )
 
   return (
-    <div className="flex group relative gap-2 sm:gap-3">
+    <div className="flex flex-col sm:flex-row group relative gap-1 sm:gap-2 py-2">
       {data.length > 0 && (
         <div className="hidden group-hover:flex absolute top-8 -left-20 sm:left-2 z-[1000]">
           <Legend data={data} />
@@ -59,21 +59,16 @@ const Profit = ({
         {toCommaSeparated(Math.abs(profit).toFixed(4))}
       </div>
 
-      <div className="justify-start items-center flex relative">
+      <div className="items-center flex relative">
         {trades
           .sort((a, b) => b.currency.address.localeCompare(a.currency.address))
           .map(({ currency }, i) => (
             <CurrencyIcon
               chain={chain}
               key={`trading-competition-currency-icon-${i}`}
-              currency={{
-                address: getAddress(currency.address),
-                name: currency.symbol,
-                symbol: currency.symbol,
-                decimals: 18,
-                icon: tokenColorMap[getAddress(currency.address)],
-              }}
-              className={`rounded-full ${i > 0 ? 'absolute top-0' : ''} left-[${10 * i}px] lg:left-[${12 * i}px]  w-[16px] lg:w-[20px] h-[16px] lg:h-[20px] z-[${i + 1}]`}
+              currency={currency}
+              className={`rounded-full ${i > 0 ? 'absolute' : ''} w-[16px] h-[16px]`}
+              style={i > 0 ? { left: `${12 * i}px z-[${i + 1}]` } : undefined}
             />
           ))}
       </div>
