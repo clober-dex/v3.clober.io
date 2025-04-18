@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
-import { createPublicClient, getAddress, http } from 'viem'
+import { createPublicClient, getAddress, http, zeroAddress } from 'viem'
 import { useAccount, useDisconnect, useWalletClient } from 'wagmi'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import CountUp from 'react-countup'
@@ -18,12 +18,16 @@ import { fetchTradingCompetitionLeaderboard } from '../apis/trading-competition'
 import { useCurrencyContext } from '../contexts/currency-context'
 import { TradingCompetitionPnl } from '../model/trading-competition-pnl'
 import { Legend } from '../components/chart/legend'
+import { CurrencyIcon } from '../components/icon/currency-icon'
+import { Chain } from '../model/chain'
 
 const Profit = ({
+  chain,
   profit,
   tokenColorMap,
   trades,
 }: {
+  chain: Chain
   profit: number
   tokenColorMap: { [address: string]: string }
   trades: TradingCompetitionPnl['trades']
@@ -41,7 +45,7 @@ const Profit = ({
   )
 
   return (
-    <div className="flex group relative">
+    <div className="flex group relative gap-2 sm:gap-3">
       {data.length > 0 && (
         <div className="hidden group-hover:flex absolute top-8 -left-20 sm:left-2 z-[1000]">
           <Legend data={data} />
@@ -53,6 +57,25 @@ const Profit = ({
       >
         {profit === 0 ? ' ' : profit > 0 ? '+' : '-'}$
         {toCommaSeparated(Math.abs(profit).toFixed(4))}
+      </div>
+
+      <div className="justify-start items-center flex relative">
+        {trades
+          .sort((a, b) => b.currency.address.localeCompare(a.currency.address))
+          .map(({ currency }, i) => (
+            <CurrencyIcon
+              chain={chain}
+              key={`trading-competition-currency-icon-${i}`}
+              currency={{
+                address: getAddress(currency.address),
+                name: currency.symbol,
+                symbol: currency.symbol,
+                decimals: 18,
+                icon: tokenColorMap[getAddress(currency.address)],
+              }}
+              className={`rounded-full ${i > 0 ? 'absolute top-0' : ''} left-[${10 * i}px] lg:left-[${12 * i}px]  w-[16px] lg:w-[20px] h-[16px] lg:h-[20px] z-[${i + 1}]`}
+            />
+          ))}
       </div>
     </div>
   )
@@ -482,6 +505,7 @@ export const TradingCompetitionContainer = () => {
                     address: userAddress,
                     value: (
                       <Profit
+                        chain={selectedChain}
                         profit={data?.userPnL?.totalPnl ?? 0}
                         tokenColorMap={tokenColorMap}
                         trades={data?.userPnL?.trades ?? []}
@@ -497,6 +521,7 @@ export const TradingCompetitionContainer = () => {
                 address: getAddress(address),
                 value: (
                   <Profit
+                    chain={selectedChain}
                     profit={totalPnl}
                     tokenColorMap={tokenColorMap}
                     trades={trades}
