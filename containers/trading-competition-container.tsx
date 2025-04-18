@@ -3,6 +3,7 @@ import { createPublicClient, getAddress, http } from 'viem'
 import { useAccount, useDisconnect, useWalletClient } from 'wagmi'
 import { useQuery } from '@tanstack/react-query'
 import BigNumber from 'bignumber.js'
+import { useQueryClient } from '@tanstack/react-query/build/modern/index'
 
 import { ActionButton } from '../components/button/action-button'
 import { toCommaSeparated } from '../utils/number'
@@ -56,6 +57,7 @@ const Profit = ({
 }
 
 export const TradingCompetitionContainer = () => {
+  const queryClient = useQueryClient()
   const { setConfirmation, queuePendingTransaction } = useTransactionContext()
   const { disconnectAsync } = useDisconnect()
   const { data: walletClient } = useWalletClient()
@@ -180,10 +182,14 @@ export const TradingCompetitionContainer = () => {
       console.error('Error registering for trading competition:', error)
     } finally {
       setConfirmation(undefined)
+      await queryClient.invalidateQueries({
+        queryKey: ['is-register-trading-competition'],
+      })
     }
   }, [
     disconnectAsync,
     publicClient,
+    queryClient,
     queuePendingTransaction,
     selectedChain,
     setConfirmation,
@@ -413,7 +419,7 @@ export const TradingCompetitionContainer = () => {
             text={
               userAddress
                 ? isRegistered
-                  ? 'Already Registered'
+                  ? 'You’re in. Good luck!'
                   : 'Register'
                 : 'Connect Wallet to Register'
             }
