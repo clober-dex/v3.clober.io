@@ -96,7 +96,7 @@ export default function Analytics() {
 
               <div className="flex w-[350px] sm:w-[500px]">
                 <HistogramChart
-                  prefix={'$ '}
+                  prefix={'$'}
                   data={analytics.map((item) => ({
                     time: item.timestamp as UTCTimestamp,
                     values: {
