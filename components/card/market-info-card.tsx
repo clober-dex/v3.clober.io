@@ -3,6 +3,7 @@ import { Currency } from '@clober/v2-sdk'
 import Link from 'next/link'
 import BigNumber from 'bignumber.js'
 import { isAddressEqual } from 'viem'
+import { NextRouter } from 'next/router'
 
 import { CurrencyIcon } from '../icon/currency-icon'
 import { toHumanReadableString, toShortNumber } from '../../utils/number'
@@ -12,9 +13,11 @@ import { ClipboardSvg } from '../svg/clipboard-svg'
 import { Toast } from '../toast'
 import { ActionButton } from '../button/action-button'
 import { Chain } from '../../model/chain'
+import { WHITE_LISTED_ASSETS } from '../../constants/futures/asset'
 
 export const MarketInfoCard = ({
   chain,
+  router,
   baseCurrency,
   quoteCurrency,
   price,
@@ -28,6 +31,7 @@ export const MarketInfoCard = ({
   telegramUrl,
 }: {
   chain: Chain
+  router: NextRouter
   baseCurrency: Currency
   quoteCurrency: Currency
   price: number
@@ -72,43 +76,14 @@ export const MarketInfoCard = ({
 
             <div className="flex flex-col justify-center gap-0.5 lg:gap-1 lg:w-[200px] overflow-y-hidden">
               <div className="flex flex-row gap-2 w-full h-full justify-start items-center">
-                <div className="text-white text-base lg:text-lg font-semibold text-nowrap">
+                <div className="text-white text-base lg:text-lg lg:max-w-[200px] font-semibold text-nowrap overflow-y-hidden">
                   <span>{baseCurrency.symbol} </span>
                   <span className="text-[#8690a5]">/</span>
                   <span> {quoteCurrency.symbol}</span>
                 </div>
-                {isAddressEqual(
-                  baseCurrency.address,
-                  '0x836047a99e11f376522b447bffb6e3495dd0637c',
-                ) && (
-                  <ActionButton
-                    disabled={false}
-                    onClick={async () => {
-                      window.open(
-                        `https://testnet.orbiter.finance/en?src_chain=11155111&tgt_chain=10143&src_token=ETH`,
-                        '_blank',
-                      )
-                    }}
-                    text="Bridge"
-                    className="disabled:text-gray-400 text-white text-[13px] font-semibold px-2 py-0.5 bg-purple-500 rounded justify-center items-center flex"
-                  />
-                )}
-                {isAddressEqual(
-                  baseCurrency.address,
-                  '0xA296f47E8Ff895Ed7A092b4a9498bb13C46ac768',
-                ) && (
-                  <ActionButton
-                    disabled={false}
-                    onClick={async () => {
-                      window.open(`https://www.monadbridge.com/`, '_blank')
-                    }}
-                    text="Bridge"
-                    className="disabled:text-gray-400 text-white text-[13px] font-semibold px-2 py-0.5 bg-purple-500 rounded justify-center items-center flex"
-                  />
-                )}
               </div>
 
-              <div className="flex items-center gap-1 lg:gap-1.5">
+              <div className="flex items-center gap-1.5">
                 <button
                   onClick={async () => {
                     await handleCopyClipBoard(baseCurrency.address)
@@ -193,6 +168,57 @@ export const MarketInfoCard = ({
                       />
                     </svg>
                   </Link>
+                ) : (
+                  <></>
+                )}
+
+                {twitterUrl.length + telegramUrl.length + websiteUrl.length ===
+                0 ? (
+                  <>
+                    {isAddressEqual(
+                      baseCurrency.address,
+                      '0x836047a99e11f376522b447bffb6e3495dd0637c',
+                    ) && (
+                      <ActionButton
+                        disabled={false}
+                        onClick={async () => {
+                          window.open(
+                            `https://testnet.orbiter.finance/en?src_chain=11155111&tgt_chain=10143&src_token=ETH`,
+                            '_blank',
+                          )
+                        }}
+                        text="Bridge"
+                        className="disabled:text-gray-400 text-white text-xs font-semibold px-2 py-0.5 bg-blue-500 rounded justify-center items-center flex"
+                      />
+                    )}
+
+                    {isAddressEqual(
+                      baseCurrency.address,
+                      '0xA296f47E8Ff895Ed7A092b4a9498bb13C46ac768',
+                    ) && (
+                      <ActionButton
+                        disabled={false}
+                        onClick={async () => {
+                          window.open(`https://www.monadbridge.com/`, '_blank')
+                        }}
+                        text="Bridge"
+                        className="disabled:text-gray-400 text-white text-xs font-semibold px-2 py-0.5 bg-blue-500 rounded justify-center items-center flex"
+                      />
+                    )}
+
+                    {WHITE_LISTED_ASSETS.some((address) =>
+                      isAddressEqual(baseCurrency.address, address),
+                    ) && (
+                      <ActionButton
+                        disabled={false}
+                        onClick={() => {
+                          router.push(`/futures/mint/${baseCurrency.address}`)
+                        }}
+                        text="Mint"
+                        className="disabled:text-gray-400 text-white text-xs font-semibold px-2 py-0.5 bg-blue-500 rounded justify-center items-center flex"
+                      />
+                    )}
+                  </>
                 ) : (
                   <></>
                 )}

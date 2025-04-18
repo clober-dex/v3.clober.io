@@ -476,6 +476,7 @@ export const TradeContainer = () => {
               <>
                 <MarketInfoCard
                   chain={selectedChain}
+                  router={router}
                   baseCurrency={
                     {
                       ...baseCurrency,
