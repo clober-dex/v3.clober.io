@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 import { createPublicClient, getAddress, http } from 'viem'
 import { useAccount, useDisconnect, useWalletClient } from 'wagmi'
 import { useQuery } from '@tanstack/react-query'
+import BigNumber from 'bignumber.js'
 
 import { ActionButton } from '../components/button/action-button'
 import { toCommaSeparated } from '../utils/number'
@@ -17,29 +18,30 @@ import { fetchTradingCompetitionLeaderboard } from '../apis/trading-competition'
 import { useCurrencyContext } from '../contexts/currency-context'
 import { TradingCompetitionPnl } from '../model/trading-competition-pnl'
 import { Legend } from '../components/chart/legend'
-import { Prices } from '../model/prices'
 
 const Profit = ({
   profit,
   tokenColorMap,
   trades,
-  prices,
 }: {
   profit: number
   tokenColorMap: { [address: string]: string }
   trades: TradingCompetitionPnl['trades']
-  prices: Prices
 }) => {
   return (
     <div className="flex group relative">
-      <div className="hidden group-hover:flex absolute top-8 left-2 z-[1000]">
+      <div className="hidden group-hover:flex absolute top-8 left-2">
         <Legend
           data={
-            trades.map(({ currency, amount }) => ({
-              label: currency.symbol,
-              color: tokenColorMap[getAddress(currency.address)],
-              value: `$${toCommaSeparated((amount * (prices[currency.address] ?? 0)).toFixed(2))}`,
-            })) ?? []
+            trades
+              .filter(({ pnl }) =>
+                new BigNumber(Math.abs(pnl).toFixed(2)).gt(0),
+              )
+              .map(({ currency, pnl }) => ({
+                label: currency.symbol,
+                color: tokenColorMap[getAddress(currency.address)],
+                value: `${pnl === 0 ? '' : pnl > 0 ? '+' : '-'}$${toCommaSeparated(Math.abs(pnl).toFixed(2))}`,
+              })) ?? []
           }
         />
       </div>
@@ -47,8 +49,7 @@ const Profit = ({
       <div
         className={`flex flex-1 justify-start items-center ${profit === 0 ? 'text-white' : profit > 0 ? 'text-green-500' : 'text-red-500'} font-semibold`}
       >
-        {profit > 0 ? '+' : '-'} $
-        {toCommaSeparated(Math.abs(profit).toFixed(2))}
+        {profit > 0 ? '+' : '-'}${toCommaSeparated(Math.abs(profit).toFixed(2))}
       </div>
     </div>
   )
@@ -410,7 +411,6 @@ export const TradingCompetitionContainer = () => {
                         profit={data?.userPnL?.totalPnl ?? 0}
                         tokenColorMap={tokenColorMap}
                         trades={data?.userPnL?.trades ?? []}
-                        prices={prices}
                       />
                     ),
                   }
@@ -426,7 +426,6 @@ export const TradingCompetitionContainer = () => {
                     profit={totalPnl}
                     tokenColorMap={tokenColorMap}
                     trades={trades}
-                    prices={prices}
                   />
                 ),
                 rank: index + 1,
