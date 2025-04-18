@@ -280,6 +280,13 @@ export const WHITELISTED_CURRENCIES: {
       decimals: 6,
     },
     {
+      address: '0xb38bb873cca844b20A9eE448a87Af3626a6e1EF5',
+      name: 'MistToken',
+      symbol: 'MIST',
+      decimals: 18,
+      icon: '/mist-logo.png',
+    },
+    {
       address: '0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701',
       name: 'Wrapped Monad Token',
       symbol: 'WMON',
