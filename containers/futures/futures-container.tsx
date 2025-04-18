@@ -126,7 +126,7 @@ export const FuturesContainer = () => {
                 Max LTV
               </div>
             </div>
-            <div className="relative flex justify-center w-full h-full lg:h-[460px] mb-6">
+            <div className="relative flex justify-center w-full h-full lg:h-[680px] mb-6">
               <div className="lg:absolute lg:top-0 lg:overflow-x-scroll w-full h-full items-center flex flex-1 flex-col md:grid md:grid-cols-2 lg:flex gap-3">
                 {assets
                   .filter((asset) => asset.expiration > now)
