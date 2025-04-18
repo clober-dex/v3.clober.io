@@ -18,6 +18,7 @@ import { QuestionMarkSvg } from '../../components/svg/question-mark-svg'
 import { AddLiquidityForm } from '../../components/form/vault/add-liquidity-form'
 import { RemoveLiquidityForm } from '../../components/form/vault/remove-liquidity-form'
 import { toCommaSeparated } from '../../utils/number'
+import { dollarValue } from '../../utils/bigint'
 
 import { VaultChartContainer } from './vault-chart-container'
 
@@ -273,7 +274,7 @@ export const VaultManagerContainer = ({
               <div className="text-white text-sm md:text-base font-bold">
                 Reserve
               </div>
-              <div className="self-stretch p-4 sm:px-6 sm:py-5 bg-[#171b24] rounded-xl flex flex-col justify-center items-center gap-3 sm:gap-3.5">
+              <div className="self-stretch px-2.5 py-4 sm:p-4 bg-[#171b24] rounded-xl flex flex-col justify-center items-center gap-3 sm:gap-3.5">
                 <div className="self-stretch w-full h-full inline-flex justify-start items-center gap-1">
                   <div
                     style={{
@@ -290,44 +291,58 @@ export const VaultManagerContainer = ({
                 </div>
 
                 <div className="self-stretch inline-flex justify-between items-center">
-                  <div className="flex justify-center gap-2 md:gap-4">
+                  <div className="flex flex-1 justify-start gap-2 md:gap-4">
                     <div className="flex items-center gap-1 md:gap-2">
                       <CurrencyIcon
                         chain={selectedChain}
                         currency={vault.currencyA}
                         className="w-5 h-5 md:w-6 md:h-6 rounded-full"
                       />
-                      <div className="text-center text-gray-400 text-sm md:text-base font-semibold">
-                        {vault.currencyA.symbol}
-                      </div>
                     </div>
-                    <div className="text-center text-blue-500 text-sm md:text-lg font-bold ">
+                    <div className="text-center text-blue-500 text-sm md:text-lg font-bold flex flex-row gap-1 items-center h-full">
                       {toCommaSeparated(
                         toPlacesAmountString(
                           vault.reserveA.toString(),
                           prices[vault.currencyA.address] ?? 0,
                         ),
                       )}
+                      <span className="text-gray-400 font-medium text-xs sm:text-sm">
+                        ($
+                        {toCommaSeparated(
+                          new BigNumber(
+                            vault.reserveA *
+                              (prices[vault.currencyA.address] ?? 0),
+                          ).toFixed(0),
+                        )}
+                        )
+                      </span>
                     </div>
                   </div>
-                  <div className="flex justify-center gap-2 md:gap-4">
+                  <div className="flex flex-1 justify-start gap-2 md:gap-4">
                     <div className="flex items-center gap-1 md:gap-2">
                       <CurrencyIcon
                         chain={selectedChain}
                         currency={vault.currencyB}
                         className="w-5 h-5 md:w-6 md:h-6 rounded-full"
                       />
-                      <div className="text-center text-gray-400 text-sm md:text-base font-semibold">
-                        {vault.currencyB.symbol}
-                      </div>
                     </div>
-                    <div className="text-center text-cyan-400 text-sm md:text-lg font-bold ">
+                    <div className="text-center text-blue-500 text-sm md:text-lg font-bold flex flex-row gap-1 items-center h-full">
                       {toCommaSeparated(
                         toPlacesAmountString(
                           vault.reserveB.toString(),
                           prices[vault.currencyB.address] ?? 0,
                         ),
                       )}
+                      <span className="text-gray-400 font-medium text-xs sm:text-sm">
+                        ($
+                        {toCommaSeparated(
+                          new BigNumber(
+                            vault.reserveB *
+                              (prices[vault.currencyB.address] ?? 0),
+                          ).toFixed(0),
+                        )}
+                        )
+                      </span>
                     </div>
                   </div>
                 </div>
