@@ -30,11 +30,13 @@ const Profit = ({
 }) => {
   const data = useMemo(
     () =>
-      trades.map(({ currency, pnl }) => ({
-        label: currency.symbol,
-        color: tokenColorMap[getAddress(currency.address)],
-        value: `${pnl === 0 ? '' : pnl > 0 ? '+' : '-'}$${toCommaSeparated(Math.abs(pnl).toFixed(4))}`,
-      })) ?? [],
+      trades
+        .filter(({ pnl }) => Math.abs(pnl) > 0.001)
+        .map(({ currency, pnl }) => ({
+          label: currency.symbol,
+          color: tokenColorMap[getAddress(currency.address)],
+          value: `${pnl === 0 ? '' : pnl > 0 ? '+' : '-'}$${toCommaSeparated(Math.abs(pnl).toFixed(4))}`,
+        })) ?? [],
     [tokenColorMap, trades],
   )
 
