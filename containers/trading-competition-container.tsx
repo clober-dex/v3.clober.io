@@ -5,7 +5,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import CountUp from 'react-countup'
 
 import { ActionButton } from '../components/button/action-button'
-import { toCommaSeparated, toHumanReadableString } from '../utils/number'
+import { toCommaSeparated } from '../utils/number'
 import { buildTransaction } from '../utils/build-transaction'
 import { RPC_URL } from '../constants/rpc-url'
 import { useChainContext } from '../contexts/chain-context'
@@ -43,7 +43,7 @@ const Profit = ({
   return (
     <div className="flex group relative">
       {data.length > 0 && (
-        <div className="hidden group-hover:flex absolute top-8 -left-20 sm:left-2">
+        <div className="hidden group-hover:flex absolute top-8 -left-20 sm:left-2 z-[1000]">
           <Legend data={data} />
         </div>
       )}
