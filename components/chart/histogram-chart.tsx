@@ -65,13 +65,19 @@ export const HistogramChart = ({
                   time={crosshairData?.time}
                   detailData={
                     crosshairData
-                      ? detailData.map(({ label, color }) => ({
-                          label,
-                          value: toHumanReadableString(
-                            crosshairData.values[label] ?? 0,
-                          ),
-                          color,
-                        }))
+                      ? detailData
+                          .map(({ label, color }) => ({
+                            label,
+                            value: toHumanReadableString(
+                              crosshairData.values[label] ?? 0,
+                            ),
+                            color,
+                          }))
+                          .sort(
+                            (a, b) =>
+                              (crosshairData.values[a.label] ?? 0) -
+                              (crosshairData.values[b.label] ?? 0),
+                          )
                       : []
                   }
                 />
