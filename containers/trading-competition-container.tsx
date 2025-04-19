@@ -585,7 +585,7 @@ export const TradingCompetitionContainer = () => {
       <div className="w-full flex justify-center relative">
         <div className="w-full md:w-[616px] overflow-x-hidden mt-4 sm:mt-8 relative">
           <div className="flex w-max animate-marquee items-center h-[60px]">
-            {Array.from({ length: 2 })
+            {Array.from({ length: 3 })
               .flatMap(() => ASSETS)
               .map((currency, i) => {
                 const isLong = i % 2 === 0
