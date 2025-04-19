@@ -18,8 +18,18 @@ const config: Config = {
         'slide-in': 'slide-in 0.3s ease-out forwards',
         'slide-out': 'slide-out 0.3s ease-in forwards',
         marquee: 'marquee 20s linear infinite',
+        'bounce-up': 'bounce-up 1.4s ease-in-out infinite',
+        'bounce-down': 'bounce-down 1.4s ease-in-out infinite',
       },
       keyframes: {
+        'bounce-up': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-6%)' },
+        },
+        'bounce-down': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(6%)' },
+        },
         marquee: {
           '0%': { transform: 'translateX(0%)' },
           '100%': { transform: 'translateX(-50%)' },

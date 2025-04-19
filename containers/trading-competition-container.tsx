@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPublicClient, getAddress, http } from 'viem'
 import { useAccount, useDisconnect, useWalletClient } from 'wagmi'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -312,6 +312,48 @@ export const TradingCompetitionContainer = () => {
     )
   }, [data?.allUsersPnL])
 
+  const intervalRef = useRef<number | null>(null)
+  const hoveredElementRef = useRef<HTMLElement | null>(null)
+
+  const [hoveredBadge, setHoveredBadge] = useState<{
+    x: number
+    y: number
+    label: 'LONG' | 'SHORT'
+    color: 'green' | 'red'
+  } | null>(null)
+
+  useEffect(
+    () => {
+      if (!hoveredElementRef.current) {
+        return
+      }
+
+      const updatePosition = () => {
+        const rect = hoveredElementRef.current!.getBoundingClientRect()
+        setHoveredBadge((prev) =>
+          prev
+            ? {
+                ...prev,
+                x: rect.left + rect.width / 2,
+                y: rect.bottom,
+              }
+            : null,
+        )
+      }
+
+      intervalRef.current = window.setInterval(updatePosition, 4)
+
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current)
+          intervalRef.current = null
+        }
+      }
+    },
+    // @ts-ignore
+    [hoveredElementRef.current],
+  )
+
   return (
     <div className="w-full flex flex-col text-white mb-4 mt-2 px-4">
       <div className="flex flex-col gap-3 lg:gap-7 w-full text-center justify-center items-center text-white text-base sm:text-2xl font-bold">
@@ -540,35 +582,87 @@ export const TradingCompetitionContainer = () => {
         </div>
       </div>
 
-      <div className="w-full md:flex md:justify-center">
-        <div className="md:w-[616px] w-full mt-4 sm:mt-8 overflow-x-hidden items-center">
-          <div className="flex w-max animate-marquee h-[44px] sm:h-[60px] items-center">
-            {[
-              ...ASSETS,
-              ...ASSETS,
-              ...ASSETS,
-              ...ASSETS,
-              ...ASSETS,
-              ...ASSETS,
-            ].map((currency, i) => (
-              <button
-                onClick={() =>
-                  router.push(
-                    `/trade?inputCurrency=0xf817257fed379853cDe0fa4F97AB987181B1E5Ea&outputCurrency=${currency.address}`,
-                  )
-                }
-                key={`currency-icon-${i}`}
-                className="flex items-center"
-              >
-                <CurrencyIcon
-                  chain={selectedChain}
-                  currency={currency}
-                  className="w-[28px] h-[28px] sm:w-[36px] sm:h-[36px] rounded-full mx-2 transition-transform duration-300 hover:scale-150"
-                />
-              </button>
-            ))}
+      <div className="w-full flex justify-center relative">
+        <div className="w-full md:w-[616px] overflow-x-hidden mt-4 sm:mt-8 relative">
+          <div className="flex w-max animate-marquee items-center h-[60px]">
+            {Array.from({ length: 2 })
+              .flatMap(() => ASSETS)
+              .map((currency, i) => {
+                const isLong = i % 2 === 0
+                return (
+                  <button
+                    key={`icon-${i}`}
+                    ref={(el) => {
+                      if (
+                        hoveredBadge &&
+                        el?.contains(document.activeElement)
+                      ) {
+                        hoveredElementRef.current = el
+                      }
+                    }}
+                    onClick={() =>
+                      isLong
+                        ? router.push(
+                            `/trade?inputCurrency=0xf817257fed379853cDe0fa4F97AB987181B1E5Ea&outputCurrency=${currency.address}`,
+                          )
+                        : router.push(`/futures/mint/${currency.address}`)
+                    }
+                    className="group relative flex flex-col items-center mx-2 z-[10]"
+                    onMouseEnter={(e) => {
+                      hoveredElementRef.current = e.currentTarget
+                      const rect = e.currentTarget.getBoundingClientRect()
+                      setHoveredBadge({
+                        x: rect.left + rect.width / 2,
+                        y: rect.bottom,
+                        label: isLong ? 'LONG' : 'SHORT',
+                        color: isLong ? 'green' : 'red',
+                      })
+                    }}
+                    onMouseLeave={() => {
+                      if (intervalRef.current) {
+                        clearInterval(intervalRef.current)
+                        intervalRef.current = null
+                      }
+                      hoveredElementRef.current = null
+                      setHoveredBadge(null)
+                    }}
+                  >
+                    <div className="transition-transform duration-300 transform group-hover:scale-150">
+                      <CurrencyIcon
+                        chain={selectedChain}
+                        currency={currency}
+                        className={`w-[28px] h-[28px] sm:w-[36px] sm:h-[36px] rounded-full transition-transform duration-300 transform ${isLong ? 'animate-bounce-up' : 'animate-bounce-down grayscale group-hover:grayscale-0'}`}
+                      />
+                    </div>
+                  </button>
+                )
+              })}
           </div>
         </div>
+
+        {hoveredBadge && (
+          <div
+            className="fixed z-[9999] pointer-events-none transition-opacity duration-200"
+            style={{
+              top: hoveredBadge.y + 16,
+              left: hoveredBadge.x - 1.5,
+              transform: 'translateX(-50%)',
+            }}
+          >
+            <div
+              className="px-2 py-0.5 rounded-full text-[11px] font-semibold border shadow-md"
+              style={{
+                backgroundColor:
+                  hoveredBadge.color === 'green' ? '#ecfdf5' : '#fee2e2',
+                color: hoveredBadge.color === 'green' ? '#059669' : '#b91c1c',
+                borderColor:
+                  hoveredBadge.color === 'green' ? '#34d399' : '#f87171',
+              }}
+            >
+              {hoveredBadge.label}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="w-full md:flex md:justify-center">
