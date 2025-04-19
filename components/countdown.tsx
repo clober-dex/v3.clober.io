@@ -24,20 +24,26 @@ const TimeUnit = ({
   value: number
   prevValue: number
 }) => {
+  const hasChanged = value !== prevValue
+
   return (
     <div className="flex flex-col items-center w-16">
       <div className="w-full h-12 relative overflow-hidden text-2xl sm:text-4xl font-bold">
         {/* prev */}
-        <div
-          key={`prev-${label}-${prevValue}`}
-          className="absolute inset-0 flex items-center justify-center animate-slide-out"
-        >
-          {String(prevValue).padStart(2, '0')}
-        </div>
+        {hasChanged && (
+          <div
+            key={`prev-${label}-${prevValue}`}
+            className="absolute inset-0 flex items-center justify-center animate-slide-out"
+          >
+            {String(prevValue).padStart(2, '0')}
+          </div>
+        )}
         {/* current */}
         <div
           key={`curr-${label}-${value}`}
-          className="absolute inset-0 flex items-center justify-center animate-slide-in"
+          className={`absolute inset-0 flex items-center justify-center ${
+            hasChanged ? 'animate-slide-in' : ''
+          }`}
         >
           {String(value).padStart(2, '0')}
         </div>
