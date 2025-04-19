@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { createPublicClient, getAddress, http } from 'viem'
 import { useAccount, useDisconnect, useWalletClient } from 'wagmi'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import CountUp from 'react-countup'
+import { useRouter } from 'next/router'
 
 import { ActionButton } from '../components/button/action-button'
 import { toCommaSeparated } from '../utils/number'
@@ -78,6 +79,7 @@ const Profit = ({
 }
 
 export const TradingCompetitionContainer = () => {
+  const router = useRouter()
   const queryClient = useQueryClient()
   const { setConfirmation, queuePendingTransaction } = useTransactionContext()
   const { disconnectAsync } = useDisconnect()
@@ -446,12 +448,21 @@ export const TradingCompetitionContainer = () => {
       <div className="flex w-full justify-center mt-8 lg:mt-10">
         <div className="flex text-base lg:text-lg w-full sm:w-[410px]">
           <ActionButton
-            disabled={!userAddress || isRegistered}
-            onClick={register}
+            disabled={!userAddress}
+            onClick={async () => {
+              if (!userAddress) {
+                return
+              }
+              if (isRegistered) {
+                await router.push(`/futures`)
+                return
+              }
+              await register()
+            }}
             text={
               userAddress
                 ? isRegistered
-                  ? 'You’re in. Good luck!'
+                  ? 'Off you go, Trading warrior!'
                   : 'Register'
                 : 'Connect Wallet to Register'
             }
