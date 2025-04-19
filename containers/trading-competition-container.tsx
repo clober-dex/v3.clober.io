@@ -3,7 +3,6 @@ import { createPublicClient, getAddress, http } from 'viem'
 import { useAccount, useDisconnect, useWalletClient } from 'wagmi'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import CountUp from 'react-countup'
-import { useRouter } from 'next/router'
 
 import { ActionButton } from '../components/button/action-button'
 import { toCommaSeparated } from '../utils/number'
@@ -79,7 +78,6 @@ const Profit = ({
 }
 
 export const TradingCompetitionContainer = () => {
-  const router = useRouter()
   const queryClient = useQueryClient()
   const { setConfirmation, queuePendingTransaction } = useTransactionContext()
   const { disconnectAsync } = useDisconnect()
@@ -454,7 +452,10 @@ export const TradingCompetitionContainer = () => {
                 return
               }
               if (isRegistered) {
-                await router.push(`/futures`)
+                window.open(
+                  `https://x.com/CloberDEX/status/1913171010754613658`,
+                  '_blank',
+                )
                 return
               }
               await register()
