@@ -3,6 +3,7 @@ import { createPublicClient, getAddress, http } from 'viem'
 import { useAccount, useDisconnect, useWalletClient } from 'wagmi'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import CountUp from 'react-countup'
+import { useRouter } from 'next/router'
 
 import { ActionButton } from '../components/button/action-button'
 import { toCommaSeparated } from '../utils/number'
@@ -21,6 +22,73 @@ import { Legend } from '../components/chart/legend'
 import { CurrencyIcon } from '../components/icon/currency-icon'
 import { Chain } from '../model/chain'
 import { Countdown } from '../components/countdown'
+import { Currency } from '../model/currency'
+
+const ASSETS: Currency[] = [
+  {
+    address: '0xcaeF04f305313080C2538e585089846017193033',
+    name: 'USOILSPOT 2025-05-16',
+    symbol: 'USOILSPOT-250516',
+    decimals: 18,
+    icon: 'https://s3-symbol-logo.tradingview.com/crude-oil--big.svg',
+  },
+  {
+    address: '0xCAfFD292a5c578Dbd4BBff733F1553bF2cD8850c',
+    name: 'XAU 2025-05-16',
+    symbol: 'XAU-250516',
+    decimals: 18,
+    icon: 'https://s3-symbol-logo.tradingview.com/metal/gold--big.svg',
+  },
+  {
+    address: '0x746e48E2CDD8F6D0B672adAc7810f55658dC801b',
+    name: 'EUR 2025-05-16',
+    symbol: 'EUR-250516',
+    decimals: 18,
+    icon: 'https://s3-symbol-logo.tradingview.com/country/EU--big.svg',
+  },
+  {
+    address: '0x5F433CFeB6CB2743481a096a56007a175E12ae23',
+    name: 'BTC 2025-05-16',
+    symbol: 'BTC-250516',
+    decimals: 18,
+    icon: 'https://s3-symbol-logo.tradingview.com/crypto/XTVCBTC--big.svg',
+  },
+  {
+    address: '0x53E2BB2d88DdC44CC395a0CbCDDC837AeF44116D',
+    name: 'AAPL 2025-05-16',
+    symbol: 'AAPL-250516',
+    decimals: 18,
+    icon: 'https://s3-symbol-logo.tradingview.com/apple--big.svg',
+  },
+  {
+    address: '0xd57e27D90e04eAE2EEcBc63BA28E433098F72855',
+    name: 'GOOGL 2025-05-16',
+    symbol: 'GOOGL-250516',
+    decimals: 18,
+    icon: 'https://s3-symbol-logo.tradingview.com/alphabet--big.svg',
+  },
+  {
+    address: '0xDB1Aa7232c2fF7bb480823af254453570d0E4A16',
+    name: 'TSLA 2025-05-16',
+    symbol: 'TSLA-250516',
+    decimals: 18,
+    icon: 'https://s3-symbol-logo.tradingview.com/tesla--big.svg',
+  },
+  {
+    address: '0x24A08695F06A37C8882CD1588442eC40061e597B',
+    name: 'BRK-A 2025-05-16',
+    symbol: 'BRK-A-250516',
+    decimals: 18,
+    icon: 'https://s3-symbol-logo.tradingview.com/berkshire-hathaway--big.svg',
+  },
+  {
+    address: '0x41DF9f8a0c014a0ce398A3F2D1af3164ff0F492A',
+    name: 'US30Y 2025-05-16',
+    symbol: 'US30Y-250516',
+    decimals: 18,
+    icon: 'https://s3-symbol-logo.tradingview.com/country/US--big.svg',
+  },
+]
 
 const Profit = ({
   chain,
@@ -78,6 +146,7 @@ const Profit = ({
 }
 
 export const TradingCompetitionContainer = () => {
+  const router = useRouter()
   const queryClient = useQueryClient()
   const { setConfirmation, queuePendingTransaction } = useTransactionContext()
   const { disconnectAsync } = useDisconnect()
@@ -472,7 +541,31 @@ export const TradingCompetitionContainer = () => {
       </div>
 
       <div className="w-full md:flex md:justify-center">
-        <div className="md:w-[616px] flex w-full mt-10 sm:mt-16 px-6 sm:px-[62px] py-4 sm:py-6 bg-[#e9edff]/5 rounded-2xl sm:rounded-[20px] flex-col justify-center items-center gap-2 sm:gap-2.5">
+        <div className="md:w-[616px] w-full mt-8 overflow-x-hidden items-center">
+          <div className="flex w-max animate-marquee h-[44px] sm:h-[60px] items-center">
+            {[...ASSETS, ...ASSETS, ...ASSETS].map((currency, i) => (
+              <button
+                onClick={() =>
+                  router.push(
+                    `/trade?inputCurrency=0xf817257fed379853cDe0fa4F97AB987181B1E5Ea&outputCurrency=${currency.address}`,
+                  )
+                }
+                key={`currency-icon-${i}`}
+                className="flex items-center"
+              >
+                <CurrencyIcon
+                  chain={selectedChain}
+                  currency={currency}
+                  className="w-[28px] h-[28px] sm:w-[36px] sm:h-[36px] rounded-full mx-2 transition-transform duration-300 hover:scale-150"
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="w-full md:flex md:justify-center">
+        <div className="md:w-[616px] flex w-full mt-8 px-6 sm:px-[62px] py-4 sm:py-6 bg-[#e9edff]/5 rounded-2xl sm:rounded-[20px] flex-col justify-center items-center gap-2 sm:gap-2.5">
           <div className="w-full flex flex-col justify-start items-center gap-2 sm:gap-4">
             <div className="self-stretch text-center justify-start text-gray-400 text-[13px] sm:text-base font-bold">
               Current Participants
