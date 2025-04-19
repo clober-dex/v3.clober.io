@@ -6,6 +6,7 @@ import { Aggregator } from '../model/aggregator'
 import { MagpieAggregator } from '../model/aggregator/magpie'
 import { OpenOceanAggregator } from '../model/aggregator/openocean'
 import { CloberV2Aggregator } from '../model/aggregator/clober-v2'
+import { AggregatorRouterGateway } from '../model/aggregator/router-gateway'
 
 import { riseSepolia } from './chains/rise-sepolia'
 
@@ -27,10 +28,17 @@ export const AGGREGATORS: {
       getContractAddresses({ chainId: CHAIN_IDS.MONAD_TESTNET }).Controller,
       monadTestnet,
     ),
-    new OpenOceanAggregator(
-      // getAddress('0xfD845859628946B317A78A9250DA251114FbD846'), // aggregator wrapper
-      getAddress('0x6352a56caadC4F1E25CD6c75970Fa768A3304e64'),
+    // new OpenOceanAggregator(
+    //   getAddress('0x6352a56caadC4F1E25CD6c75970Fa768A3304e64'),
+    //   monadTestnet,
+    // ),
+    new AggregatorRouterGateway(
+      getAddress('0xfD845859628946B317A78A9250DA251114FbD846'),
       monadTestnet,
+      new OpenOceanAggregator(
+        getAddress('0x6352a56caadC4F1E25CD6c75970Fa768A3304e64'),
+        monadTestnet,
+      ),
     ),
   ],
   [CHAIN_IDS.RISE_SEPOLIA]: [
