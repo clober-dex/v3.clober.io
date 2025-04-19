@@ -543,7 +543,14 @@ export const TradingCompetitionContainer = () => {
       <div className="w-full md:flex md:justify-center">
         <div className="md:w-[616px] w-full mt-4 sm:mt-8 overflow-x-hidden items-center">
           <div className="flex w-max animate-marquee h-[44px] sm:h-[60px] items-center">
-            {[...ASSETS, ...ASSETS, ...ASSETS].map((currency, i) => (
+            {[
+              ...ASSETS,
+              ...ASSETS,
+              ...ASSETS,
+              ...ASSETS,
+              ...ASSETS,
+              ...ASSETS,
+            ].map((currency, i) => (
               <button
                 onClick={() =>
                   router.push(
