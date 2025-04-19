@@ -574,7 +574,7 @@ export const TradingCompetitionContainer = () => {
             text={
               userAddress
                 ? isRegistered
-                  ? 'Off you go, Trading warrior!'
+                  ? 'Welcome to the arena, trader'
                   : 'Register'
                 : 'Connect Wallet to Register'
             }
