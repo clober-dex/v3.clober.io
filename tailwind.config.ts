@@ -15,8 +15,18 @@ const config: Config = {
       animation: {
         shake: 'shake 1.0s infinite cubic-bezier(0.36, 0.07, 0.19, 0.97)',
         'infinite-scroll': 'infinite-scroll 6s linear infinite',
+        'slide-in': 'slide-in 0.3s ease-out forwards',
+        'slide-out': 'slide-out 0.3s ease-in forwards',
       },
       keyframes: {
+        'slide-in': {
+          '0%': { transform: 'translateY(-100%)', opacity: '0' },
+          '100%': { transform: 'translateY(0%)', opacity: '1' },
+        },
+        'slide-out': {
+          '0%': { transform: 'translateY(0%)', opacity: '1' },
+          '100%': { transform: 'translateY(100%)', opacity: '0' },
+        },
         'infinite-scroll': {
           from: { transform: 'translateX(0)' },
           to: { transform: 'translateX(-100%)' },

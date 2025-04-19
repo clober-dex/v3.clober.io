@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { createPublicClient, getAddress, http } from 'viem'
 import { useAccount, useDisconnect, useWalletClient } from 'wagmi'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -20,6 +20,7 @@ import { TradingCompetitionPnl } from '../model/trading-competition-pnl'
 import { Legend } from '../components/chart/legend'
 import { CurrencyIcon } from '../components/icon/currency-icon'
 import { Chain } from '../model/chain'
+import { Countdown } from '../components/countdown'
 
 const Profit = ({
   chain,
@@ -436,6 +437,10 @@ export const TradingCompetitionContainer = () => {
           </defs>
         </svg>
         Clober Trading Competition
+      </div>
+
+      <div className="w-full md:flex md:justify-center mt-3 sm:mt-6">
+        <Countdown initialSeconds={1747353600 - currentTimestampInSeconds()} />
       </div>
 
       <div className="flex w-full justify-center mt-8 lg:mt-10">
