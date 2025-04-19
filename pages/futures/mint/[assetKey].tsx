@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Link from 'next/link'
@@ -19,6 +19,13 @@ export default function MintFutureAssetManage() {
       router.query.assetKey &&
       isAddressEqual(asset.id, router.query.assetKey as `0x${string}`),
   )
+  const symbol = useMemo(() => {
+    if (!asset) {
+      return ''
+    }
+    const symbol = asset.currency.symbol
+    return symbol.slice(0, symbol.lastIndexOf('-'))
+  }, [asset])
 
   return router.query.assetKey && asset ? (
     <div className="flex flex-1 w-full">
@@ -35,7 +42,7 @@ export default function MintFutureAssetManage() {
           >
             <BackSvg className="w-4 h-4 sm:w-8 sm:h-8" />
             <div className="flex gap-2 lg:gap-4">
-              Mint <span>{asset.currency.symbol}</span>
+              Short <span>{symbol}</span>
             </div>
           </Link>
           <div className="flex flex-col lg:flex-row sm:items-center lg:items-start justify-center gap-4 mb-4 px-2 md:px-0">
