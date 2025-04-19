@@ -46,25 +46,25 @@ export const VaultDashboardContainer = ({
               <div className="w-10 h-6 md:w-14 md:h-8 shrink-0 relative">
                 <CurrencyIcon
                   chain={selectedChain}
-                  currency={vaultImmutableInfo.currencyA}
+                  currency={vaultImmutableInfo.currencyB}
                   className="w-6 h-6 md:w-8 md:h-8 absolute left-0 top-0 z-[1] rounded-full"
                 />
                 <CurrencyIcon
                   chain={selectedChain}
-                  currency={vaultImmutableInfo.currencyB}
+                  currency={vaultImmutableInfo.currencyA}
                   className="w-6 h-6 md:w-8 md:h-8 absolute left-4 md:left-6 top-0 rounded-full"
                 />
               </div>
 
               <div className="flex justify-center items-start gap-1 md:gap-2">
                 <div className="text-center text-white md:text-3xl font-bold">
-                  {vaultImmutableInfo.currencyA.symbol}
+                  {vaultImmutableInfo.currencyB.symbol}
                 </div>
                 <div className="text-center text-white md:text-3xl font-bold">
                   -
                 </div>
                 <div className="text-center text-white md:text-3xl font-bold">
-                  {vaultImmutableInfo.currencyB.symbol}
+                  {vaultImmutableInfo.currencyA.symbol}
                 </div>
               </div>
 

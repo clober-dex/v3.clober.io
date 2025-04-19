@@ -25,19 +25,19 @@ export const VaultCard = ({
           <div className="w-14 h-8 shrink-0 relative">
             <CurrencyIcon
               chain={chain}
-              currency={vault.currencyA}
+              currency={vault.currencyB}
               className="w-8 h-8 absolute left-0 top-0 z-[1] rounded-full"
             />
             <CurrencyIcon
               chain={chain}
-              currency={vault.currencyB}
+              currency={vault.currencyA}
               className="w-8 h-8 absolute left-6 top-0 rounded-full"
             />
           </div>
           <div className="flex items-center text-white text-base font-bold gap-1 text-nowrap">
-            <div>{vault.currencyA.symbol}</div>
-            <div>-</div>
             <div>{vault.currencyB.symbol}</div>
+            <div>-</div>
+            <div>{vault.currencyA.symbol}</div>
           </div>
         </div>
         <div className="w-[140px] text-white text-base font-bold flex flex-row gap-2">
