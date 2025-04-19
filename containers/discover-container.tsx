@@ -16,6 +16,7 @@ import { useTransactionContext } from '../contexts/transaction-context'
 
 type Column =
   | 'market'
+  | 'age'
   | 'price'
   | 'daily-volume'
   | 'fdv'
@@ -26,6 +27,8 @@ type SortOption =
   | 'none'
   | 'market-desc'
   | 'market-asc'
+  | 'age-desc'
+  | 'age-asc'
   | 'price-desc'
   | 'price-asc'
   | 'daily-volume-desc'
@@ -134,6 +137,10 @@ export const DiscoverContainer = () => {
           return a.baseCurrency.symbol.localeCompare(b.baseCurrency.symbol)
         } else if (sortOption === 'market-desc') {
           return b.baseCurrency.symbol.localeCompare(a.baseCurrency.symbol)
+        } else if (sortOption === 'age-asc') {
+          return a.createAt - b.createAt
+        } else if (sortOption === 'age-desc') {
+          return b.createAt - a.createAt
         } else if (sortOption === 'price-asc') {
           return a.price - b.price
         } else if (sortOption === 'price-desc') {
@@ -207,7 +214,15 @@ export const DiscoverContainer = () => {
             Market
             <TriangleDown column="market" sortOption={sortOption} />
           </button>
-          <div className="w-[180px] text-sm font-semibold">Age</div>
+          <div className="w-[180px] text-sm font-semibold">
+            <button
+              onClick={() => sort('age')}
+              className="w-[330px] flex items-center gap-1 text-sm font-semibold hover:underline cursor-pointer"
+            >
+              Age
+              <TriangleDown column="age" sortOption={sortOption} />
+            </button>
+          </div>
           <button
             onClick={() => sort('price')}
             className="w-[160px] flex items-center gap-1 text-sm font-semibold hover:underline cursor-pointer"
