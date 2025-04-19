@@ -512,7 +512,7 @@ export const TradingCompetitionContainer = () => {
         <Countdown initialSeconds={1747353600 - currentTimestampInSeconds()} />
       </div>
 
-      <div className="flex w-full justify-center mt-8 lg:mt-10">
+      <div className="flex w-full justify-center mt-4 sm:mt-8 lg:mt-10">
         <div className="flex text-base lg:text-lg w-full sm:w-[410px]">
           <ActionButton
             disabled={!userAddress}
@@ -541,7 +541,7 @@ export const TradingCompetitionContainer = () => {
       </div>
 
       <div className="w-full md:flex md:justify-center">
-        <div className="md:w-[616px] w-full mt-8 overflow-x-hidden items-center">
+        <div className="md:w-[616px] w-full mt-4 sm:mt-8 overflow-x-hidden items-center">
           <div className="flex w-max animate-marquee h-[44px] sm:h-[60px] items-center">
             {[...ASSETS, ...ASSETS, ...ASSETS].map((currency, i) => (
               <button
