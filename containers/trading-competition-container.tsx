@@ -15,7 +15,10 @@ import { useTransactionContext } from '../contexts/transaction-context'
 import { currentTimestampInSeconds } from '../utils/date'
 import { FUTURES_CONTRACT_ADDRESSES } from '../constants/futures/contract-addresses'
 import { LeaderBoard } from '../components/leader-board'
-import { fetchTradingCompetitionLeaderboard } from '../apis/trading-competition'
+import {
+  fetchTotalRegisteredUsers,
+  fetchTradingCompetitionLeaderboard,
+} from '../apis/trading-competition'
 import { useCurrencyContext } from '../contexts/currency-context'
 import { TradingCompetitionPnl } from '../model/trading-competition-pnl'
 import { Legend } from '../components/chart/legend'
@@ -182,13 +185,19 @@ export const TradingCompetitionContainer = () => {
     },
   }) as {
     data: {
-      totalRegisteredUsers: number
       userPnL: TradingCompetitionPnl
       allUsersPnL: {
         [user: `0x${string}`]: TradingCompetitionPnl
       }
     }
   }
+
+  const { data: totalRegisteredUsers } = useQuery({
+    queryKey: ['total-registered-users', selectedChain.id],
+    queryFn: async () => {
+      return fetchTotalRegisteredUsers(selectedChain.id)
+    },
+  })
 
   const { data: isRegistered } = useQuery({
     queryKey: [
@@ -671,7 +680,7 @@ export const TradingCompetitionContainer = () => {
             </div>
             <div className="self-stretch text-center justify-start text-white/90 text-2xl sm:text-[32px] font-bold">
               <CountUp
-                end={data?.totalRegisteredUsers ?? 0}
+                end={totalRegisteredUsers ?? 0}
                 formattingFn={countUpFormatter}
                 preserveValue
                 useEasing={false}
