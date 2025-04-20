@@ -1,3 +1,5 @@
+import { Chain } from './chain'
+
 export type Currency = {
   address: `0x${string}`
   name: string
@@ -7,8 +9,8 @@ export type Currency = {
   isVerified?: boolean
 }
 
-export function getLogo(currency?: Currency): string {
-  if (!currency) {
+export function getLogo(chain: Chain, currency?: Currency): string {
+  if (!currency || chain.testnet) {
     return ''
   }
   if (currency.icon) {
