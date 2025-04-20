@@ -179,15 +179,16 @@ export const fetchAllMarkets = async (
             `${book.base.id.toLowerCase()}/${book.quote.id.toLowerCase()}` ===
             log.marketCode,
         )
-        const latestPrice = Number(
-          formatPrice(
-            BigInt(book.latestPrice),
-            Number(book.quote.decimals),
-            Number(book.base.decimals),
-          ),
-        )
         const quotePrice = prices[getAddress(book.quote.id)] ?? 0
         const basePrice = prices[getAddress(book.base.id)] ?? 0
+        const latestPrice =
+          Number(
+            formatPrice(
+              BigInt(book.latestPrice),
+              Number(book.quote.decimals),
+              Number(book.base.decimals),
+            ),
+          ) * quotePrice
         const totalSupply = totalSupplyMap[getAddress(book.base.id)] ?? 0n
         if (totalSupply === 0n) {
           return null
