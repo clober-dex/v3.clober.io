@@ -12,23 +12,7 @@ const nextConfig = {
     BUILD,
   },
   images: {
-    domains: [
-      'assets.odos.xyz',
-      'img.cryptorank.io',
-      'dd.dexscreener.com',
-      'avatars.githubusercontent.com',
-      'cryptologos.cc',
-      'pyth.network',
-      'imagedelivery.net',
-      'pbs.twimg.com',
-      'www.magmastaking.xyz',
-      'kintsu-logos.s3.us-east-1.amazonaws.com',
-      'i.imghippo.com',
-      'assets.coingecko.com',
-      'storage.nadapp.net',
-      'cdn.countryflags.com',
-      's3-symbol-logo',
-    ],
+    domains: ['assets.odos.xyz', 'dd.dexscreener.com'],
   },
 }
 
