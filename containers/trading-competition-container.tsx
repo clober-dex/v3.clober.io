@@ -30,63 +30,63 @@ const ASSETS: Currency[] = [
     name: 'USOILSPOT 2025-05-16',
     symbol: 'USOILSPOT-250516',
     decimals: 18,
-    icon: 'https://s3-symbol-logo.tradingview.com/crude-oil--big.svg',
+    icon: '/asset-icon/crude-oil--big.svg',
   },
   {
     address: '0xCAfFD292a5c578Dbd4BBff733F1553bF2cD8850c',
     name: 'XAU 2025-05-16',
     symbol: 'XAU-250516',
     decimals: 18,
-    icon: 'https://s3-symbol-logo.tradingview.com/metal/gold--big.svg',
+    icon: '/asset-icon/gold--big.svg',
   },
   {
     address: '0x746e48E2CDD8F6D0B672adAc7810f55658dC801b',
     name: 'EUR 2025-05-16',
     symbol: 'EUR-250516',
     decimals: 18,
-    icon: 'https://s3-symbol-logo.tradingview.com/country/EU--big.svg',
+    icon: '/asset-icon/EU--big.svg',
   },
   {
     address: '0x5F433CFeB6CB2743481a096a56007a175E12ae23',
     name: 'BTC 2025-05-16',
     symbol: 'BTC-250516',
     decimals: 18,
-    icon: 'https://s3-symbol-logo.tradingview.com/crypto/XTVCBTC--big.svg',
+    icon: '/asset-icon/XTVCBTC--big.svg',
   },
   {
     address: '0x53E2BB2d88DdC44CC395a0CbCDDC837AeF44116D',
     name: 'AAPL 2025-05-16',
     symbol: 'AAPL-250516',
     decimals: 18,
-    icon: 'https://s3-symbol-logo.tradingview.com/apple--big.svg',
+    icon: '/asset-icon/apple--big.svg',
   },
   {
     address: '0xd57e27D90e04eAE2EEcBc63BA28E433098F72855',
     name: 'GOOGL 2025-05-16',
     symbol: 'GOOGL-250516',
     decimals: 18,
-    icon: 'https://s3-symbol-logo.tradingview.com/alphabet--big.svg',
+    icon: '/asset-icon/alphabet--big.svg',
   },
   {
     address: '0xDB1Aa7232c2fF7bb480823af254453570d0E4A16',
     name: 'TSLA 2025-05-16',
     symbol: 'TSLA-250516',
     decimals: 18,
-    icon: 'https://s3-symbol-logo.tradingview.com/tesla--big.svg',
+    icon: '/asset-icon/tesla--big.svg',
   },
   {
     address: '0x24A08695F06A37C8882CD1588442eC40061e597B',
     name: 'BRK-A 2025-05-16',
     symbol: 'BRK-A-250516',
     decimals: 18,
-    icon: 'https://s3-symbol-logo.tradingview.com/berkshire-hathaway--big.svg',
+    icon: '/asset-icon/berkshire-hathaway--big.svg',
   },
   {
     address: '0x41DF9f8a0c014a0ce398A3F2D1af3164ff0F492A',
     name: 'US30Y 2025-05-16',
     symbol: 'US30Y-250516',
     decimals: 18,
-    icon: 'https://s3-symbol-logo.tradingview.com/country/US--big.svg',
+    icon: '/asset-icon/US--big.svg',
   },
 ]
 
@@ -180,8 +180,6 @@ export const TradingCompetitionContainer = () => {
         userAddress,
       )
     },
-    refetchInterval: 5 * 1000, // checked
-    refetchIntervalInBackground: true,
   }) as {
     data: {
       totalRegisteredUsers: number
