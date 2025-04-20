@@ -11,7 +11,7 @@ export type Currency = {
 
 export function getLogo(chain: Chain, currency?: Currency): string {
   if (!currency || chain.testnet) {
-    return ''
+    return '/unknown.svg'
   }
   if (currency.icon) {
     return currency.icon
