@@ -13,6 +13,7 @@ import { QuestionMarkSvg } from '../components/svg/question-mark-svg'
 import { TriangleDownSvg } from '../components/svg/triangle-down-svg'
 import { Market } from '../model/market'
 import { useTransactionContext } from '../contexts/transaction-context'
+import { Chain } from '../model/chain'
 
 type Column =
   | 'market'
@@ -56,6 +57,8 @@ const TriangleDown = ({
   )
 }
 
+const LOCAL_STORAGE_MARKET_KEY = (chain: Chain) => `markets-${chain.id}`
+
 export const DiscoverContainer = () => {
   const { selectedChain } = useChainContext()
   const { whitelistCurrencies, prices } = useCurrencyContext()
@@ -66,7 +69,11 @@ export const DiscoverContainer = () => {
       transport: http(RPC_URL[selectedChain.id]),
     })
   }, [selectedChain])
-  const prevMarkets = useRef<Market[]>([])
+  const prevMarkets = useRef<Market[]>(
+    JSON.parse(
+      localStorage.getItem(LOCAL_STORAGE_MARKET_KEY(selectedChain)) ?? '[]',
+    ) as Market[],
+  )
   const prevSubgraphBlockNumber = useRef<number>(0)
 
   const [searchValue, setSearchValue] = React.useState('')
@@ -91,6 +98,10 @@ export const DiscoverContainer = () => {
         )
         prevMarkets.current = market
         prevSubgraphBlockNumber.current = latestSubgraphBlockNumber.blockNumber
+        localStorage.setItem(
+          LOCAL_STORAGE_MARKET_KEY(selectedChain),
+          JSON.stringify(market),
+        )
         return market
       }
       return prevMarkets.current
