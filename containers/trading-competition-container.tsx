@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPublicClient, getAddress, http } from 'viem'
 import { useAccount, useDisconnect, useWalletClient } from 'wagmi'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -22,6 +22,73 @@ import { Legend } from '../components/chart/legend'
 import { CurrencyIcon } from '../components/icon/currency-icon'
 import { Chain } from '../model/chain'
 import { Countdown } from '../components/countdown'
+import { Currency } from '../model/currency'
+
+const ASSETS: Currency[] = [
+  {
+    address: '0xcaeF04f305313080C2538e585089846017193033',
+    name: 'USOILSPOT 2025-05-16',
+    symbol: 'USOILSPOT-250516',
+    decimals: 18,
+    icon: 'https://s3-symbol-logo.tradingview.com/crude-oil--big.svg',
+  },
+  {
+    address: '0xCAfFD292a5c578Dbd4BBff733F1553bF2cD8850c',
+    name: 'XAU 2025-05-16',
+    symbol: 'XAU-250516',
+    decimals: 18,
+    icon: 'https://s3-symbol-logo.tradingview.com/metal/gold--big.svg',
+  },
+  {
+    address: '0x746e48E2CDD8F6D0B672adAc7810f55658dC801b',
+    name: 'EUR 2025-05-16',
+    symbol: 'EUR-250516',
+    decimals: 18,
+    icon: 'https://s3-symbol-logo.tradingview.com/country/EU--big.svg',
+  },
+  {
+    address: '0x5F433CFeB6CB2743481a096a56007a175E12ae23',
+    name: 'BTC 2025-05-16',
+    symbol: 'BTC-250516',
+    decimals: 18,
+    icon: 'https://s3-symbol-logo.tradingview.com/crypto/XTVCBTC--big.svg',
+  },
+  {
+    address: '0x53E2BB2d88DdC44CC395a0CbCDDC837AeF44116D',
+    name: 'AAPL 2025-05-16',
+    symbol: 'AAPL-250516',
+    decimals: 18,
+    icon: 'https://s3-symbol-logo.tradingview.com/apple--big.svg',
+  },
+  {
+    address: '0xd57e27D90e04eAE2EEcBc63BA28E433098F72855',
+    name: 'GOOGL 2025-05-16',
+    symbol: 'GOOGL-250516',
+    decimals: 18,
+    icon: 'https://s3-symbol-logo.tradingview.com/alphabet--big.svg',
+  },
+  {
+    address: '0xDB1Aa7232c2fF7bb480823af254453570d0E4A16',
+    name: 'TSLA 2025-05-16',
+    symbol: 'TSLA-250516',
+    decimals: 18,
+    icon: 'https://s3-symbol-logo.tradingview.com/tesla--big.svg',
+  },
+  {
+    address: '0x24A08695F06A37C8882CD1588442eC40061e597B',
+    name: 'BRK-A 2025-05-16',
+    symbol: 'BRK-A-250516',
+    decimals: 18,
+    icon: 'https://s3-symbol-logo.tradingview.com/berkshire-hathaway--big.svg',
+  },
+  {
+    address: '0x41DF9f8a0c014a0ce398A3F2D1af3164ff0F492A',
+    name: 'US30Y 2025-05-16',
+    symbol: 'US30Y-250516',
+    decimals: 18,
+    icon: 'https://s3-symbol-logo.tradingview.com/country/US--big.svg',
+  },
+]
 
 const Profit = ({
   chain,
@@ -248,44 +315,44 @@ export const TradingCompetitionContainer = () => {
   const intervalRef = useRef<number | null>(null)
   const hoveredElementRef = useRef<HTMLElement | null>(null)
 
-  // const [hoveredBadge, setHoveredBadge] = useState<{
-  //   x: number
-  //   y: number
-  //   label: 'LONG' | 'SHORT'
-  //   color: 'green' | 'red'
-  // } | null>(null)
-  //
-  // useEffect(
-  //   () => {
-  //     if (!hoveredElementRef.current) {
-  //       return
-  //     }
-  //
-  //     const updatePosition = () => {
-  //       const rect = hoveredElementRef.current!.getBoundingClientRect()
-  //       setHoveredBadge((prev) =>
-  //         prev
-  //           ? {
-  //               ...prev,
-  //               x: rect.left + rect.width / 2,
-  //               y: rect.bottom,
-  //             }
-  //           : null,
-  //       )
-  //     }
-  //
-  //     intervalRef.current = window.setInterval(updatePosition, 4)
-  //
-  //     return () => {
-  //       if (intervalRef.current) {
-  //         clearInterval(intervalRef.current)
-  //         intervalRef.current = null
-  //       }
-  //     }
-  //   },
-  //   // @ts-ignore
-  //   [hoveredElementRef.current],
-  // )
+  const [hoveredBadge, setHoveredBadge] = useState<{
+    x: number
+    y: number
+    label: 'LONG' | 'SHORT'
+    color: 'green' | 'red'
+  } | null>(null)
+
+  useEffect(
+    () => {
+      if (!hoveredElementRef.current) {
+        return
+      }
+
+      const updatePosition = () => {
+        const rect = hoveredElementRef.current!.getBoundingClientRect()
+        setHoveredBadge((prev) =>
+          prev
+            ? {
+                ...prev,
+                x: rect.left + rect.width / 2,
+                y: rect.bottom,
+              }
+            : null,
+        )
+      }
+
+      intervalRef.current = window.setInterval(updatePosition, 4)
+
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current)
+          intervalRef.current = null
+        }
+      }
+    },
+    // @ts-ignore
+    [hoveredElementRef.current],
+  )
 
   return (
     <div className="w-full flex flex-col text-white mb-4 mt-2 px-4">
@@ -515,88 +582,88 @@ export const TradingCompetitionContainer = () => {
         </div>
       </div>
 
-      {/*<div className="w-full flex justify-center relative">*/}
-      {/*  <div className="w-full md:w-[616px] overflow-x-hidden mt-4 sm:mt-8 relative">*/}
-      {/*    <div className="flex w-max animate-marquee items-center h-[60px]">*/}
-      {/*      {Array.from({ length: 3 })*/}
-      {/*        .flatMap(() => ASSETS)*/}
-      {/*        .map((currency, i) => {*/}
-      {/*          const isLong = i % 2 === 0*/}
-      {/*          return (*/}
-      {/*            <button*/}
-      {/*              key={`icon-${i}`}*/}
-      {/*              ref={(el) => {*/}
-      {/*                if (*/}
-      {/*                  hoveredBadge &&*/}
-      {/*                  el?.contains(document.activeElement)*/}
-      {/*                ) {*/}
-      {/*                  hoveredElementRef.current = el*/}
-      {/*                }*/}
-      {/*              }}*/}
-      {/*              onClick={() =>*/}
-      {/*                isLong*/}
-      {/*                  ? router.push(*/}
-      {/*                      `/trade?inputCurrency=0xf817257fed379853cDe0fa4F97AB987181B1E5Ea&outputCurrency=${currency.address}`,*/}
-      {/*                    )*/}
-      {/*                  : router.push(`/futures/mint/${currency.address}`)*/}
-      {/*              }*/}
-      {/*              className="group relative flex flex-col items-center mx-2 z-[10]"*/}
-      {/*              onMouseEnter={(e) => {*/}
-      {/*                hoveredElementRef.current = e.currentTarget*/}
-      {/*                const rect = e.currentTarget.getBoundingClientRect()*/}
-      {/*                setHoveredBadge({*/}
-      {/*                  x: rect.left + rect.width / 2,*/}
-      {/*                  y: rect.bottom,*/}
-      {/*                  label: isLong ? 'LONG' : 'SHORT',*/}
-      {/*                  color: isLong ? 'green' : 'red',*/}
-      {/*                })*/}
-      {/*              }}*/}
-      {/*              onMouseLeave={() => {*/}
-      {/*                if (intervalRef.current) {*/}
-      {/*                  clearInterval(intervalRef.current)*/}
-      {/*                  intervalRef.current = null*/}
-      {/*                }*/}
-      {/*                hoveredElementRef.current = null*/}
-      {/*                setHoveredBadge(null)*/}
-      {/*              }}*/}
-      {/*            >*/}
-      {/*              <div className="transition-transform duration-300 transform group-hover:scale-150">*/}
-      {/*                <CurrencyIcon*/}
-      {/*                  chain={selectedChain}*/}
-      {/*                  currency={currency}*/}
-      {/*                  className={`w-[28px] h-[28px] sm:w-[36px] sm:h-[36px] rounded-full transition-transform duration-300 transform ${isLong ? 'animate-bounce-up' : 'animate-bounce-down grayscale group-hover:grayscale-0'}`}*/}
-      {/*                />*/}
-      {/*              </div>*/}
-      {/*            </button>*/}
-      {/*          )*/}
-      {/*        })}*/}
-      {/*    </div>*/}
-      {/*  </div>*/}
+      <div className="w-full flex justify-center relative">
+        <div className="w-full md:w-[616px] overflow-x-hidden mt-4 sm:mt-8 relative">
+          <div className="flex w-max animate-marquee items-center h-[60px]">
+            {Array.from({ length: 3 })
+              .flatMap(() => ASSETS)
+              .map((currency, i) => {
+                const isLong = i % 2 === 0
+                return (
+                  <button
+                    key={`icon-${i}`}
+                    ref={(el) => {
+                      if (
+                        hoveredBadge &&
+                        el?.contains(document.activeElement)
+                      ) {
+                        hoveredElementRef.current = el
+                      }
+                    }}
+                    onClick={() =>
+                      isLong
+                        ? router.push(
+                            `/trade?inputCurrency=0xf817257fed379853cDe0fa4F97AB987181B1E5Ea&outputCurrency=${currency.address}`,
+                          )
+                        : router.push(`/futures/mint/${currency.address}`)
+                    }
+                    className="group relative flex flex-col items-center mx-2 z-[10]"
+                    onMouseEnter={(e) => {
+                      hoveredElementRef.current = e.currentTarget
+                      const rect = e.currentTarget.getBoundingClientRect()
+                      setHoveredBadge({
+                        x: rect.left + rect.width / 2,
+                        y: rect.bottom,
+                        label: isLong ? 'LONG' : 'SHORT',
+                        color: isLong ? 'green' : 'red',
+                      })
+                    }}
+                    onMouseLeave={() => {
+                      if (intervalRef.current) {
+                        clearInterval(intervalRef.current)
+                        intervalRef.current = null
+                      }
+                      hoveredElementRef.current = null
+                      setHoveredBadge(null)
+                    }}
+                  >
+                    <div className="transition-transform duration-300 transform group-hover:scale-150">
+                      <CurrencyIcon
+                        chain={selectedChain}
+                        currency={currency}
+                        className={`w-[28px] h-[28px] sm:w-[36px] sm:h-[36px] rounded-full transition-transform duration-300 transform ${isLong ? 'animate-bounce-up' : 'animate-bounce-down grayscale group-hover:grayscale-0'}`}
+                      />
+                    </div>
+                  </button>
+                )
+              })}
+          </div>
+        </div>
 
-      {/*  {hoveredBadge && (*/}
-      {/*    <div*/}
-      {/*      className="fixed z-[9999] pointer-events-none transition-opacity duration-200"*/}
-      {/*      style={{*/}
-      {/*        top: hoveredBadge.y + 16,*/}
-      {/*        left: hoveredBadge.x - 1.5,*/}
-      {/*        transform: 'translateX(-50%)',*/}
-      {/*      }}*/}
-      {/*    >*/}
-      {/*      <div*/}
-      {/*        className="px-2 py-0.5 rounded-full text-[11px] font-semibold border shadow-md"*/}
-      {/*        style={{*/}
-      {/*          backgroundColor:*/}
-      {/*            hoveredBadge.color === 'green' ? '#ecfdf5' : '#fee2e2',*/}
-      {/*          color: hoveredBadge.color === 'green' ? '#059669' : '#b91c1c',*/}
-      {/*          borderColor:*/}
-      {/*            hoveredBadge.color === 'green' ? '#34d399' : '#f87171',*/}
-      {/*        }}*/}
-      {/*      >*/}
-      {/*        {hoveredBadge.label}*/}
-      {/*      </div>*/}
-      {/*    </div>*/}
-      {/*  )}*/}
-      {/*</div>*/}
+        {hoveredBadge && (
+          <div
+            className="fixed z-[9999] pointer-events-none transition-opacity duration-200"
+            style={{
+              top: hoveredBadge.y + 16,
+              left: hoveredBadge.x - 1.5,
+              transform: 'translateX(-50%)',
+            }}
+          >
+            <div
+              className="px-2 py-0.5 rounded-full text-[11px] font-semibold border shadow-md"
+              style={{
+                backgroundColor:
+                  hoveredBadge.color === 'green' ? '#ecfdf5' : '#fee2e2',
+                color: hoveredBadge.color === 'green' ? '#059669' : '#b91c1c',
+                borderColor:
+                  hoveredBadge.color === 'green' ? '#34d399' : '#f87171',
+              }}
+            >
+              {hoveredBadge.label}
+            </div>
+          </div>
+        )}
+      </div>
 
       <div className="w-full md:flex md:justify-center">
         <div className="md:w-[616px] flex w-full mt-8 px-6 sm:px-[62px] py-4 sm:py-6 bg-[#e9edff]/5 rounded-2xl sm:rounded-[20px] flex-col justify-center items-center gap-2 sm:gap-2.5">
