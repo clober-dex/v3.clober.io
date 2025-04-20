@@ -73,7 +73,7 @@ export const DiscoverContainer = () => {
   const [sortOption, setSortOption] = useState<SortOption>('none')
 
   const { data: markets } = useQuery({
-    queryKey: ['markets', selectedChain.id],
+    queryKey: ['markets', selectedChain.id, latestSubgraphBlockNumber, prices],
     queryFn: async () => {
       if (latestSubgraphBlockNumber.blockNumber === 0) {
         return [] as Market[]
@@ -95,12 +95,10 @@ export const DiscoverContainer = () => {
       }
       return prevMarkets.current
     },
-    refetchInterval: 1000, // checked
-    refetchIntervalInBackground: true,
   })
 
   const filteredMarkets = useMemo(() => {
-    return (markets ?? [])
+    return (markets ?? prevMarkets.current ?? [])
       .filter(
         (market) =>
           market.baseCurrency.symbol

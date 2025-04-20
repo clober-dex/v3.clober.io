@@ -46,7 +46,7 @@ export const FuturesProvider = ({ children }: React.PropsWithChildren<{}>) => {
     },
     initialData: [],
     refetchIntervalInBackground: true,
-    refetchInterval: 2 * 1000, // checked
+    refetchInterval: 10 * 1000, // checked
   }) as {
     data: FuturesPosition[]
   }

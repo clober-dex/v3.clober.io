@@ -158,7 +158,7 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
         ])
       ).reduce((acc, price) => ({ ...acc, ...price }), {} as Prices)
     },
-    refetchInterval: 30 * 1000, // checked
+    refetchInterval: 5 * 1000, // checked
     refetchIntervalInBackground: true,
   })
 
