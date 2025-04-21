@@ -56,7 +56,7 @@ export default function Analytics() {
       ]
         .sort()
         .map((address, index) => [
-          address,
+          getAddress(address),
           `hsl(${(index * 137.508) % 360}, 100%, 50%)`,
         ]),
     )
@@ -109,24 +109,30 @@ export default function Analytics() {
               <div className="flex w-[350px] sm:w-[500px]">
                 <HistogramChart
                   prefix={'$'}
-                  data={analytics.map((item) => ({
-                    time: item.timestamp as UTCTimestamp,
-                    values: {
-                      ...Object.fromEntries(
-                        item.volumeSnapshots.map(
-                          ({ symbol, amount, address }) => [
-                            symbol,
-                            amount * (prices[address] ?? 0),
-                          ],
+                  data={analytics.map((item) => {
+                    const value = item.volumeSnapshots
+                      .map(({ symbol, amount, address }) => [
+                        whitelistCurrencies.find((currency) =>
+                          isAddressEqual(
+                            getAddress(currency.address),
+                            getAddress(address),
+                          ),
+                        )?.symbol ?? symbol,
+                        amount * (prices[getAddress(address)] ?? 0),
+                      ])
+                      .sort((a, b) => Number(b[1]) - Number(a[1]))
+                    return {
+                      time: item.timestamp as UTCTimestamp,
+                      values: {
+                        ...Object.fromEntries(value),
+                        TotalUSD: item.volumeSnapshots.reduce(
+                          (sum, { amount, address }) =>
+                            sum + (prices[getAddress(address)] ?? 0) * amount,
+                          0,
                         ),
-                      ),
-                      TotalUSD: item.volumeSnapshots.reduce(
-                        (sum, { amount, address }) =>
-                          sum + (prices[address] ?? 0) * amount,
-                        0,
-                      ),
-                    },
-                  }))}
+                      },
+                    }
+                  })}
                   totalKey={'TotalUSD'}
                   colors={[...Object.values(tokenColorMap), '#4C82FB'].sort()}
                   detailData={
@@ -134,8 +140,8 @@ export default function Analytics() {
                       .map(([address, color]) => ({
                         label: whitelistCurrencies.find((currency) =>
                           isAddressEqual(
-                            currency.address,
-                            address as `0x${string}`,
+                            getAddress(currency.address),
+                            getAddress(address),
                           ),
                         )?.symbol,
                         color,
