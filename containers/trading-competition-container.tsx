@@ -177,6 +177,9 @@ export const TradingCompetitionContainer = () => {
       Object.keys(prices).length !== 0,
     ],
     queryFn: async () => {
+      if (Object.keys(prices).length === 0) {
+        return {}
+      }
       return fetchTradingCompetitionLeaderboard(selectedChain.id, prices)
     },
   }) as {
@@ -193,7 +196,7 @@ export const TradingCompetitionContainer = () => {
       Object.keys(prices).length !== 0,
     ],
     queryFn: async () => {
-      if (!userAddress) {
+      if (!userAddress || Object.keys(prices).length === 0) {
         return {
           totalPnl: 0,
           trades: [],
