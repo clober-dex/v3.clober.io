@@ -37,7 +37,7 @@ type BookDto = {
   }[]
   latestPrice: string
   latestTimestamp: string
-  createAt: string
+  // createAt: string
 }
 
 let totalSupplyMap: {
@@ -90,7 +90,7 @@ export const fetchAllMarkets = async (
   }>(
     endpoint,
     'getMarkets',
-    'query getMarkets($baseAddresses: [String!], $quoteAddresses: [String!]) { books( first: 1000 where: {and: [{base_in: $baseAddresses}, {quote_in: $quoteAddresses}]} ) { id base { id decimals name symbol } quote { id decimals name symbol } depths(orderBy: tick, orderDirection: desc) { price baseAmount quoteAmount } latestPrice latestTimestamp createAt } }',
+    'query getMarkets($baseAddresses: [String!], $quoteAddresses: [String!]) { books( first: 1000 where: {and: [{base_in: $baseAddresses}, {quote_in: $quoteAddresses}]} ) { id base { id decimals name symbol } quote { id decimals name symbol } depths(orderBy: tick, orderDirection: desc) { price baseAmount quoteAmount } latestPrice latestTimestamp } }',
     {
       baseAddresses: tokenAddresses.map((address) => address.toLowerCase()),
       quoteAddresses: tokenAddresses.map((address) => address.toLowerCase()),
@@ -254,7 +254,7 @@ export const fetchAllMarkets = async (
                 name: book.quote.name,
                 symbol: book.quote.symbol,
               },
-          createAt: Number(book.createAt),
+          createAt: Number(0), // todo
           bidSideUpdatedAt: Number(book.latestTimestamp),
           isBidTaken:
             bidSideUpdatedAt -
