@@ -138,6 +138,7 @@ export const WETH: {
     name: 'Wrapped ETH',
     symbol: 'WETH',
     decimals: 18,
+    icon: '/asset-icon/weth.jpg',
   },
 }
 
@@ -365,18 +366,21 @@ export const WHITELISTED_CURRENCIES: {
       name: 'Ethereum',
       symbol: 'ETH',
       decimals: 18,
+      icon: '/asset-icon/ETH.webp',
     },
     {
       address: '0x4200000000000000000000000000000000000006',
       name: 'Wrapped ETH',
       symbol: 'WETH',
       decimals: 18,
+      icon: '/asset-icon/weth.jpg',
     },
     {
       address: '0xA985e387dDF21b87c1Fe8A0025D827674040221E',
       name: 'Clober USDC',
       symbol: 'cUSDC',
       decimals: 6,
+      icon: '/asset-icon/USDC.webp',
     },
   ],
 }
@@ -402,5 +406,6 @@ export const DEFAULT_INPUT_CURRENCY: {
     name: 'Ethereum',
     symbol: 'ETH',
     decimals: 18,
+    icon: '/asset-icon/ETH.webp',
   },
 }
