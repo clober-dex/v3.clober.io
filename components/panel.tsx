@@ -63,17 +63,20 @@ const Panel = ({
                         {PAGE_BUTTONS.map(
                           (button, index) =>
                             (button.chains as number[]).includes(chainId) && (
-                              <PageButton
-                                key={index}
-                                disabled={router.pathname.includes(button.path)}
-                                onClick={() => {
-                                  router.push(button.path)
-                                  setOpen(false)
-                                }}
-                              >
-                                {button.icon}
-                                {button.label}
-                              </PageButton>
+                              <div className={button.className} key={index}>
+                                <PageButton
+                                  disabled={router.pathname.includes(
+                                    button.path,
+                                  )}
+                                  onClick={() => {
+                                    router.push(button.path)
+                                    setOpen(false)
+                                  }}
+                                >
+                                  {button.icon}
+                                  {button.label}
+                                </PageButton>
+                              </div>
                             ),
                         )}
                       </div>
