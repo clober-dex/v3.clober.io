@@ -15,7 +15,7 @@ export const PAGE_BUTTONS = [
     label: 'Discover',
     icon: <DiscoverPageSvg className="w-4 h-4" />,
     chains: [monadTestnet.id],
-    className: 'hidden sm:flex',
+    className: 'hidden lg:flex',
   },
   {
     path: '/trade',
