@@ -101,10 +101,12 @@ export default function Analytics() {
                     time: item.timestamp as UTCTimestamp,
                     values: {
                       ...Object.fromEntries(
-                        item.volumeSnapshots.map(({ symbol, amount }) => [
-                          symbol,
-                          amount,
-                        ]),
+                        item.volumeSnapshots.map(
+                          ({ symbol, amount, address }) => [
+                            symbol,
+                            amount * (prices[address] ?? 0),
+                          ],
+                        ),
                       ),
                       TotalUSD: item.volumeSnapshots.reduce(
                         (sum, { amount, address }) =>

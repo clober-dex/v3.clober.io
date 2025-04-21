@@ -70,9 +70,9 @@ export const HistogramChart = ({
                       ? detailData
                           .map(({ label, color }) => ({
                             label,
-                            value: toHumanReadableString(
+                            value: `${prefix ?? ''}${toHumanReadableString(
                               crosshairData.values[label] ?? 0,
-                            ),
+                            )}`,
                             color,
                           }))
                           .sort(
