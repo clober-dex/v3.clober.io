@@ -121,65 +121,41 @@ export const fetchTradingCompetitionLeaderboard = async (
     return cachedData.data
   }
   const {
-    data: { sortedTradesByRealizedPnL, sortedTradesByEstimateHolding },
+    data: { sortedTradesByPnL },
   } = await Subgraph.get<{
     data: {
-      sortedTradesByRealizedPnL: Array<{
+      sortedTradesByPnL: Array<{
         user: { id: string }
         token: { id: string; decimals: string; name: string; symbol: string }
         realizedPnL: string
         estimatedHolding: string
-      }>
-      sortedTradesByEstimateHolding: Array<{
-        user: { id: string }
-        token: { id: string; decimals: string; name: string; symbol: string }
-        realizedPnL: string
-        estimatedHolding: string
+        pnl: string
       }>
     }
   }>(
     FUTURES_SUBGRAPH_ENDPOINT[chainId]!,
     'getTrades',
-    '{ sortedTradesByRealizedPnL: trades( first: 300 orderBy: realizedPnL orderDirection: desc where: {user_: {isRegistered: true}} ) { user { id } token { id decimals name symbol } realizedPnL estimatedHolding } sortedTradesByEstimateHolding: trades( first: 300 orderBy: estimatedHolding orderDirection: desc where: {user_: {isRegistered: true}} ) { user { id } token { id decimals name symbol } realizedPnL estimatedHolding } }',
+    '{ sortedTradesByPnL: trades( first: 1000 orderBy: pnl orderDirection: desc where: {user_: {isRegistered: true}} ) { user { id } token { id decimals name symbol } realizedPnL estimatedHolding pnl } }',
     {},
   )
-  const intersectionUsers = [
-    ...new Set(
-      sortedTradesByRealizedPnL
-        .map((trade) => getAddress(trade.user.id))
-        .filter((user) =>
-          sortedTradesByEstimateHolding.some((trade) =>
-            isAddressEqual(getAddress(trade.user.id), getAddress(user)),
-          ),
-        ),
-    ),
-  ]
-  const trades = intersectionUsers
-    .map((user) => {
-      return sortedTradesByRealizedPnL
-        .filter((trade) =>
-          isAddressEqual(getAddress(trade.user.id), getAddress(user)),
-        )
-        .map((trade) => {
-          const token = getAddress(trade.token.id)
-          const amount = formatUnits(
-            BigInt(trade.estimatedHolding),
-            Number(trade.token.decimals),
-          )
-          return {
-            user,
-            currency: {
-              address: token,
-              symbol: trade.token.symbol,
-              name: trade.token.name,
-              decimals: Number(trade.token.decimals),
-            },
-            amount: Number(amount),
-            pnl: Number(trade.realizedPnL) + Number(amount) * prices[token],
-          }
-        })
-    })
-    .flat()
+  const trades = sortedTradesByPnL.map((trade) => {
+    const token = getAddress(trade.token.id)
+    const amount = formatUnits(
+      BigInt(trade.estimatedHolding),
+      Number(trade.token.decimals),
+    )
+    return {
+      user: getAddress(trade.user.id),
+      currency: {
+        address: token,
+        symbol: trade.token.symbol,
+        name: trade.token.name,
+        decimals: Number(trade.token.decimals),
+      },
+      amount: Number(amount),
+      pnl: Number(trade.realizedPnL) + Number(amount) * prices[token],
+    }
+  })
 
   const results = trades.reduce(
     (acc, trade) => {
