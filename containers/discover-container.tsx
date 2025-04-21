@@ -225,15 +225,13 @@ export const DiscoverContainer = () => {
             Market
             <TriangleDown column="market" sortOption={sortOption} />
           </button>
-          <div className="w-[180px] text-sm font-semibold">
-            <button
-              onClick={() => sort('age')}
-              className="w-[330px] flex items-center gap-1 text-sm font-semibold hover:underline cursor-pointer"
-            >
-              Age
-              <TriangleDown column="age" sortOption={sortOption} />
-            </button>
-          </div>
+          <button
+            onClick={() => sort('age')}
+            className="w-[180px] flex items-center gap-1 text-sm font-semibold hover:underline cursor-pointer"
+          >
+            Age
+            <TriangleDown column="age" sortOption={sortOption} />
+          </button>
           <button
             onClick={() => sort('price')}
             className="w-[160px] flex items-center gap-1 text-sm font-semibold hover:underline cursor-pointer"
