@@ -9,7 +9,7 @@ import { formatUnits } from '../../../../../utils/bigint'
 import { WHITELISTED_CURRENCIES } from '../../../../../constants/currency'
 
 const getGoogleAnalyticsActiveUsersSnapshot = async (): Promise<
-  { timestamp: number; activeUsers: number }[]
+  { timestamp: number; userType: 'new' | 'returning'; activeUsers: number }[]
 > => {
   if (
     !process.env.GOOGLE_ANALYTICS_PROPERTY_ID ||
@@ -43,6 +43,7 @@ const getGoogleAnalyticsActiveUsersSnapshot = async (): Promise<
       {
         name: 'date',
       },
+      { name: 'newVsReturning' },
     ],
     metrics: [
       {
@@ -51,24 +52,38 @@ const getGoogleAnalyticsActiveUsersSnapshot = async (): Promise<
     ],
   }
   const [response] = await analyticsDataClient.runReport(request)
-  return (response.rows ?? [])
-    .map((row) =>
-      // 20250323 -> 2025-03-23
-      row.dimensionValues?.[0]?.value && row.metricValues?.[0]?.value
-        ? {
+  const rows = response.rows ?? []
+
+  return rows
+    .map((row) => {
+      if (row.dimensionValues) {
+        const date = row.dimensionValues?.[0]?.value
+        const type = row.dimensionValues?.[1]?.value // 'new' or 'returning'
+        const value = row.metricValues?.[0]?.value
+
+        if (date && type && value && ['returning', 'new'].includes(type)) {
+          return {
             timestamp: Math.floor(
               new Date(
-                row.dimensionValues[0].value.replace(
-                  /(\d{4})(\d{2})(\d{2})/,
-                  '$1-$2-$3',
-                ),
+                date.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3'),
               ).getTime() / 1000,
             ),
-            activeUsers: Number(row.metricValues[0].value),
+            userType: type,
+            activeUsers: Number(value),
           }
-        : undefined,
+        }
+        return undefined
+      }
+    })
+    .filter(
+      (
+        row,
+      ): row is {
+        timestamp: number
+        userType: 'new' | 'returning'
+        activeUsers: number
+      } => !!row,
     )
-    .filter((row): row is { timestamp: number; activeUsers: number } => !!row)
 }
 
 const getOnChainSnapshot = async ({
@@ -171,13 +186,23 @@ export default async function handler(
       ...googleAnalyticsActiveUsersSnapshot.map((row) => row.timestamp),
       ...onChainSnapshot.map((row) => row.timestamp),
     ])
+    console.log(
+      'googleAnalyticsActiveUsersSnapshot',
+      googleAnalyticsActiveUsersSnapshot,
+    )
     res.json({
       snapshots: Array.from(keys)
         .map((timestamp) => ({
           timestamp,
-          googleAnalyticsActiveUsers: googleAnalyticsActiveUsersSnapshot.find(
-            (row) => row.timestamp === timestamp,
-          )?.activeUsers,
+          googleAnalyticsActiveUsers: {
+            returning: googleAnalyticsActiveUsersSnapshot.find(
+              (row) =>
+                row.timestamp === timestamp && row.userType === 'returning',
+            )?.activeUsers,
+            new: googleAnalyticsActiveUsersSnapshot.find(
+              (row) => row.timestamp === timestamp && row.userType === 'new',
+            )?.activeUsers,
+          },
           transactionCount: onChainSnapshot.find(
             (row) => row.timestamp === timestamp,
           )?.transactionCount,

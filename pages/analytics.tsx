@@ -22,7 +22,10 @@ export default function Analytics() {
         } = await axios.get<{
           snapshots: {
             timestamp: number
-            googleAnalyticsActiveUsers: number
+            googleAnalyticsActiveUsers: {
+              returning: number
+              new: number
+            }
             walletCount: number
             transactionCount: number
             volumeSnapshots: {
@@ -79,11 +82,20 @@ export default function Analytics() {
                 <HistogramChart
                   data={analytics.map((item) => ({
                     time: item.timestamp as UTCTimestamp,
-                    values: { User: item.googleAnalyticsActiveUsers },
+                    values: {
+                      User:
+                        item.googleAnalyticsActiveUsers.new +
+                        item.googleAnalyticsActiveUsers.returning,
+                      Returning: item.googleAnalyticsActiveUsers.returning,
+                      New: item.googleAnalyticsActiveUsers.new,
+                    },
                   }))}
                   totalKey={'User'}
-                  colors={['#4C82FB']}
-                  detailData={[{ label: 'User', color: '#4C82FB' }]}
+                  colors={['#A457FF', '#FC72FF']}
+                  detailData={[
+                    { label: 'Returning', color: '#A457FF' },
+                    { label: 'New', color: '#FC72FF' },
+                  ]}
                   height={312}
                 />
               </div>
