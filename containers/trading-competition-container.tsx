@@ -18,6 +18,7 @@ import { LeaderBoard } from '../components/leader-board'
 import {
   fetchTotalRegisteredUsers,
   fetchTradingCompetitionLeaderboard,
+  fetchUserPnL,
 } from '../apis/trading-competition'
 import { useCurrencyContext } from '../contexts/currency-context'
 import { TradingCompetitionPnl } from '../model/trading-competition-pnl'
@@ -169,28 +170,39 @@ export const TradingCompetitionContainer = () => {
     return toCommaSeparated(value.toFixed(0))
   }, [])
 
-  const { data } = useQuery({
+  const { data: allUserPnL } = useQuery({
     queryKey: [
       'trading-competition-leader-board',
+      selectedChain.id,
+      Object.keys(prices).length !== 0,
+    ],
+    queryFn: async () => {
+      return fetchTradingCompetitionLeaderboard(selectedChain.id, prices)
+    },
+  }) as {
+    data: {
+      [user: `0x${string}`]: TradingCompetitionPnl
+    }
+  }
+  console.log('allUserPnL', allUserPnL)
+
+  const { data: userPnL } = useQuery({
+    queryKey: [
+      'trading-competition-user-pnl',
       selectedChain.id,
       userAddress,
       Object.keys(prices).length !== 0,
     ],
     queryFn: async () => {
-      return fetchTradingCompetitionLeaderboard(
-        selectedChain.id,
-        prices,
-        userAddress,
-      )
-    },
-  }) as {
-    data: {
-      userPnL: TradingCompetitionPnl
-      allUsersPnL: {
-        [user: `0x${string}`]: TradingCompetitionPnl
+      if (!userAddress) {
+        return {
+          totalPnl: 0,
+          trades: [],
+        }
       }
-    }
-  }
+      return fetchUserPnL(selectedChain.id, prices, userAddress)
+    },
+  })
 
   const { data: totalRegisteredUsers } = useQuery({
     queryKey: ['total-registered-users', selectedChain.id],
@@ -304,7 +316,7 @@ export const TradingCompetitionContainer = () => {
     return Object.fromEntries(
       [
         ...new Set(
-          Object.values(data?.allUsersPnL ?? [])
+          Object.values(allUserPnL ?? [])
             .map((item) =>
               item.trades.map(({ currency }) => getAddress(currency.address)),
             )
@@ -317,7 +329,7 @@ export const TradingCompetitionContainer = () => {
           `hsl(${(index * 137.508) % 360}, 100%, 50%)`,
         ]),
     )
-  }, [data?.allUsersPnL])
+  }, [allUserPnL])
 
   const intervalRef = useRef<number | null>(null)
   const hoveredElementRef = useRef<HTMLElement | null>(null)
@@ -720,15 +732,15 @@ export const TradingCompetitionContainer = () => {
                     value: (
                       <Profit
                         chain={selectedChain}
-                        profit={data?.userPnL?.totalPnl ?? 0}
+                        profit={userPnL?.totalPnl ?? 0}
                         tokenColorMap={tokenColorMap}
-                        trades={data?.userPnL?.trades ?? []}
+                        trades={userPnL?.trades ?? []}
                       />
                     ),
                   }
                 : undefined
             }
-            values={Object.entries(data?.allUsersPnL ?? {})
+            values={Object.entries(allUserPnL ?? {})
               .sort(([, a], [, b]) => b.totalPnl - a.totalPnl)
               .slice(0, 100)
               .map(([address, { totalPnl, trades }], index) => ({
