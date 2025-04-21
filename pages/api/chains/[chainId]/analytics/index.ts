@@ -186,10 +186,7 @@ export default async function handler(
       ...googleAnalyticsActiveUsersSnapshot.map((row) => row.timestamp),
       ...onChainSnapshot.map((row) => row.timestamp),
     ])
-    console.log(
-      'googleAnalyticsActiveUsersSnapshot',
-      googleAnalyticsActiveUsersSnapshot,
-    )
+
     res.json({
       snapshots: Array.from(keys)
         .map((timestamp) => ({
