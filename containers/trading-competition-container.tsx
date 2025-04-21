@@ -744,7 +744,6 @@ export const TradingCompetitionContainer = () => {
             }
             values={Object.entries(allUserPnL ?? {})
               .sort(([, a], [, b]) => b.totalPnl - a.totalPnl)
-              .slice(0, 100)
               .map(([address, { totalPnl, trades }], index) => ({
                 address: getAddress(address),
                 value: (
