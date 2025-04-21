@@ -184,7 +184,6 @@ export const TradingCompetitionContainer = () => {
       [user: `0x${string}`]: TradingCompetitionPnl
     }
   }
-  console.log('allUserPnL', allUserPnL)
 
   const { data: userPnL } = useQuery({
     queryKey: [
