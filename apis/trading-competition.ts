@@ -6,6 +6,7 @@ import { FUTURES_SUBGRAPH_ENDPOINT } from '../constants/futures/subgraph-endpoin
 import { Prices } from '../model/prices'
 import { formatUnits } from '../utils/bigint'
 import { TradingCompetitionPnl } from '../model/trading-competition-pnl'
+import { currentTimestampInSeconds } from '../utils/date'
 
 const BLACKLISTED_USER_ADDRESSES = [
   '0x5F79EE8f8fA862E98201120d83c4eC39D9468D49',
@@ -91,6 +92,16 @@ export const fetchUserPnL = async (
   }
 }
 
+const cache = new Map<
+  string,
+  {
+    data: {
+      [user: `0x${string}`]: TradingCompetitionPnl
+    }
+    timestamp: number
+  }
+>()
+
 export const fetchTradingCompetitionLeaderboard = async (
   chainId: CHAIN_IDS,
   prices: Prices,
@@ -100,7 +111,15 @@ export const fetchTradingCompetitionLeaderboard = async (
   if (!FUTURES_SUBGRAPH_ENDPOINT[chainId]) {
     return {}
   }
-
+  const cacheKey = `${chainId}`
+  const cachedData = cache.get(cacheKey)
+  if (
+    cachedData &&
+    Object.keys(prices).length > 0 &&
+    cachedData.timestamp > currentTimestampInSeconds() - 60
+  ) {
+    return cachedData.data
+  }
   const {
     data: { sortedTradesByRealizedPnL, sortedTradesByEstimateHolding },
   } = await Subgraph.get<{
@@ -162,7 +181,7 @@ export const fetchTradingCompetitionLeaderboard = async (
     })
     .flat()
 
-  return trades.reduce(
+  const results = trades.reduce(
     (acc, trade) => {
       if (
         BLACKLISTED_USER_ADDRESSES.some((address) =>
@@ -195,4 +214,9 @@ export const fetchTradingCompetitionLeaderboard = async (
       [user: `0x${string}`]: TradingCompetitionPnl
     },
   )
+  cache.set(cacheKey, {
+    data: results,
+    timestamp: currentTimestampInSeconds(),
+  })
+  return results
 }
