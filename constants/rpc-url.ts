@@ -6,6 +6,6 @@ export const RPC_URL: {
   [CHAIN_IDS.BASE]:
     'https://base-mainnet.g.alchemy.com/v2/3Um4IcT1mrq2MEOYurXvsRAzk_v3Q_4X',
   [CHAIN_IDS.MONAD_TESTNET]:
-    'https://proud-tiniest-flower.monad-testnet.quiknode.pro/a4ebe00fca2e7bf01201f3b0f7fe2f0077c52a36',
+    'https://monad-testnet.blockpi.network/v1/rpc/f58e2c25e2e1239627d95af2fbaf1130d123c0a3',
   [CHAIN_IDS.RISE_SEPOLIA]: 'https://testnet.riselabs.xyz',
 }
