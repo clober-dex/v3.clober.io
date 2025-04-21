@@ -234,7 +234,7 @@ export const DiscoverContainer = () => {
           </button>
           <button
             onClick={() => sort('price')}
-            className="w-[160px] flex items-center gap-1 text-sm font-semibold hover:underline cursor-pointer"
+            className="w-[150px] flex items-center gap-1 text-sm font-semibold hover:underline cursor-pointer"
           >
             Price
             <TriangleDown column="price" sortOption={sortOption} />
