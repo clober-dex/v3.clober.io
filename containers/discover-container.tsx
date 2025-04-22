@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPublicClient, http } from 'viem'
 import { useQuery } from '@tanstack/react-query'
 import { Tooltip } from 'react-tooltip'
@@ -72,15 +72,20 @@ export const DiscoverContainer = () => {
       transport: http(RPC_URL[selectedChain.id]),
     })
   }, [selectedChain])
-  const prevMarkets = useRef<Market[]>(
-    JSON.parse(
-      localStorage.getItem(LOCAL_STORAGE_MARKET_KEY(selectedChain)) ?? '[]',
-    ) as Market[],
-  )
+  const prevMarkets = useRef<Market[]>([])
   const prevSubgraphBlockNumber = useRef<number>(0)
 
   const [searchValue, setSearchValue] = React.useState('')
   const [sortOption, setSortOption] = useState<SortOption>('none')
+
+  useEffect(() => {
+    const storedMarkets = localStorage.getItem(
+      LOCAL_STORAGE_MARKET_KEY(selectedChain),
+    )
+    if (storedMarkets) {
+      prevMarkets.current = JSON.parse(storedMarkets)
+    }
+  }, [selectedChain])
 
   const { data: markets } = useQuery({
     queryKey: ['markets', selectedChain.id],
