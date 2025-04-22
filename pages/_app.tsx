@@ -162,7 +162,7 @@ function App({ Component, pageProps }: AppProps) {
     } else if (pathname.includes('/futures')) {
       return "bg-[url('../public/base-background.png')] bg-top"
     } else if (pathname.includes('/discover')) {
-      return "bg-[url('../public/base-background.png')] bg-top"
+      return "lg:bg-[url('../public/base-background.png')] bg-top"
     } else if (pathname.includes('/point')) {
       return "sm:bg-[url('../public/base-background.png')] bg-top"
     } else if (pathname.includes('/trading-competition')) {
