@@ -120,23 +120,36 @@ export const fetchTradingCompetitionLeaderboard = async (
   ) {
     return cachedData.data
   }
-  const {
-    data: { sortedTradesByPnL },
-  } = await Subgraph.get<{
-    data: {
-      sortedTradesByPnL: Array<{
-        user: { id: string }
-        token: { id: string; decimals: string; name: string; symbol: string }
-        realizedPnL: string
-        estimatedHolding: string
-        pnl: string
-      }>
-    }
-  }>(
-    FUTURES_SUBGRAPH_ENDPOINT[chainId]!,
-    'getTrades',
-    '{ sortedTradesByPnL: trades( first: 1000 orderBy: pnl orderDirection: desc where: {user_: {isRegistered: true}} ) { user { id } token { id decimals name symbol } realizedPnL estimatedHolding pnl } }',
-    {},
+  const data = await Promise.all(
+    [0, 100, 200, 300, 400].map(async (skip) => {
+      return Subgraph.get<{
+        data: {
+          sortedTradesByPnL: Array<{
+            user: { id: string }
+            token: {
+              id: string
+              decimals: string
+              name: string
+              symbol: string
+            }
+            realizedPnL: string
+            estimatedHolding: string
+            pnl: string
+          }>
+        }
+      }>(
+        FUTURES_SUBGRAPH_ENDPOINT[chainId]!,
+        'getTrades',
+        'query ($first: Int, $skip: Int) { sortedTradesByPnL: trades( first: $first skip: $skip orderBy: pnl orderDirection: desc where: {user_: {isRegistered: true}} ) { user { id } token { id decimals name symbol } realizedPnL estimatedHolding pnl } }',
+        {
+          first: 100,
+          skip,
+        },
+      )
+    }),
+  )
+  const sortedTradesByPnL = data.flatMap(
+    ({ data: { sortedTradesByPnL } }) => sortedTradesByPnL,
   )
   const trades = sortedTradesByPnL.map((trade) => {
     const token = getAddress(trade.token.id)
