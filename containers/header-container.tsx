@@ -39,7 +39,7 @@ const PageButtons = () => {
       {PAGE_BUTTONS.map(
         (page) =>
           (page.chains as number[]).includes(selectedChain.id) && (
-            <div key={page.path} className={page.className}>
+            <div key={page.path}>
               <PageButton
                 disabled={router.pathname.includes(page.path)}
                 onClick={() => router.push(page.path)}

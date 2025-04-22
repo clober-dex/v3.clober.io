@@ -15,35 +15,30 @@ export const PAGE_BUTTONS = [
     label: 'Discover',
     icon: <DiscoverPageSvg className="w-4 h-4" />,
     chains: [monadTestnet.id],
-    className: 'hidden lg:flex',
   },
   {
     path: '/trade',
     label: 'Trade',
     icon: <SwapPageSvg className="w-4 h-4" />,
     chains: [base.id, monadTestnet.id, riseSepolia.id],
-    className: 'flex',
   },
   {
     path: '/earn',
     label: 'Earn',
     icon: <VaultPageSvg className="w-4 h-4" />,
     chains: [base.id, monadTestnet.id],
-    className: 'flex',
   },
   {
     path: '/trading-competition',
     label: 'Competition',
     icon: <TradingCompetitionPageSvg className="w-4 h-4" />,
     chains: [monadTestnet.id],
-    className: 'flex',
   },
   {
     path: '/futures',
     label: 'Futures',
     icon: <LimitPageSvg className="w-4 h-4" />,
     chains: [monadTestnet.id],
-    className: 'flex',
   },
   {
     path: '/analytics',
@@ -63,6 +58,5 @@ export const PAGE_BUTTONS = [
       </svg>
     ),
     chains: [monadTestnet.id],
-    className: 'flex',
   },
 ]

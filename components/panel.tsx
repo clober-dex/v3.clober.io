@@ -63,7 +63,7 @@ const Panel = ({
                         {PAGE_BUTTONS.map(
                           (button, index) =>
                             (button.chains as number[]).includes(chainId) && (
-                              <div className={button.className} key={index}>
+                              <div key={index}>
                                 <PageButton
                                   disabled={router.pathname.includes(
                                     button.path,
