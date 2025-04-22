@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { isAddressEqual } from 'viem'
 import Image from 'next/image'
 
@@ -21,32 +21,38 @@ export const CurrencyIconBase = ({
     isAddressEqual(c.address, currency.address),
   )
 
-  const iconSrc = _currency?.icon ?? getLogo(chain, currency)
-  const fallbackSrc = chain
-    ? `https://dd.dexscreener.com/ds-data/tokens/${chain.name}/${currency.address.toLowerCase()}.png?size=lg`
-    : '/unknown.svg'
-  const [src, setSrc] = React.useState(iconSrc)
+  const [src, setSrc] = React.useState<string | null>(null)
   const handleError = () => {
     if (tryCount === 0 && !chain.testnet) {
-      setSrc(fallbackSrc)
+      setSrc(
+        chain
+          ? `https://dd.dexscreener.com/ds-data/tokens/${chain.name}/${currency.address.toLowerCase()}.png?size=lg`
+          : '/unknown.svg',
+      )
       setTryCount(1)
     } else {
       setSrc('/unknown.svg')
     }
   }
 
+  useEffect(() => {
+    setSrc(_currency?.icon ?? getLogo(chain, currency))
+  }, [_currency?.icon, chain, currency, src])
+
   return (
     <div {...props}>
-      <Image
-        unoptimized={unoptimized ? true : undefined}
-        priority={unoptimized ? true : undefined}
-        className="flex rounded-full"
-        alt={`${chain.id}-${currency.address}`}
-        src={src}
-        width={32}
-        height={32}
-        onError={handleError}
-      />
+      {src && (
+        <Image
+          unoptimized={unoptimized ? true : undefined}
+          priority={unoptimized ? true : undefined}
+          className="flex rounded-full"
+          alt={`${chain.id}-${currency.address}`}
+          src={src}
+          width={32}
+          height={32}
+          onError={handleError}
+        />
+      )}
     </div>
   )
 }
