@@ -331,6 +331,9 @@ export const DiscoverContainer = () => {
                 itemCount={filteredMarkets.length}
                 itemSize={64 + 12}
                 width={1072}
+                itemKey={(index) =>
+                  `${filteredMarkets[index].baseCurrency.address}-${filteredMarkets[index].quoteCurrency.address}`
+                }
               >
                 {MarketListRow}
               </List>
@@ -373,6 +376,9 @@ export const DiscoverContainer = () => {
                 itemCount={filteredMarkets.length}
                 itemSize={MOBILE_ROW_HEIGHT + 12}
                 width="100%"
+                itemKey={(index) =>
+                  `${filteredMarkets[index].baseCurrency.address}-${filteredMarkets[index].quoteCurrency.address}`
+                }
               >
                 {MarketListRow}
               </List>
