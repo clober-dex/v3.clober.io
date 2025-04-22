@@ -76,11 +76,13 @@ export const MarketCard = ({
             <CurrencyIcon
               chain={chain}
               currency={baseCurrency}
+              unoptimized={true}
               className="w-8 h-8 absolute left-0 top-0 z-[1] rounded-full"
             />
             <CurrencyIcon
               chain={chain}
               currency={quoteCurrency}
+              unoptimized={true}
               className="w-8 h-8 absolute left-6 top-0 rounded-full"
             />
           </div>
@@ -141,11 +143,13 @@ export const MarketCard = ({
             <CurrencyIcon
               chain={chain}
               currency={baseCurrency}
+              unoptimized={true}
               className="w-6 h-6 absolute left-0 top-0 z-[1] rounded-full"
             />
             <CurrencyIcon
               chain={chain}
               currency={quoteCurrency}
+              unoptimized={true}
               className="w-6 h-6 absolute left-[16px] top-0 rounded-full"
             />
           </div>
