@@ -37,9 +37,19 @@ export const FuturesProvider = ({ children }: React.PropsWithChildren<{}>) => {
   }
 
   const { data: positions } = useQuery({
-    queryKey: ['futures-positions', userAddress, selectedChain.id],
+    queryKey: [
+      'futures-positions',
+      userAddress,
+      selectedChain.id,
+      Object.keys(prices).length !== 0,
+      Object.keys(assets).length !== 0,
+    ],
     queryFn: async () => {
-      if (!userAddress) {
+      if (
+        !userAddress ||
+        Object.keys(prices).length === 0 ||
+        Object.keys(assets).length === 0
+      ) {
         return []
       }
       return fetchFuturesPositions(selectedChain, userAddress, prices, assets)
