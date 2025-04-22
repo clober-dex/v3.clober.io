@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import { VaultDashboardContainer } from '../../../containers/chart/vault-dashboard-container'
 import { WHITELISTED_VAULTS } from '../../../constants/vault'
 import { useChainContext } from '../../../contexts/chain-context'
+import { Loading } from '../../../components/loading'
 
 export default function PoolManage() {
   const router = useRouter()
@@ -19,6 +20,6 @@ export default function PoolManage() {
   return vaultImmutableInfo ? (
     <VaultDashboardContainer vaultImmutableInfo={vaultImmutableInfo} />
   ) : (
-    <></>
+    <Loading />
   )
 }
