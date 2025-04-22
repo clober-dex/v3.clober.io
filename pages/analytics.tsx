@@ -83,18 +83,13 @@ export default function Analytics() {
                   data={analytics.map((item) => ({
                     time: item.timestamp as UTCTimestamp,
                     values: {
-                      User:
-                        item.googleAnalyticsActiveUsers.new +
-                        item.googleAnalyticsActiveUsers.returning,
-                      Returning: item.googleAnalyticsActiveUsers.returning,
                       New: item.googleAnalyticsActiveUsers.new,
+                      Returning: item.googleAnalyticsActiveUsers.returning,
                     },
                   }))}
-                  totalKey={'User'}
-                  colors={['#A457FF', '#FC72FF']}
-                  detailData={[
-                    { label: 'Returning', color: '#A457FF' },
+                  colors={[
                     { label: 'New', color: '#FC72FF' },
+                    { label: 'Returning', color: '#A457FF' },
                   ]}
                   height={312}
                 />
@@ -110,32 +105,26 @@ export default function Analytics() {
                 <HistogramChart
                   prefix={'$'}
                   data={analytics.map((item) => {
-                    const value = item.volumeSnapshots
-                      .map(({ symbol, amount, address }) => [
+                    const values = item.volumeSnapshots
+                      .map(({ amount, address }) => [
                         whitelistCurrencies.find((currency) =>
                           isAddressEqual(
                             getAddress(currency.address),
                             getAddress(address),
                           ),
-                        )?.symbol ?? symbol,
+                        )?.symbol,
                         amount * (prices[getAddress(address)] ?? 0),
                       ])
-                      .sort((a, b) => Number(b[1]) - Number(a[1]))
+                      .filter(([symbol]) => symbol !== undefined)
+                      .sort()
                     return {
                       time: item.timestamp as UTCTimestamp,
                       values: {
-                        ...Object.fromEntries(value),
-                        TotalUSD: item.volumeSnapshots.reduce(
-                          (sum, { amount, address }) =>
-                            sum + (prices[getAddress(address)] ?? 0) * amount,
-                          0,
-                        ),
+                        ...Object.fromEntries(values),
                       },
                     }
                   })}
-                  totalKey={'TotalUSD'}
-                  colors={[...Object.values(tokenColorMap), '#4C82FB'].sort()}
-                  detailData={
+                  colors={
                     Object.entries(tokenColorMap)
                       .map(([address, color]) => ({
                         label: whitelistCurrencies.find((currency) =>
@@ -146,10 +135,8 @@ export default function Analytics() {
                         )?.symbol,
                         color,
                       }))
-                      .filter(({ label }) => label) as {
-                      label: string
-                      color: string
-                    }[]
+                      .filter(({ label }) => label !== undefined)
+                      .sort() as any
                   }
                   height={312}
                 />
@@ -169,9 +156,7 @@ export default function Analytics() {
                     time: item.timestamp as UTCTimestamp,
                     values: { Wallet: item.walletCount },
                   }))}
-                  totalKey={'Wallet'}
-                  colors={['#A457FF']}
-                  detailData={[{ label: 'Wallet', color: '#A457FF' }]}
+                  colors={[{ label: 'Wallet', color: '#A457FF' }]}
                   height={312}
                 />
               </div>
@@ -188,9 +173,7 @@ export default function Analytics() {
                     time: item.timestamp as UTCTimestamp,
                     values: { Transaction: item.transactionCount },
                   }))}
-                  totalKey={'Transaction'}
-                  colors={['#FC72FF']}
-                  detailData={[{ label: 'Transaction', color: '#FC72FF' }]}
+                  colors={[{ label: 'Transaction', color: '#FC72FF' }]}
                   height={312}
                 />
               </div>

@@ -7,7 +7,7 @@ import { CrosshairHighlightPrimitive } from './crosshair-highlight-primitive'
 import { CustomHistogramSeries } from './custom-histogram-series'
 
 export type CustomVolumeChartModelParams = {
-  colors: string[]
+  colors: { label: string; color: string }[]
   headerHeight: number
   useThinCrosshair?: boolean
   background?: string

@@ -146,7 +146,7 @@ export abstract class ChartModel<TDataType extends SeriesDataItemType> {
     }
     if (legend) {
       // keep legend centered on mouse cursor if hovered
-      legend.style.left = `${x}px`
+      legend.style.left = `${x - 100}px`
       const heroWidth = 230
       // adjust height of tooltip if hovering below the hero text
       if (x < heroWidth) {

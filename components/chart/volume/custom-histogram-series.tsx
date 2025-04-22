@@ -24,7 +24,7 @@ export class CustomHistogramSeries<TData extends CustomHistogramData>
   implements ICustomSeriesPaneView<Time, TData, CustomHistogramSeriesOptions>
 {
   _renderer: CustomHistogramSeriesRenderer<TData>
-  _colors: string[]
+  _colors: { label: string; color: string }[]
   _background?: string
 
   constructor(props: CustomHistogramProps) {
@@ -55,7 +55,7 @@ export class CustomHistogramSeries<TData extends CustomHistogramData>
   defaultOptions() {
     return {
       ...customSeriesDefaultOptions,
-      colors: this._colors,
+      colors: this._colors.map((color) => color.color),
     }
   }
 }

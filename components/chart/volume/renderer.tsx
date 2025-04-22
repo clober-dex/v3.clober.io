@@ -57,7 +57,7 @@ export function roundRect(
 
 interface BarItem {
   x: number
-  ys: number[]
+  ys: { y: number; label: string }[]
   column?: ColumnPosition
 }
 
@@ -78,7 +78,7 @@ function cumulativeBuildUp(data: StackedHistogramData): number[] {
 }
 
 export interface CustomHistogramProps {
-  colors: string[]
+  colors: { label: string; color: string }[]
   background?: string
 }
 
@@ -87,7 +87,7 @@ export class CustomHistogramSeriesRenderer<TData extends CustomHistogramData>
 {
   _data: PaneRendererCustomData<Time, TData> | null = null
   _options: CustomHistogramSeriesOptions | null = null
-  _colors: string[]
+  _colors: { label: string; color: string }[]
   _background?: string
 
   constructor(props: CustomHistogramProps) {
@@ -133,7 +133,10 @@ export class CustomHistogramSeriesRenderer<TData extends CustomHistogramData>
         : [(bar.originalData as any).value]
       return {
         x: bar.x,
-        ys: cumulativePrice.map((value) => priceToCoordinate(value) ?? 0),
+        ys: cumulativePrice.map((value, index) => ({
+          y: priceToCoordinate(value) ?? 0,
+          label: Object.keys((bar.originalData as any).values)[index],
+        })),
       }
     })
     calculateColumnPositionsInPlace(
@@ -169,7 +172,7 @@ export class CustomHistogramSeriesRenderer<TData extends CustomHistogramData>
       // Modification: draw rounded rect corresponding to total volume
       const totalBox = positionsBox(
         zeroY,
-        stack.ys[stack.ys.length - 1],
+        stack.ys[stack.ys.length - 1].y,
         renderingScope.verticalPixelRatio,
       )
 
@@ -194,8 +197,11 @@ export class CustomHistogramSeriesRenderer<TData extends CustomHistogramData>
         hoveredXPos &&
         hoveredXPos >= stack.x - width / 4 &&
         hoveredXPos <= stack.x + width / 4 + 1
-      stack.ys.forEach((y, index) => {
-        const color = this._colors[this._colors.length - 1 - index] // color v2, then v3
+      stack.ys.forEach(({ y, label }) => {
+        const color = this._colors.find((color) => color.label === label)?.color
+        if (!color) {
+          return
+        }
         const stackBoxPositions = positionsBox(
           previousY,
           y,

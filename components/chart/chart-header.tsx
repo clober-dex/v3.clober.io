@@ -63,7 +63,9 @@ export function ChartHeader({
           {additionalFields}
           <HeaderTimeDisplay time={time} timePlaceholder={timePlaceholder} />
         </div>
-        {isHovered && detailData && <Legend data={detailData} />}
+        {isHovered && detailData && Object.keys(detailData).length > 1 && (
+          <Legend data={detailData} />
+        )}
       </div>
     </View>
   )

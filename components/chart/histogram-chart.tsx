@@ -11,16 +11,12 @@ import { ChartHeader } from './chart-header'
 
 export const HistogramChart = ({
   data,
-  totalKey,
   colors,
-  detailData,
   height,
   prefix,
 }: {
   data: StackedHistogramData[]
-  totalKey: string
-  colors: string[]
-  detailData: { label: string; color: string }[]
+  colors: { label: string; color: string }[]
   height: number
   prefix?: string
 }) => {
@@ -31,14 +27,16 @@ export const HistogramChart = ({
   }
   const last = useMemo(
     () =>
-      data[
-        data.length > 2
-          ? data.length - 2
-          : data.length > 1
-            ? data.length - 1
-            : 0
-      ].values[totalKey as keyof StackedHistogramData['values']] ?? 0,
-    [data, totalKey],
+      Object.values(
+        data[
+          data.length > 2
+            ? data.length - 2
+            : data.length > 1
+              ? data.length - 1
+              : 0
+        ].values ?? {},
+      ).reduce((acc: number, value) => acc + (value ?? 0), 0),
+    [data],
   )
 
   return (
@@ -55,31 +53,36 @@ export const HistogramChart = ({
             height={height}
           >
             {(crosshairData) => {
+              const total = Object.values(crosshairData?.values ?? {}).reduce(
+                (acc: number, value) => acc + (value ?? 0),
+                0,
+              )
               return (
                 <ChartHeader
                   value={`${prefix ?? ''}${
-                    crosshairData
-                      ? toHumanReadableString(
-                          crosshairData.values[totalKey] ?? 0,
-                        )
+                    crosshairData && crosshairData.values
+                      ? toHumanReadableString(total)
                       : toHumanReadableString(last)
                   }`}
                   time={crosshairData?.time}
                   detailData={
                     crosshairData
-                      ? detailData
+                      ? (colors
                           .map(({ label, color }) => ({
                             label,
-                            value: `${prefix ?? ''}${toHumanReadableString(
-                              crosshairData.values[label] ?? 0,
-                            )}`,
+                            value: crosshairData.values[label]
+                              ? `${prefix ?? ''}${toHumanReadableString(
+                                  crosshairData.values[label]!,
+                                )}`
+                              : undefined,
                             color,
                           }))
+                          .filter(({ value }) => value !== undefined)
                           .sort(
                             (a, b) =>
-                              (crosshairData.values[a.label] ?? 0) -
-                              (crosshairData.values[b.label] ?? 0),
-                          )
+                              (crosshairData.values[b.label] ?? 0) -
+                              (crosshairData.values[a.label] ?? 0),
+                          ) as any)
                       : []
                   }
                 />
