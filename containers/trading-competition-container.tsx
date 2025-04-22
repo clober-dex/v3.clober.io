@@ -141,6 +141,7 @@ const Profit = ({
               chain={chain}
               key={`trading-competition-currency-icon-${i}`}
               currency={currency}
+              unoptimized={true}
               className={`rounded-full ${i > 0 ? 'absolute' : ''} w-[16px] h-[16px]`}
               style={i > 0 ? { left: `${12 * i}px`, zIndex: i + 1 } : undefined}
             />
@@ -653,7 +654,6 @@ export const TradingCompetitionContainer = () => {
                       <CurrencyIcon
                         chain={selectedChain}
                         currency={currency}
-                        unoptimized={true}
                         className={`w-[28px] h-[28px] sm:w-[36px] sm:h-[36px] rounded-full transition-transform duration-300 transform ${isLong ? 'animate-bounce-up' : 'animate-bounce-down grayscale group-hover:grayscale-0'}`}
                       />
                     </div>
