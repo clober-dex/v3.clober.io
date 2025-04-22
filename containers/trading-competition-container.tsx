@@ -745,7 +745,6 @@ export const TradingCompetitionContainer = () => {
               }
               values={Object.entries(allUserPnL)
                 .sort(([, a], [, b]) => b.totalPnl - a.totalPnl)
-                .slice(0, 100)
                 .map(([address, { totalPnl, trades }], index) => ({
                   address: getAddress(address),
                   value: (
@@ -762,7 +761,7 @@ export const TradingCompetitionContainer = () => {
           ) : (
             <div
               role="status"
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 mt-24"
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 mt-36"
             >
               <svg
                 aria-hidden="true"
