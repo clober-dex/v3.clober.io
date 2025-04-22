@@ -208,7 +208,7 @@ export class CustomHistogramSeriesRenderer<TData extends CustomHistogramData>
           renderingScope.verticalPixelRatio,
         )
         ctx.fillStyle = color
-        ctx.globalAlpha = isStackedHistogram && !isHovered ? 0.24 : 1
+        ctx.globalAlpha = isStackedHistogram && !isHovered ? 0.66 : 1
         ctx.fillRect(
           column.left + margin,
           stackBoxPositions.position,
