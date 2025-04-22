@@ -84,13 +84,13 @@ export default function Analytics() {
                   data={analytics.map((item) => ({
                     time: item.timestamp as UTCTimestamp,
                     values: {
-                      New: item.googleAnalyticsActiveUsers.new,
                       Returning: item.googleAnalyticsActiveUsers.returning,
+                      New: item.googleAnalyticsActiveUsers.new,
                     },
                   }))}
                   colors={[
-                    { label: 'New', color: '#FC72FF' },
-                    { label: 'Returning', color: '#A457FF' },
+                    { label: 'New', color: '#40DE7A' },
+                    { label: 'Returning', color: '#3B82F6' },
                   ]}
                   height={312}
                 />
