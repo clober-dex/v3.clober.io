@@ -237,6 +237,12 @@ export const fetchAllMarkets = async (
               getAddress(book.quote.id),
             ),
         )
+        const bidSideUpdateGap =
+          bidSideUpdatedAt -
+          (prevMarket?.bidSideUpdatedAt || currentTimestampInSeconds)
+        const askSideUpdateGap =
+          askSideUpdatedAt -
+          (prevMarket?.askSideUpdatedAt || currentTimestampInSeconds)
         return {
           baseCurrency: isAddressEqual(getAddress(book.base.id), zeroAddress)
             ? { ...chain.nativeCurrency, address: zeroAddress }
@@ -255,16 +261,10 @@ export const fetchAllMarkets = async (
                 symbol: book.quote.symbol,
               },
           createAt: Number(0), // todo
-          bidSideUpdatedAt: Number(book.latestTimestamp),
-          isBidTaken:
-            bidSideUpdatedAt -
-              (prevMarket?.bidSideUpdatedAt || currentTimestampInSeconds) >
-            0,
-          askSideUpdatedAt: Number(askBook?.latestTimestamp) || 0,
-          isAskTaken:
-            askSideUpdatedAt -
-              (prevMarket?.askSideUpdatedAt || currentTimestampInSeconds) >
-            0,
+          bidSideUpdatedAt,
+          isBidTaken: 0 < bidSideUpdateGap && bidSideUpdateGap < 60,
+          askSideUpdatedAt,
+          isAskTaken: 0 < askSideUpdateGap && askSideUpdateGap < 60,
           price: latestPrice,
           dailyVolume:
             Number(chartLog?.baseVolume ?? 0) * (basePrice || latestPrice),

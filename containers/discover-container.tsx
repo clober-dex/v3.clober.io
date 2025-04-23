@@ -98,20 +98,20 @@ export const DiscoverContainer = () => {
         prevSubgraphBlockNumber.current !==
         latestSubgraphBlockNumber.blockNumber
       ) {
-        const market = await fetchAllMarkets(
+        const markets = await fetchAllMarkets(
           publicClient,
           selectedChain,
           prices,
           whitelistCurrencies.map((currency) => currency.address),
           prevMarkets.current,
         )
-        prevMarkets.current = market
+        prevMarkets.current = markets
         prevSubgraphBlockNumber.current = latestSubgraphBlockNumber.blockNumber
         localStorage.setItem(
           LOCAL_STORAGE_MARKET_KEY(selectedChain),
-          JSON.stringify(market),
+          JSON.stringify(markets),
         )
-        return market
+        return markets
       }
       return prevMarkets.current
     },
