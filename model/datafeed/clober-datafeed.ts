@@ -139,72 +139,63 @@ export default class CloberDatafeed implements IBasicDataFeed {
     periodParams: PeriodParams,
     onResult: HistoryCallback,
   ) {
-    try {
-      const { from, to, firstDataRequest } = periodParams
-      console.log(
-        '[getBars]: Method call',
-        symbolInfo.name,
-        resolution,
+    const { from, to, firstDataRequest } = periodParams
+    console.log('[getBars]: Method call', symbolInfo.name, resolution, from, to)
+    if (to === 0) {
+      onResult([], {
+        noData: true,
+      })
+      return
+    }
+    const resolutionKey = (SUPPORTED_INTERVALS.find(
+      (interval) => interval[0] === resolution,
+    ) || SUPPORTED_INTERVALS[0])[1]
+
+    const chartLogs = (
+      await getChartLogs({
+        chainId: this.chainId.valueOf(),
+        quote: this.quoteCurrency.address,
+        base: this.baseCurrency.address,
+        intervalType: resolutionKey,
         from,
         to,
-      )
-      if (to === 0) {
-        onResult([], {
-          noData: true,
-        })
-        return
-      }
-      const resolutionKey = (SUPPORTED_INTERVALS.find(
-        (interval) => interval[0] === resolution,
-      ) || SUPPORTED_INTERVALS[0])[1]
-
-      const chartLogs = (
-        await getChartLogs({
-          chainId: this.chainId.valueOf(),
-          quote: this.quoteCurrency.address,
-          base: this.baseCurrency.address,
-          intervalType: resolutionKey,
-          from,
-          to,
-        })
-      ).filter((v) => Number(v.close) > 0 && Number(v.open) > 0)
-      if (chartLogs.length === 0) {
-        onResult([], {
-          noData: true,
-        })
-        return
-      }
-
-      const bars = chartLogs.map<Bar>((v, index) => ({
-        time: Number(v.timestamp) * 1000,
-        open:
-          Number(index === 0 ? v.open : chartLogs[index - 1].close) *
-          this.totalSupply,
-        high: Number(v.high) * this.totalSupply,
-        low: Number(v.low) * this.totalSupply,
-        close: Number(v.close) * this.totalSupply,
-        volume: Number(v.volume) * this.totalSupply,
-      }))
-
-      if (firstDataRequest) {
-        this.lastBarsCache.set(
-          this.buildCacheKey(
-            symbolInfo.ticker ?? '',
-            resolution,
-            this.totalSupply,
-          ),
-          {
-            ...bars[bars.length - 1],
-          },
-        )
-      }
-
-      onResult(bars, {
-        noData: false,
       })
-    } catch (error) {
-      console.error((error as Error).message)
-      await this.getBars(symbolInfo, resolution, periodParams, onResult)
+    ).filter((v) => Number(v.close) > 0 && Number(v.open) > 0)
+    if (chartLogs.length === 0) {
+      onResult([], {
+        noData: true,
+      })
+      return
+    }
+
+    const bars = chartLogs.map<Bar>((v, index) => ({
+      time: Number(v.timestamp) * 1000,
+      open:
+        Number(index === 0 ? v.open : chartLogs[index - 1].close) *
+        this.totalSupply,
+      high: Number(v.high) * this.totalSupply,
+      low: Number(v.low) * this.totalSupply,
+      close: Number(v.close) * this.totalSupply,
+      volume: Number(v.volume) * this.totalSupply,
+    }))
+
+    if (firstDataRequest) {
+      this.lastBarsCache.set(
+        this.buildCacheKey(
+          symbolInfo.ticker ?? '',
+          resolution,
+          this.totalSupply,
+        ),
+        {
+          ...bars[bars.length - 1],
+        },
+      )
+    }
+
+    if (bars) {
+      onResult(bars, {
+        noData: true,
+      })
     }
   }
 
@@ -213,6 +204,7 @@ export default class CloberDatafeed implements IBasicDataFeed {
     resolution: ResolutionString,
     onTick: SubscribeBarsCallback,
     listenerGuid: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onResetCacheNeededCallback: () => void,
   ) {
     if (!symbolInfo.ticker || this.subscriber[listenerGuid]) {
@@ -221,62 +213,57 @@ export default class CloberDatafeed implements IBasicDataFeed {
     console.log('[subscribeBars]: Method call', listenerGuid)
 
     this.subscriber[listenerGuid] = setIntervalAsync(async () => {
-      try {
-        const ticker = symbolInfo.ticker ?? ''
-        const { timestamp, close, open, volume, high, low } =
-          await getLatestChartLog({
-            chainId: this.chainId.valueOf(),
-            base: this.baseCurrency.address,
-            quote: this.quoteCurrency.address,
-          })
+      const ticker = symbolInfo.ticker ?? ''
+      const { timestamp, close, open, volume, high, low } =
+        await getLatestChartLog({
+          chainId: this.chainId.valueOf(),
+          base: this.baseCurrency.address,
+          quote: this.quoteCurrency.address,
+        })
 
-        const intervalInNumber = (SUPPORTED_INTERVALS.find(
-          (interval) => interval[0] === resolution,
-        ) || SUPPORTED_INTERVALS[0])[2]
+      const intervalInNumber = (SUPPORTED_INTERVALS.find(
+        (interval) => interval[0] === resolution,
+      ) || SUPPORTED_INTERVALS[0])[2]
 
-        // We assume here that the data received will have the same timestamp
-        const timestampForAcc =
-          Math.floor((timestamp * 1000) / intervalInNumber) * intervalInNumber
-        const lastTickBar = this.lastBarsCache.get(
-          this.buildCacheKey(ticker, resolution, this.totalSupply),
-        )
-        const nextTickTime = (lastTickBar?.time || 0) + intervalInNumber
-        const bar =
-          timestampForAcc >= nextTickTime || !lastTickBar
-            ? {
-                time: timestamp * 1000,
-                open: Number(open) * this.totalSupply,
-                high: Number(high) * this.totalSupply,
-                low: Number(low) * this.totalSupply,
-                close: Number(close) * this.totalSupply,
-                volume: Number(volume) * this.totalSupply,
-              }
-            : {
-                time: lastTickBar.time,
-                open: lastTickBar.open,
-                high: Math.max(
-                  Number(close) * this.totalSupply,
-                  lastTickBar.high,
-                ),
-                low: Math.min(
-                  Number(close) * this.totalSupply,
-                  lastTickBar.low,
-                ),
-                close: Number(close) * this.totalSupply,
-                volume: Number(volume) * this.totalSupply,
-              }
+      // We assume here that the data received will have the same timestamp
+      const timestampForAcc =
+        Math.floor((timestamp * 1000) / intervalInNumber) * intervalInNumber
+      const lastTickBar = this.lastBarsCache.get(
+        this.buildCacheKey(ticker, resolution, this.totalSupply),
+      )
+      const nextTickTime = (lastTickBar?.time || 0) + intervalInNumber
+      const bar =
+        timestampForAcc >= nextTickTime || !lastTickBar
+          ? {
+              time: timestamp * 1000,
+              open: Number(open) * this.totalSupply,
+              high: Number(high) * this.totalSupply,
+              low: Number(low) * this.totalSupply,
+              close: Number(close) * this.totalSupply,
+              volume: Number(volume) * this.totalSupply,
+            }
+          : {
+              time: lastTickBar.time,
+              open: lastTickBar.open,
+              high: Math.max(
+                Number(close) * this.totalSupply,
+                lastTickBar.high,
+              ),
+              low: Math.min(Number(close) * this.totalSupply, lastTickBar.low),
+              close: Number(close) * this.totalSupply,
+              volume: Number(volume) * this.totalSupply,
+            }
 
-        this.lastBarsCache.set(
-          this.buildCacheKey(ticker, resolution, this.totalSupply),
-          bar,
-        )
+      this.lastBarsCache.set(
+        this.buildCacheKey(ticker, resolution, this.totalSupply),
+        bar,
+      )
 
+      if (bar) {
         onTick(bar)
-
-        onResetCacheNeededCallback()
-      } catch (e) {
-        console.error(e)
       }
+
+      // onResetCacheNeededCallback()
     }, 2000)
   }
 
