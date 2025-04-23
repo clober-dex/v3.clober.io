@@ -111,7 +111,7 @@ const Profit = ({
       trades
         .filter(({ pnl }) => Math.abs(pnl) > 0.0001)
         .map(({ currency, pnl }) => ({
-          label: currency.symbol,
+          label: (currency.symbol.split('-')?.[0] ?? '').toUpperCase(),
           color: tokenColorMap[getAddress(currency.address)],
           value: `${pnl === 0 ? '' : pnl > 0 ? '+' : '-'}$${toCommaSeparated(Math.abs(pnl).toFixed(4))}`,
         })) ?? [],
