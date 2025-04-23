@@ -121,75 +121,70 @@ export const fetchTradingCompetitionLeaderboard = async (
     return cachedData.data
   }
   const {
-    data: { sortedTradesByPnL },
+    data: { users },
   } = await Subgraph.get<{
     data: {
-      sortedTradesByPnL: Array<{
-        user: { id: string }
-        token: { id: string; decimals: string; name: string; symbol: string }
-        realizedPnL: string
-        estimatedHolding: string
+      users: Array<{
+        id: string
         pnl: string
+        trades: Array<{
+          token: { id: string; decimals: string; symbol: string }
+          realizedPnL: string
+          estimatedHolding: string
+        }>
       }>
     }
   }>(
     FUTURES_SUBGRAPH_ENDPOINT[chainId]!,
-    'getTrades',
-    '{ sortedTradesByPnL: trades( first: 1000 orderBy: pnl orderDirection: desc where: {user_: {isRegistered: true}} ) { user { id } token { id decimals name symbol } realizedPnL estimatedHolding pnl } }',
+    'getUsersPnL',
+    '{ users( first: 1000 orderBy: pnl orderDirection: desc where: {isRegistered: true} ) { id pnl trades { token { id decimals symbol } realizedPnL estimatedHolding } } }',
     {},
   )
-  const trades = sortedTradesByPnL.map((trade) => {
-    const token = getAddress(trade.token.id)
-    const amount = formatUnits(
-      BigInt(trade.estimatedHolding),
-      Number(trade.token.decimals),
+  const results = users
+    .filter(
+      (user) =>
+        !BLACKLISTED_USER_ADDRESSES.some((address) =>
+          isAddressEqual(user.id as `0x${string}`, address),
+        ),
     )
-    return {
-      user: getAddress(trade.user.id),
-      currency: {
-        address: token,
-        symbol: trade.token.symbol,
-        name: trade.token.name,
-        decimals: Number(trade.token.decimals),
-      },
-      amount: Number(amount),
-      pnl: Number(trade.realizedPnL) + Number(amount) * prices[token],
-    }
-  })
-
-  const results = trades.reduce(
-    (acc, trade) => {
-      if (
-        BLACKLISTED_USER_ADDRESSES.some((address) =>
-          isAddressEqual(getAddress(trade.user), address),
-        )
-      ) {
-        return acc
-      }
-      const user = getAddress(trade.user)
-      if (!acc[user]) {
-        acc[user] = {
-          totalPnl: 0,
-          trades: [],
+    .reduce(
+      (acc, user) => {
+        const userAddress = getAddress(user.id)
+        acc[userAddress] = {
+          trades: user.trades.map((trade) => {
+            const token = getAddress(trade.token.id)
+            const amount = formatUnits(
+              BigInt(trade.estimatedHolding),
+              Number(trade.token.decimals),
+            )
+            const pnl =
+              Number(trade.realizedPnL) + Number(amount) * prices[token]
+            return {
+              currency: {
+                address: token,
+                symbol: trade.token.symbol,
+                name: trade.token.symbol,
+                decimals: Number(trade.token.decimals),
+              },
+              pnl,
+              amount: Number(amount),
+            }
+          }),
+          totalPnl: user.trades.reduce((acc, trade) => {
+            const token = getAddress(trade.token.id)
+            const amount = formatUnits(
+              BigInt(trade.estimatedHolding),
+              Number(trade.token.decimals),
+            )
+            return (
+              acc + Number(trade.realizedPnL) + Number(amount) * prices[token]
+            )
+          }, 0),
         }
-      }
-      acc[user].totalPnl += trade.pnl
-      acc[user].trades.push({
-        currency: {
-          address: trade.currency.address,
-          symbol: trade.currency.symbol,
-          name: trade.currency.name,
-          decimals: trade.currency.decimals,
-        },
-        pnl: trade.pnl,
-        amount: trade.amount,
-      })
-      return acc
-    },
-    {} as {
-      [user: `0x${string}`]: TradingCompetitionPnl
-    },
-  )
+        return acc
+      },
+      {} as { [user: `0x${string}`]: TradingCompetitionPnl },
+    )
   cache.set(cacheKey, {
     data: results,
     timestamp: currentTimestampInSeconds(),
