@@ -103,26 +103,32 @@ const CurrencySelect = ({
           </div>
           <div className="w-6 h-6 shrink-0"></div>
         </div>
-        <div className="flex flex-col relative rounded shadow-sm">
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <div className="relative h-4 w-4">
-              <SearchSvg />
+        <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col relative rounded shadow-sm">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <div className="relative h-4 w-4">
+                <SearchSvg />
+              </div>
+            </div>
+            <div className="inline-block">
+              <div className="invisible h-0 mx-[29px]" aria-hidden="true">
+                Search by token name, symbol, or address
+              </div>
+              <input
+                type="search"
+                name="search"
+                id="search"
+                className="inline w-full rounded-md border-0 pl-10 py-3 text-gray-500 bg-gray-800 placeholder:text-gray-500 text-xs sm:text-sm"
+                placeholder="Search by token name, symbol, or address"
+                value={value}
+                onChange={(event) => setValue(event.target.value)}
+              />
             </div>
           </div>
-          <div className="inline-block">
-            <div className="invisible h-0 mx-[29px]" aria-hidden="true">
-              Search by token name, symbol, or address
-            </div>
-            <input
-              type="search"
-              name="search"
-              id="search"
-              className="inline w-full rounded-md border-0 pl-10 py-3 text-gray-500 bg-gray-800 placeholder:text-gray-500 text-xs sm:text-sm"
-              placeholder="Search by token name, symbol, or address"
-              value={value}
-              onChange={(event) => setValue(event.target.value)}
-            />
-          </div>
+          <span className="self-stretch justify-start text-gray-400 text-[13px] font-medium">
+            Trade any ERC-20 token permissionlessly. Just paste the token
+            address to get started.
+          </span>
         </div>
         <div className="flex flex-col h-full overflow-y-auto custom-scrollbar bg-gray-[#171b24] rounded-b-xl sm:rounded-b-3xl">
           {deduplicateCurrencies(
