@@ -155,6 +155,26 @@ function App({ Component, pageProps }: AppProps) {
     return () => window.removeEventListener('popstate', handlePopState)
   }, [handlePopState])
 
+  // Tally script
+  useEffect(() => {
+    const script = document.createElement('script')
+    script.src = 'https://tally.so/widgets/embed.js'
+    script.defer = true
+    document.body.appendChild(script)
+
+    script.onload = () => {
+      if ((window as any).Tally) {
+        ;(window as any).Tally.openPopup('3qgBN2', {
+          layout: 'modal',
+          width: 500,
+          overlay: true,
+          doNotShowAfterSubmit: true,
+          theme: 'dark',
+        })
+      }
+    }
+  }, [])
+
   const getBackground = (pathname: string) => {
     if (pathname.includes('/trade')) {
       return "lg:bg-[url('../public/trade-background.png')] lg:bg-top"
