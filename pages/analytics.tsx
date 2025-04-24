@@ -12,8 +12,8 @@ import RedirectIfNotMonadTestnetContainer from '../containers/redirect-if-not-mo
 import { Loading } from '../components/loading'
 import tamaguiConfig from '../tamagui.config'
 import { Chart } from '../components/chart/chart-model'
-import { VaultPerformanceChartModel } from '../components/chart/vault-performance-chart-model'
 import { ChartHeader } from '../components/chart/chart-header'
+import { StackedChartModel } from '../components/chart/stacked/stacked-chart-model'
 
 export default function Analytics() {
   const { prices, whitelistCurrencies } = useCurrencyContext()
@@ -219,7 +219,7 @@ export default function Analytics() {
                   {(() => {
                     return (
                       <Chart
-                        Model={VaultPerformanceChartModel}
+                        Model={StackedChartModel}
                         params={
                           {
                             data: retentionRate,
