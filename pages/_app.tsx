@@ -12,6 +12,7 @@ import type { AppProps } from 'next/app'
 import { WagmiProvider } from 'wagmi'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
+import { Analytics } from '@vercel/analytics/next'
 
 import HeaderContainer from '../containers/header-container'
 import { ChainProvider, useChainContext } from '../contexts/chain-context'
@@ -233,6 +234,7 @@ function App({ Component, pageProps }: AppProps) {
           </ChainProvider>
         </WalletProvider>
       </ErrorBoundary>
+      <Analytics />
     </>
   )
 }
