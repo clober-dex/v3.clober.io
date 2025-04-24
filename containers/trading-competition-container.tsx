@@ -759,6 +759,7 @@ export const TradingCompetitionContainer = () => {
                   ),
                   rank: index + 1,
                 }))}
+              maxDisplayRank={30}
             />
           ) : (
             <Loading />

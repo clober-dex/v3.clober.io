@@ -42,6 +42,7 @@ export const PointContainer = () => {
 
             <LeaderBoard
               explorerUrl="https://clober.io"
+              maxDisplayRank={100}
               myValue={
                 myVaultPoint && userAddress
                   ? {

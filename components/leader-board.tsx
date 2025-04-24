@@ -12,6 +12,7 @@ export const LeaderBoard = ({
   explorerUrl,
   values,
   myValue,
+  maxDisplayRank,
 }: {
   explorerUrl: string
   values: {
@@ -23,6 +24,7 @@ export const LeaderBoard = ({
     value: React.ReactNode
     address: `0x${string}`
   }
+  maxDisplayRank: number
 }) => {
   const width = useWindowWidth()
   const isMobile = width < 640
@@ -32,12 +34,14 @@ export const LeaderBoard = ({
 
   const sortedValues = useMemo(
     () =>
-      [...values].sort(
-        (a, b) =>
-          (a.rank ?? Number.MAX_SAFE_INTEGER) -
-          (b.rank ?? Number.MAX_SAFE_INTEGER),
-      ),
-    [values],
+      [...values]
+        .sort(
+          (a, b) =>
+            (a.rank ?? Number.MAX_SAFE_INTEGER) -
+            (b.rank ?? Number.MAX_SAFE_INTEGER),
+        )
+        .slice(0, maxDisplayRank ?? 100),
+    [maxDisplayRank, values],
   )
 
   const Row = ({
