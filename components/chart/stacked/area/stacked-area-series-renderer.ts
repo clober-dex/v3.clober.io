@@ -47,15 +47,25 @@ function moveYs(
   firstYs: number,
   ys: number,
   verticalPixelRatio: number,
+  multiplier = 1,
 ): number {
-  return ys * verticalPixelRatio + (ys / firstYs - 1) * 1000
+  return ys * verticalPixelRatio + (ys / firstYs - 1) * multiplier
 }
 
 export class StackedAreaSeriesRenderer<TData extends StackedAreaData>
   implements ICustomSeriesPaneRenderer
 {
+  private readonly yMultiplier: number
   _data: PaneRendererCustomData<Time, TData> | null = null
   _options: StackedAreaSeriesOptions | null = null
+
+  constructor(
+    { yMultiplier = 1 }: { yMultiplier?: number } = {
+      yMultiplier: 1,
+    },
+  ) {
+    this.yMultiplier = yMultiplier
+  }
 
   draw(
     target: CanvasRenderingTarget2D,
@@ -255,6 +265,7 @@ export class StackedAreaSeriesRenderer<TData extends StackedAreaData>
         firstYs,
         priceToCoordinate(price) ?? 0,
         renderingScope.verticalPixelRatio,
+        this.yMultiplier,
       ),
     )
 
@@ -306,7 +317,7 @@ export class StackedAreaSeriesRenderer<TData extends StackedAreaData>
         }
 
         const x = stack.x * horizontalPixelRatio
-        const y = moveYs(firstYs, yMedia, verticalPixelRatio)
+        const y = moveYs(firstYs, yMedia, verticalPixelRatio, this.yMultiplier)
 
         if (i === hoveredIndex) {
           hoverInfo.points[index] = y
@@ -355,7 +366,7 @@ export class StackedAreaSeriesRenderer<TData extends StackedAreaData>
         }
 
         const x = stack.x * horizontalPixelRatio
-        const y = moveYs(firstYs, yMedia, verticalPixelRatio)
+        const y = moveYs(firstYs, yMedia, verticalPixelRatio, this.yMultiplier)
 
         if (i === hoveredIndex) {
           hoverInfo.points[index] = y

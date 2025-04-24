@@ -22,6 +22,7 @@ export interface StackedLineData extends WhitespaceData<UTCTimestamp> {
 
 interface TVLChartParams extends ChartModelParams<StackedLineData> {
   colors: string[]
+  yMultiplier?: number
   gradients?: { start: string; end: string }[]
 }
 
@@ -34,7 +35,7 @@ export class TVLChartModel extends ChartModel<StackedLineData> {
     super(chartDiv, params)
 
     this.series = this.api.addCustomSeries(
-      new StackedAreaSeries(),
+      new StackedAreaSeries({ yMultiplier: params.yMultiplier }),
       {} as DeepPartial<CustomStyleOptions>,
     )
 

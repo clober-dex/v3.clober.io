@@ -19,8 +19,12 @@ export class StackedAreaSeries<TData extends StackedAreaData>
 {
   _renderer: StackedAreaSeriesRenderer<TData>
 
-  constructor() {
-    this._renderer = new StackedAreaSeriesRenderer()
+  constructor(
+    { yMultiplier = 1 }: { yMultiplier?: number } = {
+      yMultiplier: 1,
+    },
+  ) {
+    this._renderer = new StackedAreaSeriesRenderer({ yMultiplier })
   }
 
   priceValueBuilder(plotRow: TData): CustomSeriesPricePlotValues {

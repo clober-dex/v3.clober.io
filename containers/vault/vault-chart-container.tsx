@@ -24,6 +24,7 @@ export const VaultChartContainer = ({
         values: showPnL ? [entry.values[1], 0] : [entry.values[0], 0],
       })),
       colors: ['#4C82FB', '#FC72FF'],
+      yMultiplier: 1000,
       gradients: [
         {
           start: 'rgba(96, 123, 238, 0.20)',
