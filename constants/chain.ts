@@ -9,6 +9,8 @@ import { riseSepolia } from './chains/rise-sepolia'
 
 let config: any | null = null
 
+export const supportedChains: Chain[] = [base, monadTestnet, riseSepolia]
+
 export const getChain = (): Chain => {
   const url = window.location.href
   const _monadTestnet: Chain = {
@@ -28,7 +30,9 @@ export const getChain = (): Chain => {
   } else if (url.includes('rise.clober.io')) {
     return _riseTestnet
   }
-  return _monadTestnet
+  const chainId = Number(process.env.NEXT_PUBLIC_CHAIN_ID ?? _monadTestnet.id)
+  const chain = supportedChains.find((chain) => chain.id === chainId)
+  return chain ?? _monadTestnet
 }
 
 export const getClientConfig = () => {
