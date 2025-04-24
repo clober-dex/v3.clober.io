@@ -13,11 +13,12 @@ import { WagmiProvider } from 'wagmi'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { Analytics } from '@vercel/analytics/next'
+import { monadTestnet } from 'viem/chains'
 
 import HeaderContainer from '../containers/header-container'
 import { ChainProvider, useChainContext } from '../contexts/chain-context'
 import { MarketProvider } from '../contexts/trade/market-context'
-import { getClientConfig } from '../constants/chain'
+import { getChain, getClientConfig } from '../constants/chain'
 import {
   TransactionProvider,
   useTransactionContext,
@@ -157,20 +158,21 @@ function App({ Component, pageProps }: AppProps) {
 
   // Tally script
   useEffect(() => {
-    const script = document.createElement('script')
-    script.src = 'https://tally.so/widgets/embed.js'
-    script.defer = true
-    document.body.appendChild(script)
+    if (getChain().id === monadTestnet.id) {
+      const script = document.createElement('script')
+      script.src = 'https://tally.so/widgets/embed.js'
+      script.defer = true
+      document.body.appendChild(script)
 
-    script.onload = () => {
-      if ((window as any).Tally) {
-        ;(window as any).Tally.openPopup('3qgBN2', {
-          layout: 'modal',
-          width: 500,
-          overlay: true,
-          doNotShowAfterSubmit: true,
-          theme: 'dark',
-        })
+      script.onload = () => {
+        if ((window as any).Tally) {
+          ;(window as any).Tally.openPopup('3qgBN2', {
+            layout: 'modal',
+            width: 500,
+            overlay: true,
+            doNotShowAfterSubmit: true,
+          })
+        }
       }
     }
   }, [])
