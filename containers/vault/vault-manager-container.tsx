@@ -256,7 +256,6 @@ export const VaultManagerContainer = ({
                       : router.push(`/earn/${vault.key}/dashboard`)
                   }
                   className="hidden lg:flex w-fit h-8 px-3 py-2 bg-blue-500 rounded-lg justify-center items-center gap-1"
-                  rel="noreferrer"
                 >
                   <div className="grow shrink basis-0 opacity-90 text-center text-white text-sm font-bold">
                     {showDashboard ? 'Add Liquidity' : 'Dashboard'}

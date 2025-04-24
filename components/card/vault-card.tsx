@@ -54,7 +54,6 @@ export const VaultCard = ({
             <button
               onClick={() => router.push(`/earn/${vault.key}/dashboard`)}
               className="flex w-[130px] h-8 px-3 py-2 bg-blue-500 rounded-lg justify-center items-center gap-1"
-              rel="noreferrer"
             >
               <div className="grow shrink basis-0 opacity-90 text-center text-white text-sm font-bold">
                 Dashboard
@@ -68,7 +67,6 @@ export const VaultCard = ({
                 )
               }
               className="flex w-[130px] h-8 px-3 py-2 bg-blue-500 rounded-lg justify-center items-center gap-1"
-              rel="noreferrer"
             >
               <div className="grow shrink basis-0 opacity-90 text-center text-white text-sm font-bold">
                 Trade
@@ -78,7 +76,6 @@ export const VaultCard = ({
           <button
             onClick={() => router.push(`/earn/${vault.key}`)}
             className={`flex w-40 h-8 px-3 py-2 bg-blue-500 rounded-lg justify-center items-center gap-1`}
-            rel="noreferrer"
           >
             <div className="grow shrink basis-0 opacity-90 text-center text-white text-sm font-bold">
               Add Liquidity
@@ -112,7 +109,6 @@ export const VaultCard = ({
           <button
             onClick={() => router.push(`/earn/${vault.key}`)}
             className="flex ml-auto"
-            rel="noreferrer"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

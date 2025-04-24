@@ -71,7 +71,6 @@ export const FuturesAssetCard = ({
           <button
             onClick={() => router.push(`/futures/mint/${asset.id}`)}
             className="flex w-32 h-8 px-3 py-2 bg-blue-500 rounded-lg justify-center items-center gap-1"
-            rel="noreferrer"
           >
             <div className="grow shrink basis-0 opacity-90 text-center text-white text-sm font-bold">
               Mint
@@ -95,7 +94,6 @@ export const FuturesAssetCard = ({
           <button
             onClick={() => router.push(`/futures/mint/${getAddress(asset.id)}`)}
             className="flex ml-auto"
-            rel="noreferrer"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

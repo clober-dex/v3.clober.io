@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import Link from 'next/link'
 import { useAccount, useDisconnect } from 'wagmi'
 import { useRouter } from 'next/router'
 import {
@@ -96,23 +95,23 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
       <div className="flex items-center bg-gray-800 bg-opacity-50 justify-between h-[46px] md:h-[60px] py-0 px-4">
         <div className="flex items-center gap-2.5 md:gap-12">
           {router.pathname.includes('/futures') ? (
-            <Link
+            <a
               className="flex gap-2 items-center"
               target="_blank"
               href="https://alpha.clober.io/futures"
-              rel="noreferrer"
+              rel="noopener noreferrer"
             >
               <img className="h-7 sm:h-9" src="/futures-logo.svg" alt="logo" />
-            </Link>
+            </a>
           ) : (
-            <Link
+            <a
               className="flex gap-2 items-center"
               target="_blank"
               href="https://clober.io"
-              rel="noreferrer"
+              rel="noopener noreferrer"
             >
               <img className="h-5 md:h-7" src="/logo.svg" alt="logo" />
-            </Link>
+            </a>
           )}
           <div className="hidden xl:flex py-1 justify-start items-center gap-8">
             <PageButtons />

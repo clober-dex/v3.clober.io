@@ -1,7 +1,6 @@
 import React, { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
-import Link from 'next/link'
 import { NextRouter } from 'next/router'
 import { CHAIN_IDS } from '@clober/v2-sdk'
 
@@ -95,7 +94,7 @@ const Panel = ({
                         />
                       </svg>
                       <div className="flex flex-col gap-8">
-                        <Link
+                        <a
                           className="link"
                           target="_blank"
                           href="https://github.com/clober-dex/"
@@ -105,8 +104,8 @@ const Panel = ({
                             <GithubLogoSvg className="w-4 h-4" />
                             Github
                           </div>
-                        </Link>
-                        <Link
+                        </a>
+                        <a
                           className="link"
                           target="_blank"
                           href="https://docs.clober.io/"
@@ -116,8 +115,8 @@ const Panel = ({
                             <DocsIconSvg className="w-4 h-4" />
                             Docs
                           </div>
-                        </Link>
-                        <Link
+                        </a>
+                        <a
                           className="link"
                           target="_blank"
                           href="https://x.com/CloberDEX"
@@ -127,8 +126,8 @@ const Panel = ({
                             <TwitterLogoSvg className="w-4 h-4" />
                             Twitter
                           </div>
-                        </Link>
-                        <Link
+                        </a>
+                        <a
                           className="link"
                           target="_blank"
                           href="https://discord.gg/clober-dex"
@@ -138,7 +137,7 @@ const Panel = ({
                             <DiscordLogoSvg className="w-4 h-4" />
                             Discord
                           </div>
-                        </Link>
+                        </a>
                       </div>
                     </div>
                   </div>

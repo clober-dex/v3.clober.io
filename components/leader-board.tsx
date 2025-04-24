@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
 import { FixedSizeList as List } from 'react-window'
-import Link from 'next/link'
 import { isAddressEqual } from 'viem'
 
 import { shortAddress } from '../utils/address'
@@ -89,13 +88,13 @@ export const LeaderBoard = ({
           <div className="flex flex-1 justify-start items-center text-white gap-1">
             <span className="flex sm:hidden">{shortAddress(address, 2)}</span>
             <span className="hidden sm:flex">{shortAddress(address, 8)}</span>
-            <Link
+            <a
               target="_blank"
               href={`${explorerUrl}/address/${address}`}
               rel="noreferrer"
             >
               <OutlinkSvg className="w-2 h-2 sm:w-3 sm:h-3 flex items-center" />
-            </Link>
+            </a>
           </div>
           <div className="flex flex-1 justify-start items-center text-white font-semibold">
             {value}
@@ -120,13 +119,13 @@ export const LeaderBoard = ({
               <span className="hidden sm:flex">
                 ({shortAddress(myValue.address, 6)})
               </span>
-              <Link
+              <a
                 target="_blank"
                 href={`${explorerUrl}/address/${myValue.address}`}
                 rel="noreferrer"
               >
                 <OutlinkSvg className="w-2 h-2 sm:w-3 sm:h-3 flex items-center" />
-              </Link>
+              </a>
             </div>
             <div className="flex flex-1 justify-start items-center text-white font-semibold">
               {myValue.value}

@@ -37,3 +37,6 @@ rules:
     - error
     - newlines-between: always
   import/no-named-as-default: off
+  react/jsx-no-target-blank:
+    - error
+    - allowReferrer: true

@@ -63,7 +63,6 @@ export const VaultPositionCard = ({
           <button
             onClick={() => router.push(`/earn/${vaultPosition.vault.key}`)}
             className="grow shrink basis-0 opacity-90 text-center text-blue-500 text-sm font-bold"
-            rel="noreferrer"
           >
             Manage Position
           </button>
@@ -114,7 +113,6 @@ export const VaultPositionCard = ({
           <button
             onClick={() => router.push(`/earn/${vaultPosition.vault.key}`)}
             className="grow shrink basis-0 opacity-90 text-center text-blue-500 text-sm font-bold"
-            rel="noreferrer"
           >
             Manage Position
           </button>

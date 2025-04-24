@@ -1,5 +1,4 @@
 import React from 'react'
-import Link from 'next/link'
 
 import { BlockNumberWidget } from './block-number-widget'
 
@@ -20,15 +19,15 @@ const Footer = ({
             official@clober.io
           </a>
         </div>
-        <Link
+        <a
           className="flex w-auto ml-auto"
           target="_blank"
-          href="https://clober.io"
-          rel="noreferrer"
+          href="https://clober.io/?utm_source=app_page&utm_medium=app_page"
+          rel="noopener"
         >
           Powered by Clober (v
           {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA?.slice(0, 7)})
-        </Link>
+        </a>
       </div>
       <BlockNumberWidget latestBlockNumber={latestSubgraphBlockNumber} />
     </>
