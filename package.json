@@ -20,6 +20,7 @@
     "@tamagui/config": "^1.112.22",
     "@tamagui/next-plugin": "^1.112.22",
     "@tanstack/react-query": "^5.62.8",
+    "@vercel/analytics": "^1.5.0",
     "axios": "^1.5.0",
     "bignumber.js": "^9.1.1",
     "javascript-time-ago": "^2.5.11",
