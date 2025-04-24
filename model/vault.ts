@@ -1,4 +1,4 @@
-import { StackedLineData } from '../components/chart/tvl-chart-model'
+import { StackedLineData } from '../components/chart/vault-performance-chart-model'
 
 import { Currency } from './currency'
 

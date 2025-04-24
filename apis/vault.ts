@@ -11,7 +11,7 @@ import { WHITELISTED_VAULTS } from '../constants/vault'
 import { Prices } from '../model/prices'
 import { Vault, VaultImmutableInfo } from '../model/vault'
 import { calculateApy } from '../utils/apy'
-import { StackedLineData } from '../components/chart/tvl-chart-model'
+import { StackedLineData } from '../components/chart/vault-performance-chart-model'
 import { RPC_URL } from '../constants/rpc-url'
 import { Chain } from '../model/chain'
 

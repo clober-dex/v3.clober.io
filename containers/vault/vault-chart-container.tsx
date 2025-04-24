@@ -6,8 +6,8 @@ import tamaguiConfig from '../../tamagui.config'
 import { ChartHeader } from '../../components/chart/chart-header'
 import {
   StackedLineData,
-  TVLChartModel,
-} from '../../components/chart/tvl-chart-model'
+  VaultPerformanceChartModel,
+} from '../../components/chart/vault-performance-chart-model'
 
 export const VaultChartContainer = ({
   historicalPriceIndex,
@@ -47,7 +47,11 @@ export const VaultChartContainer = ({
     >
       {(() => {
         return (
-          <Chart Model={TVLChartModel} params={params as any} height={368}>
+          <Chart
+            Model={VaultPerformanceChartModel}
+            params={params as any}
+            height={368}
+          >
             {(crosshairData) => {
               const value = crosshairData
                 ? crosshairData.values[0]

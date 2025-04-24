@@ -20,18 +20,19 @@ export interface StackedLineData extends WhitespaceData<UTCTimestamp> {
   values: number[]
 }
 
-interface TVLChartParams extends ChartModelParams<StackedLineData> {
+interface VaultPerformanceChartParams
+  extends ChartModelParams<StackedLineData> {
   colors: string[]
   yMultiplier?: number
   gradients?: { start: string; end: string }[]
 }
 
-export class TVLChartModel extends ChartModel<StackedLineData> {
+export class VaultPerformanceChartModel extends ChartModel<StackedLineData> {
   protected series: ISeriesApi<'Custom'>
 
   private hoveredLogicalIndex: Logical | null | undefined
 
-  constructor(chartDiv: HTMLDivElement, params: TVLChartParams) {
+  constructor(chartDiv: HTMLDivElement, params: VaultPerformanceChartParams) {
     super(chartDiv, params)
 
     this.series = this.api.addCustomSeries(
@@ -53,7 +54,7 @@ export class TVLChartModel extends ChartModel<StackedLineData> {
     })
   }
 
-  updateOptions(params: TVLChartParams) {
+  updateOptions(params: VaultPerformanceChartParams) {
     const isSingleLineChart = params.colors.length === 1
 
     const gridSettings = isSingleLineChart

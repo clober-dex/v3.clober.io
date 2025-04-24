@@ -12,7 +12,7 @@ import RedirectIfNotMonadTestnetContainer from '../containers/redirect-if-not-mo
 import { Loading } from '../components/loading'
 import tamaguiConfig from '../tamagui.config'
 import { Chart } from '../components/chart/chart-model'
-import { TVLChartModel } from '../components/chart/tvl-chart-model'
+import { VaultPerformanceChartModel } from '../components/chart/vault-performance-chart-model'
 import { ChartHeader } from '../components/chart/chart-header'
 
 export default function Analytics() {
@@ -219,7 +219,7 @@ export default function Analytics() {
                   {(() => {
                     return (
                       <Chart
-                        Model={TVLChartModel}
+                        Model={VaultPerformanceChartModel}
                         params={
                           {
                             data: retentionRate,
