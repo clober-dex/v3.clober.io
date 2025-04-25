@@ -127,8 +127,9 @@ const CurrencySelect = ({
               <input
                 ref={inputRef}
                 type="search"
-                name="search"
+                name="token-search"
                 id="search"
+                autoComplete="off"
                 className="focus:ring-2 inline w-full rounded-md border-0 pl-10 py-3 text-gray-500 bg-gray-800 placeholder:text-gray-500 text-xs sm:text-sm"
                 placeholder="Search by token name, symbol, or address"
                 value={value}

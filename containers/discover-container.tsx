@@ -248,8 +248,9 @@ export const DiscoverContainer = () => {
           </div>
           <input
             type="search"
-            name="search"
+            name="discover-search"
             id="search"
+            autoComplete="off"
             className="inline w-full pl-10 py-2 lg:py-3 text-white bg-gray-800 rounded-xl border border-solid border-gray-400 focus:ring-1 focus:ring-inset focus:ring-gray-400 flex-col placeholder:text-gray-400 text-xs sm:text-sm"
             placeholder="Search markets"
             value={searchValue}

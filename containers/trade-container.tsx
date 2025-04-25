@@ -837,8 +837,9 @@ export const TradeContainer = () => {
                     </div>
                     <input
                       type="search"
-                      name="search"
+                      name="open-order-search"
                       id="search"
+                      autoComplete="off"
                       className="inline w-full pl-10 py-1.5 lg:py-2.5 text-white bg-transparent rounded-xl border border-solid border-gray-400 focus:ring-1 focus:ring-inset focus:ring-gray-400 flex-col placeholder:text-gray-400 text-xs sm:text-sm"
                       placeholder="Search tokens"
                       value={searchValue}
