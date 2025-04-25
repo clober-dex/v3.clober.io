@@ -62,6 +62,9 @@ const toLiquidityVaultPoint = (
 export async function fetchLiquidVaultPoints(
   chainId: CHAIN_IDS,
 ): Promise<LiquidityVaultPoint[]> {
+  if (!LIQUIDITY_VAULT_POINT_SUBGRAPH_ENDPOINT[chainId]) {
+    return []
+  }
   const {
     data: { users: liquidityVaultPoints },
   } = await Subgraph.get<{
@@ -97,7 +100,10 @@ export async function fetchLiquidVaultPoints(
 export async function fetchLiquidVaultPoint(
   chainId: CHAIN_IDS,
   userAddress: `0x${string}`,
-): Promise<LiquidityVaultPoint> {
+): Promise<LiquidityVaultPoint | null> {
+  if (!LIQUIDITY_VAULT_POINT_SUBGRAPH_ENDPOINT[chainId]) {
+    return null
+  }
   const {
     data: { user: liquidityVaultPoint },
   } = await Subgraph.get<{

@@ -17,6 +17,9 @@ const BLACKLISTED_USER_ADDRESSES = [
 export const fetchTotalRegisteredUsers = async (
   chainId: CHAIN_IDS,
 ): Promise<number> => {
+  if (!FUTURES_SUBGRAPH_ENDPOINT[chainId]) {
+    return 0
+  }
   const {
     data: {
       globalState: { totalRegisteredUsers },
