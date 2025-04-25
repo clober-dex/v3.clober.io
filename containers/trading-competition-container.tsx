@@ -571,6 +571,7 @@ export const TradingCompetitionContainer = () => {
           </defs>
         </svg>
         Clober Trading Competition
+        <div className="text-sm sm:text-xl">Season 1 ends in</div>
       </div>
 
       <div className="w-full md:flex md:justify-center mt-3 sm:mt-6">
