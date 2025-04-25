@@ -326,5 +326,24 @@ export const WHITELISTED_VAULTS: {
       hasPoint: false,
     },
   ],
-  [CHAIN_IDS.RISE_SEPOLIA]: [],
+  [CHAIN_IDS.RISE_SEPOLIA]: [
+    {
+      currencyA: {
+        address: '0xA985e387dDF21b87c1Fe8A0025D827674040221E',
+        name: 'Clober USD',
+        symbol: 'cUSD',
+        decimals: 6,
+      },
+      currencyB: {
+        address: '0x0000000000000000000000000000000000000000',
+        name: 'Ethereum',
+        symbol: 'ETH',
+        decimals: 18,
+      },
+      salt: '0x0000000000000000000000000000000000000000000000000000000000000000',
+      key: '0xecfa2b2198c01967ff83c8401accb26747316b862a74aab6e9c2d914c1da6ab1',
+      hasDashboard: false,
+      hasPoint: false,
+    },
+  ],
 }
