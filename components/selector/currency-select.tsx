@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { getAddress, isAddress, isAddressEqual } from 'viem'
 import Image from 'next/image'
 
@@ -16,6 +16,7 @@ import {
 } from '../../utils/currency'
 import InspectCurrencyModal from '../modal/inspect-currency-modal'
 import { Chain } from '../../model/chain'
+import { useWindowWidth } from '../../hooks/useWindowWidth'
 
 const CurrencySelect = ({
   chain,
@@ -36,6 +37,15 @@ const CurrencySelect = ({
   onCurrencySelect: (currency: Currency) => void
   defaultBlacklistedCurrency?: Currency
 } & React.HTMLAttributes<HTMLDivElement>) => {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const width = useWindowWidth()
+
+  useEffect(() => {
+    if (width > 0 && width >= 640) {
+      inputRef.current?.focus()
+    }
+  }, [width])
+
   const [customizedCurrencies, setCustomizedCurrencies] = React.useState<
     Currency[] | undefined
   >()
@@ -115,10 +125,11 @@ const CurrencySelect = ({
                 Search by token name, symbol, or address
               </div>
               <input
+                ref={inputRef}
                 type="search"
                 name="search"
                 id="search"
-                className="inline w-full rounded-md border-0 pl-10 py-3 text-gray-500 bg-gray-800 placeholder:text-gray-500 text-xs sm:text-sm"
+                className="focus:ring-2 inline w-full rounded-md border-0 pl-10 py-3 text-gray-500 bg-gray-800 placeholder:text-gray-500 text-xs sm:text-sm"
                 placeholder="Search by token name, symbol, or address"
                 value={value}
                 onChange={(event) => setValue(event.target.value)}
