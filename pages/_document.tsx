@@ -1,6 +1,5 @@
 import React from 'react'
 import { Html, Head, Main, NextScript } from 'next/document'
-import Script from 'next/script'
 
 export default function Document() {
   return (
@@ -35,19 +34,6 @@ export default function Document() {
           name="twitter:image"
           content="https://app.clober.io/twitter-card.png"
         />
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-TE8CSB6JP2"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-TE8CSB6JP2');
-        `}
-        </Script>
       </Head>
       <body>
         <Main />

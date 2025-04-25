@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import '../styles/globals.css'
 import '@rainbow-me/rainbowkit/styles.css'
 import { darkTheme, RainbowKitProvider } from '@rainbow-me/rainbowkit'
@@ -14,6 +14,7 @@ import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { Analytics } from '@vercel/analytics/next'
 import { monadTestnet } from 'viem/chains'
+import Script from 'next/script'
 
 import HeaderContainer from '../containers/header-container'
 import { ChainProvider, useChainContext } from '../contexts/chain-context'
@@ -36,6 +37,7 @@ import { VaultContractProvider } from '../contexts/vault/vault-contract-context'
 import { FuturesProvider } from '../contexts/futures/futures-context'
 import { FuturesContractProvider } from '../contexts/futures/futures-contract-context'
 import { PointProvider } from '../contexts/point-context'
+import { GOOGLE_ANALYTICS_TRACKING_ID } from '../constants/google-analytics'
 
 const CacheProvider = ({ children }: React.PropsWithChildren) => {
   const queryClient = useQueryClient()
@@ -156,9 +158,11 @@ function App({ Component, pageProps }: AppProps) {
     return () => window.removeEventListener('popstate', handlePopState)
   }, [handlePopState])
 
+  const chain = useMemo(() => getChain(), [])
+
   // Tally script
   useEffect(() => {
-    if (getChain().id === monadTestnet.id) {
+    if (chain.id === monadTestnet.id) {
       const script = document.createElement('script')
       script.src = 'https://tally.so/widgets/embed.js'
       script.defer = true
@@ -175,7 +179,7 @@ function App({ Component, pageProps }: AppProps) {
         }
       }
     }
-  }, [])
+  }, [chain.id])
 
   const getBackground = (pathname: string) => {
     if (pathname.includes('/trade')) {
@@ -195,6 +199,24 @@ function App({ Component, pageProps }: AppProps) {
 
   return (
     <>
+      {GOOGLE_ANALYTICS_TRACKING_ID[chain.id] && (
+        <>
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_TRACKING_ID[chain.id]}`}
+            strategy="afterInteractive"
+          />
+          <Script id="google-analytics" strategy="afterInteractive">
+            {`
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', '${GOOGLE_ANALYTICS_TRACKING_ID[chain.id]}');
+        `}
+          </Script>
+        </>
+      )}
+
       <ErrorBoundary>
         <Head>
           <title>Clober | Fully On-chain Order Book</title>
