@@ -13,7 +13,6 @@ import { WagmiProvider } from 'wagmi'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { Analytics } from '@vercel/analytics/next'
-import { monadTestnet } from 'viem/chains'
 import Script from 'next/script'
 
 import HeaderContainer from '../containers/header-container'
@@ -159,27 +158,6 @@ function App({ Component, pageProps }: AppProps) {
   }, [handlePopState])
 
   const chain = useMemo(() => getChain(), [])
-
-  // Tally script
-  useEffect(() => {
-    if (chain.id === monadTestnet.id) {
-      const script = document.createElement('script')
-      script.src = 'https://tally.so/widgets/embed.js'
-      script.defer = true
-      document.body.appendChild(script)
-
-      script.onload = () => {
-        if ((window as any).Tally) {
-          ;(window as any).Tally.openPopup('3qgBN2', {
-            layout: 'modal',
-            width: 500,
-            overlay: true,
-            doNotShowAfterSubmit: true,
-          })
-        }
-      }
-    }
-  }, [chain.id])
 
   const getBackground = (pathname: string) => {
     if (pathname.includes('/trade')) {
