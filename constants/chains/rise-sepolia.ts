@@ -14,7 +14,7 @@ export const riseSepolia = /*#__PURE__*/ defineChain({
   blockExplorers: {
     default: {
       name: 'Rise Sepolia',
-      url: 'https://testnet-explorer.riselabs.xyz',
+      url: 'https://explorer.testnet.riselabs.xyz',
     },
   },
   testnet: true,
