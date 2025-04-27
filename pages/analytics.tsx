@@ -1,13 +1,13 @@
 import React, { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
-import { UTCTimestamp } from 'lightweight-charts'
 import { getAddress, isAddressEqual } from 'viem'
+import { UTCTimestamp } from 'lightweight-charts'
 
-import { HistogramChart } from '../components/chart/histogram-chart'
 import { useChainContext } from '../contexts/chain-context'
 import { useCurrencyContext } from '../contexts/currency-context'
+import { fetchDailyActivitySnapshot } from '../apis/analytics'
 import RedirectIfNotMonadTestnetContainer from '../containers/redirect-if-not-monad-testnet-container'
+import { HistogramChart } from '../components/chart/histogram-chart'
 import { Loading } from '../components/loading'
 
 export default function Analytics() {
@@ -17,49 +17,26 @@ export default function Analytics() {
   const { data: analytics } = useQuery({
     queryKey: ['analytics', selectedChain.id],
     queryFn: async () => {
-      try {
-        const {
-          data: { snapshots },
-        } = await axios.get<{
-          snapshots: {
-            timestamp: number
-            googleAnalyticsActiveUsers: {
-              returning: number
-              new: number
-            }
-            walletCount: number
-            transactionCount: number
-            volumeSnapshots: {
-              symbol: string
-              amount: number
-              address: `0x${string}`
-            }[]
-          }[]
-        }>(`/api/chains/${selectedChain.id}/analytics`)
-        return snapshots.sort((a, b) => a.timestamp - b.timestamp)
-      } catch {
-        return []
-      }
+      return fetchDailyActivitySnapshot(selectedChain)
     },
     initialData: [],
   })
 
   const tokenColorMap = useMemo(() => {
-    return Object.fromEntries(
-      [
-        ...new Set(
-          analytics
-            .map((item) =>
-              item.volumeSnapshots.map(({ address }) => getAddress(address)),
-            )
-            .flat(),
+    const addresses = [
+      ...new Set(
+        analytics.flatMap((item) =>
+          item.volumeSnapshots.map(({ address }) => getAddress(address)),
         ),
-      ]
-        .sort()
-        .map((address, index) => [
-          getAddress(address),
-          `hsl(${(index * 137.508) % 360}, 100%, 50%)`,
-        ]),
+      ),
+    ].sort()
+
+    return Object.fromEntries(
+      addresses.map((address, index) => {
+        const baseHue = (index * 47) % 360
+        const hue = (baseHue + (index % 2) * 180) % 360
+        return [address, `hsl(${hue}, 70%, 50%)`]
+      }),
     )
   }, [analytics])
 
