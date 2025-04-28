@@ -111,6 +111,16 @@ export default function Analytics() {
                       .filter(({ label }) => label !== undefined)
                       .sort() as any
                   }
+                  defaultValue={analytics.reduce(
+                    (acc, item) =>
+                      acc +
+                      item.volumeSnapshots.reduce(
+                        (acc, { amount, address }) =>
+                          acc + (amount * prices[getAddress(address)] ?? 0),
+                        0,
+                      ),
+                    0,
+                  )}
                   height={312}
                 />
               </div>

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { TamaguiProvider } from '@tamagui/web'
 
 import tamaguiConfig from '../../tamagui.config'
@@ -19,7 +19,7 @@ export const HistogramChart = ({
   data: StackedHistogramData[]
   colors: { label: string; color: string }[]
   height: number
-  defaultValue?: number
+  defaultValue: number
   prefix?: string
 }) => {
   const params = {
@@ -27,14 +27,6 @@ export const HistogramChart = ({
     colors,
     background: '#FFFFFF',
   }
-  const last = useMemo(
-    () =>
-      Object.values(data?.[data.length - 1]?.values ?? {}).reduce(
-        (acc: number, value) => acc + (value ?? 0),
-        0,
-      ),
-    [data],
-  )
 
   return (
     <TamaguiProvider
@@ -59,8 +51,8 @@ export const HistogramChart = ({
                   value={`${prefix ?? ''}${
                     crosshairData && crosshairData.values
                       ? toHumanReadableString(total)
-                      : toHumanReadableString(defaultValue ?? last)
-                  }`}
+                      : toHumanReadableString(defaultValue)
+                  } Total`}
                   time={crosshairData?.time}
                   detailData={
                     crosshairData
