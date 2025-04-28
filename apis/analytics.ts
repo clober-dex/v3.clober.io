@@ -21,6 +21,17 @@ const BLACKLISTED_TOKENS: `0x${string}`[] = [
   '0xB5a30b0FDc5EA94A52fDc42e3E9760Cb8449Fb37',
 ]
 
+const FUNCTION_SIG_MAP: Record<string, string> = {
+  '0x7d773110': 'Limit',
+  '0xfe815746': 'Limit',
+  '0x8feb85b7': 'Claim',
+  '0xa04c796b': 'Cancel',
+  '0xc0e8e89a': 'Market',
+  '0x4f28185a': 'Add-Liq',
+  '0x0a31b953': 'Remove-Liq',
+  '0x7e865aa4': 'Swap',
+}
+
 export const fetchDailyActivitySnapshot = async (
   chain: Chain,
 ): Promise<DailyActivitySnapshot[]> => {
@@ -108,12 +119,24 @@ export const fetchDailyActivitySnapshot = async (
               getAddress(volumeSnapshot.address),
             ) === -1,
         )
-      const transactionTypeSnapshots = item.transactionTypes.map(
-        ({ type, txCount }) => ({
-          type,
+      const transactionTypeSnapshots = item.transactionTypes
+        .map(({ type, txCount }) => ({
+          type: FUNCTION_SIG_MAP[type] ?? type,
           count: Number(txCount),
-        }),
-      )
+        }))
+        // if the type is not in FUNCIONS_SIG_MAP, it means it's a normal transaction
+        .reduce(
+          (acc, { type, count }) => {
+            const existing = acc.find((item) => item.type === type)
+            if (existing) {
+              existing.count += count
+            } else {
+              acc.push({ type, count })
+            }
+            return acc
+          },
+          [] as { type: string; count: number }[],
+        )
       return {
         timestamp: Number(item.id),
         volumeSnapshots,
