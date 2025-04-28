@@ -52,7 +52,7 @@ export const HistogramChart = ({
                     crosshairData && crosshairData.values
                       ? toHumanReadableString(total)
                       : toHumanReadableString(defaultValue)
-                  } Total`}
+                  } ${crosshairData && crosshairData.values ? '' : 'Total'}`}
                   time={crosshairData?.time}
                   detailData={
                     crosshairData
