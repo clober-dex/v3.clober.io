@@ -30,6 +30,9 @@ const FUNCTION_SIG_MAP: Record<string, string> = {
   '0x4f28185a': 'Add-Liq',
   '0x0a31b953': 'Remove-Liq',
   '0x7e865aa4': 'Swap',
+  '0xa0f15331': '', // update position
+  '0xed56531a': '', // pause
+  '0xf4dfd83a': '', // arbitrage
 }
 
 export const fetchDailyActivitySnapshot = async (
@@ -136,6 +139,11 @@ export const fetchDailyActivitySnapshot = async (
             return acc
           },
           [] as { type: string; count: number }[],
+        )
+        .filter(
+          (transactionTypeSnapshot) =>
+            transactionTypeSnapshot.count > 0 &&
+            transactionTypeSnapshot.type !== '',
         )
       return {
         timestamp: Number(item.id),
