@@ -2,7 +2,7 @@ import React from 'react'
 import { TamaguiProvider } from '@tamagui/web'
 
 import tamaguiConfig from '../../tamagui.config'
-import { toHumanReadableString } from '../../utils/number'
+import { toCommaSeparated, toHumanReadableString } from '../../utils/number'
 
 import { Chart } from './chart-model'
 import { CustomVolumeChartModel } from './volume/custom-volume-chart-model'
@@ -48,11 +48,12 @@ export const HistogramChart = ({
               )
               return (
                 <ChartHeader
-                  value={`${prefix ?? ''}${
-                    crosshairData && crosshairData.values
-                      ? toHumanReadableString(total)
-                      : toHumanReadableString(defaultValue)
-                  } ${crosshairData && crosshairData.values ? '' : 'Total'}`}
+                  value={`${prefix ?? ''}${toCommaSeparated(
+                    (crosshairData && crosshairData.values
+                      ? total
+                      : defaultValue
+                    ).toFixed(0),
+                  )} ${crosshairData && crosshairData.values ? '' : 'Total'}`}
                   time={crosshairData?.time}
                   detailData={
                     crosshairData
@@ -60,9 +61,7 @@ export const HistogramChart = ({
                           .map(({ label, color }) => ({
                             label,
                             value: crosshairData.values[label]
-                              ? `${prefix ?? ''}${toHumanReadableString(
-                                  crosshairData.values[label]!,
-                                )}`
+                              ? `${prefix ?? ''}${toCommaSeparated(crosshairData.values[label]!.toFixed(0))}`
                               : undefined,
                             color,
                           }))
