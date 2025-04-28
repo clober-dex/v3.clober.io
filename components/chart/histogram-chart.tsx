@@ -29,15 +29,10 @@ export const HistogramChart = ({
   }
   const last = useMemo(
     () =>
-      Object.values(
-        data[
-          data.length > 2
-            ? data.length - 2
-            : data.length > 1
-              ? data.length - 1
-              : 0
-        ].values ?? {},
-      ).reduce((acc: number, value) => acc + (value ?? 0), 0),
+      Object.values(data?.[data.length - 1]?.values ?? {}).reduce(
+        (acc: number, value) => acc + (value ?? 0),
+        0,
+      ),
     [data],
   )
 
