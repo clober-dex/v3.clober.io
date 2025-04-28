@@ -124,72 +124,6 @@ const CloberSVG = () => (
   </div>
 )
 
-const handleUploadAndShare = async (
-  userAddress: `0x${string}`,
-  target: 'twitter' | 'telegram',
-) => {
-  const captureElement = document.getElementById('pnl-capture-target')
-  if (!captureElement) {
-    return
-  }
-
-  const canvas = await html2canvas(captureElement, {
-    backgroundColor: null,
-    useCORS: true,
-  })
-
-  const blob = await new Promise<Blob | null>((resolve) => {
-    canvas.toBlob((blob) => resolve(blob), 'image/png')
-  })
-
-  if (!blob) {
-    return
-  }
-
-  const fileName = `trading-pnl-${userAddress.slice(2, 8)}-${Date.now()}.png`
-  const formData = new FormData()
-  formData.append('file', blob)
-
-  const res = await fetch('/api/blob/upload', {
-    method: 'POST',
-    body: blob,
-    headers: {
-      'Content-Type': 'application/octet-stream',
-      'x-filename': fileName,
-    },
-  })
-
-  if (!res.ok) {
-    console.error('Upload failed')
-    return
-  }
-
-  const { url } = await res.json()
-
-  if (!url) {
-    console.error('No URL returned from upload')
-    return
-  }
-
-  if (target === 'twitter') {
-    const tweetText = encodeURIComponent('Check out my trading performance! 🚀')
-    const tweetUrl = encodeURIComponent(
-      `https://alpha.clober.io/preview/${url.split('/').pop()}`,
-    )
-
-    window.open(
-      `https://twitter.com/intent/tweet?text=${tweetText}&url=${tweetUrl}`,
-      '_blank',
-    )
-  } else if (target === 'telegram') {
-    const telegramText = encodeURIComponent(
-      `Check out my trading performance! 🚀\nhttps://alpha.clober.io/preview/${url.split('/').pop()}`,
-    )
-
-    window.open(`https://t.me/share/url?url=${telegramText}`, '_blank')
-  }
-}
-
 export const TradingCompetitionPnlCard = ({
   chain,
   userAddress,
@@ -220,6 +154,28 @@ export const TradingCompetitionPnlCard = ({
       useCORS: true,
     })
     return canvas.toDataURL('image/png')
+  }
+
+  const handleTextShare = (
+    userAddress: `0x${string}`,
+    profit: number,
+    target: 'twitter' | 'telegram',
+  ) => {
+    const profitString =
+      profit >= 0
+        ? `+$${profit.toFixed(2)}`
+        : `-$${Math.abs(profit).toFixed(2)}`
+    const shortAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`
+
+    const message = `💰💰 Profit: ${profitString} \n ${shortAddress}\n\nTrade futures on Clober!\n\nhttps://alpha.clober.io/trading-competition`
+
+    if (target === 'twitter') {
+      const text = encodeURIComponent(message)
+      window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank')
+    } else if (target === 'telegram') {
+      const text = encodeURIComponent(message)
+      window.open(`https://t.me/share/url?url=${text}`, '_blank')
+    }
   }
 
   const handleDownload = async () => {
@@ -295,12 +251,11 @@ export const TradingCompetitionPnlCard = ({
           </div>
         </div>
 
-        <div
-          onClick={handleDownload}
-          className="self-stretch w-full h-12 px-5 py-1.5 rounded-xl inline-flex justify-center items-center gap-10"
-        >
+        <div className="self-stretch w-full h-12 px-5 py-1.5 rounded-xl inline-flex justify-center items-center gap-10">
           <button
-            onClick={async () => handleUploadAndShare(userAddress, 'telegram')}
+            onClick={async () =>
+              handleTextShare(userAddress, totalProfit, 'telegram')
+            }
             className="flex flex-1 h-10 flex-row gap-1 bg-blue-500/20 rounded-xl text-blue-400 text-base font-bold leading-normal justify-center items-center"
           >
             <svg
@@ -346,7 +301,9 @@ export const TradingCompetitionPnlCard = ({
           </button>
 
           <button
-            onClick={async () => handleUploadAndShare(userAddress, 'twitter')}
+            onClick={async () =>
+              handleTextShare(userAddress, totalProfit, 'twitter')
+            }
             className="flex flex-1 h-10 flex-row gap-1 bg-blue-500/20 rounded-xl text-blue-400 text-base font-bold leading-normal justify-center items-center"
           >
             <svg
