@@ -62,12 +62,6 @@ export default function Analytics() {
     <RedirectIfNotMonadTestnetContainer>
       {analytics.length > 0 && (
         <div className="flex flex-col w-full h-full items-center justify-center gap-8 px-16 pb-16">
-          <div className="flex w-full h-12 sm:h-[72px] flex-col justify-start items-center gap-2 sm:gap-3">
-            <div className="self-stretch text-center text-white text-lg sm:text-4xl font-bold">
-              Monad Testnet Analytics
-            </div>
-          </div>
-
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex flex-col">
               <div className="text-white text-sm md:text-base font-bold">
