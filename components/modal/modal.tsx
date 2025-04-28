@@ -9,11 +9,13 @@ const Modal = ({
   children,
   onModalClick,
   onButtonClick,
+  width = '480px',
 }: {
   show: boolean
   onClose: () => void
   onModalClick?: () => void
   onButtonClick?: () => void
+  width?: string
 } & React.PropsWithChildren) => {
   if (!show) {
     return <></>
@@ -25,7 +27,8 @@ const Modal = ({
       onClick={onClose}
     >
       <div
-        className="relative flex flex-col w-full sm:w-[480px] bg-[#171b24] text-white rounded-xl sm:rounded-2xl p-4 sm:p-6"
+        className="relative flex flex-col w-full sm:w-auto bg-[#171b24] text-white rounded-xl sm:rounded-2xl p-4 sm:p-6"
+        style={{ width }}
         onClick={(e) => {
           onModalClick?.()
           e.stopPropagation()
