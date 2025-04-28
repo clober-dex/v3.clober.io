@@ -13,6 +13,13 @@ import { RPC_URL } from '../constants/rpc-url'
 import { Chain } from '../model/chain'
 import { ERC20_PERMIT_ABI } from '../abis/@openzeppelin/erc20-permit-abi'
 import { formatUnits } from '../utils/bigint'
+import { getStartOfTodayTimestampInSeconds } from '../utils/date'
+
+const BLACKLISTED_TOKENS: `0x${string}`[] = [
+  '0x836047a99e11f376522b447bffb6e3495dd0637c',
+  '0xA296f47E8Ff895Ed7A092b4a9498bb13C46ac768',
+  '0xB5a30b0FDc5EA94A52fDc42e3E9760Cb8449Fb37',
+]
 
 export const fetchDailyActivitySnapshot = async (
   chain: Chain,
@@ -28,14 +35,15 @@ export const fetchDailyActivitySnapshot = async (
         id: string
         txCount: string
         walletCount: string
+        newWalletCount: string
         tokenVolumes: { token: string; volume: string }[]
         transactionTypes: { type: string; txCount: string }[]
       }[]
     }
   }>(
-    'https://api.goldsky.com/api/public/project_clsljw95chutg01w45cio46j0/subgraphs/clober-analytics-subgraph-monad-testnet/v1.0.4/gn',
+    'https://api.goldsky.com/api/public/project_clsljw95chutg01w45cio46j0/subgraphs/clober-analytics-subgraph-monad-testnet/v1.0.6/gn',
     '',
-    '{ cloberDayDatas { id txCount walletCount tokenVolumes { token volume } transactionTypes { type txCount } } }',
+    '{ cloberDayDatas { id txCount walletCount newWalletCount tokenVolumes { token volume } transactionTypes { type txCount } } }',
     {},
   )
   const tokenAddresses = [
@@ -77,34 +85,43 @@ export const fetchDailyActivitySnapshot = async (
     ]),
   )
 
-  return cloberDayDatas.map((item) => {
-    const volumeSnapshots = item.tokenVolumes
-      .map(({ token, volume }) => ({
-        address: getAddress(token),
-        symbol: (tokenInfoMap.get(getAddress(token))?.symbol ?? '') as string,
-        amount: Number(
-          formatUnits(
-            BigInt(volume),
-            Number(tokenInfoMap.get(getAddress(token))?.decimals ?? 18),
-          ),
-        ),
-      }))
-      .filter(
-        (volumeSnapshot) =>
-          volumeSnapshot.amount > 0 && volumeSnapshot.symbol !== '',
+  const startOfTodayTimestampInSeconds = getStartOfTodayTimestampInSeconds()
+  return cloberDayDatas
+    .map((item) => {
+      const volumeSnapshots = item.tokenVolumes
+        .map(({ token, volume }) => ({
+          address: getAddress(token),
+          symbol: (tokenInfoMap.get(getAddress(token))?.symbol ?? '') as string,
+          amount:
+            Number(
+              formatUnits(
+                BigInt(volume),
+                Number(tokenInfoMap.get(getAddress(token))?.decimals ?? 18),
+              ),
+            ) / 2, // div 2 to avoid double counting
+        }))
+        .filter(
+          (volumeSnapshot) =>
+            volumeSnapshot.amount > 0 &&
+            volumeSnapshot.symbol !== '' &&
+            BLACKLISTED_TOKENS.map((address) => getAddress(address)).indexOf(
+              getAddress(volumeSnapshot.address),
+            ) === -1,
+        )
+      const transactionTypeSnapshots = item.transactionTypes.map(
+        ({ type, txCount }) => ({
+          type,
+          count: Number(txCount),
+        }),
       )
-    const transactionTypeSnapshots = item.transactionTypes.map(
-      ({ type, txCount }) => ({
-        type,
-        count: Number(txCount),
-      }),
-    )
-    return {
-      timestamp: Number(item.id),
-      volumeSnapshots,
-      transactionTypeSnapshots,
-      walletCount: Number(item.walletCount),
-      transactionCount: Number(item.txCount),
-    }
-  })
+      return {
+        timestamp: Number(item.id),
+        volumeSnapshots,
+        transactionTypeSnapshots,
+        walletCount: Number(item.walletCount),
+        newWalletCount: Number(item.newWalletCount),
+        transactionCount: Number(item.txCount),
+      }
+    })
+    .filter(({ timestamp }) => timestamp < startOfTodayTimestampInSeconds)
 }

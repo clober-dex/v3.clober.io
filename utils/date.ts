@@ -15,6 +15,12 @@ export const formatDate = (date: Date): string =>
 export const currentTimestampInSeconds = (): number =>
   Math.floor(new Date().getTime() / 1000)
 
+export const getStartOfTodayTimestampInSeconds = (): number => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return Math.floor(today.getTime() / 1000)
+}
+
 export const getExpirationDateTextColor = (
   expirationDate: number,
   now: number,

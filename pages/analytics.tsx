@@ -127,9 +127,19 @@ export default function Analytics() {
                 <HistogramChart
                   data={analytics.map((item) => ({
                     time: item.timestamp as UTCTimestamp,
-                    values: { Wallet: item.walletCount },
+                    values: {
+                      Returning: item.walletCount - item.newWalletCount,
+                      New: item.newWalletCount,
+                    },
                   }))}
-                  colors={[{ label: 'Wallet', color: '#A457FF' }]}
+                  colors={[
+                    { label: 'New', color: '#40DE7A' },
+                    { label: 'Returning', color: '#3B82F6' },
+                  ]}
+                  defaultValue={analytics.reduce(
+                    (acc, item) => acc + (item.newWalletCount ?? 0),
+                    0,
+                  )}
                   height={312}
                 />
               </div>
@@ -156,6 +166,10 @@ export default function Analytics() {
                       label: type,
                       color,
                     }),
+                  )}
+                  defaultValue={analytics.reduce(
+                    (acc, item) => acc + (item.transactionCount ?? 0),
+                    0,
                   )}
                   height={312}
                 />

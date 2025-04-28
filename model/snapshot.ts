@@ -1,6 +1,7 @@
 export type DailyActivitySnapshot = {
   timestamp: number
   walletCount: number
+  newWalletCount: number
   transactionCount: number
   volumeSnapshots: {
     symbol: string
