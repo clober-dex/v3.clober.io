@@ -116,7 +116,8 @@ export default function Analytics() {
                       acc +
                       item.volumeSnapshots.reduce(
                         (acc, { amount, address }) =>
-                          acc + (amount * prices[getAddress(address)] ?? 0),
+                          acc +
+                          (amount ?? 0) * (prices[getAddress(address)] ?? 0),
                         0,
                       ),
                     0,
