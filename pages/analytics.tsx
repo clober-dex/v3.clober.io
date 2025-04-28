@@ -40,6 +40,24 @@ export default function Analytics() {
     )
   }, [analytics])
 
+  const transactionTypeColorMap = useMemo(() => {
+    const transactionTypes = [
+      ...new Set(
+        analytics.flatMap((item) =>
+          item.transactionTypeSnapshots.map(({ type }) => type),
+        ),
+      ),
+    ].sort()
+
+    return Object.fromEntries(
+      transactionTypes.map((type, index) => {
+        const baseHue = (index * 47) % 360
+        const hue = (baseHue + (index % 2) * 180) % 360
+        return [type, `hsl(${hue}, 70%, 50%)`]
+      }),
+    )
+  }, [analytics])
+
   return (
     <RedirectIfNotMonadTestnetContainer>
       {analytics.length > 0 && (
@@ -126,9 +144,19 @@ export default function Analytics() {
                 <HistogramChart
                   data={analytics.map((item) => ({
                     time: item.timestamp as UTCTimestamp,
-                    values: { Transaction: item.transactionCount },
+                    values: Object.fromEntries(
+                      item.transactionTypeSnapshots.map(({ type, count }) => [
+                        type,
+                        count,
+                      ]),
+                    ),
                   }))}
-                  colors={[{ label: 'Transaction', color: '#FC72FF' }]}
+                  colors={Object.entries(transactionTypeColorMap).map(
+                    ([type, color]) => ({
+                      label: type,
+                      color,
+                    }),
+                  )}
                   height={312}
                 />
               </div>

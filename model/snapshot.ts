@@ -7,4 +7,8 @@ export type DailyActivitySnapshot = {
     amount: number
     address: `0x${string}`
   }[]
+  transactionTypeSnapshots: {
+    type: string
+    count: number
+  }[]
 }

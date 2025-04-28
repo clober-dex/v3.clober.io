@@ -28,13 +28,14 @@ export const fetchDailyActivitySnapshot = async (
         id: string
         txCount: string
         walletCount: string
-        tokenVolumes: { date: string; token: string; volume: string }[]
+        tokenVolumes: { token: string; volume: string }[]
+        transactionTypes: { type: string; txCount: string }[]
       }[]
     }
   }>(
-    'https://api.goldsky.com/api/public/project_clsljw95chutg01w45cio46j0/subgraphs/clober-analytics-subgraph-monad-testnet/latest/gn',
+    'https://api.goldsky.com/api/public/project_clsljw95chutg01w45cio46j0/subgraphs/clober-analytics-subgraph-monad-testnet/v1.0.4/gn',
     '',
-    '{ cloberDayDatas { id txCount walletCount tokenVolumes { date token volume } } }',
+    '{ cloberDayDatas { id txCount walletCount tokenVolumes { token volume } transactionTypes { type txCount } } }',
     {},
   )
   const tokenAddresses = [
@@ -92,9 +93,16 @@ export const fetchDailyActivitySnapshot = async (
         (volumeSnapshot) =>
           volumeSnapshot.amount > 0 && volumeSnapshot.symbol !== '',
       )
+    const transactionTypeSnapshots = item.transactionTypes.map(
+      ({ type, txCount }) => ({
+        type,
+        count: Number(txCount),
+      }),
+    )
     return {
       timestamp: Number(item.id),
       volumeSnapshots,
+      transactionTypeSnapshots,
       walletCount: Number(item.walletCount),
       transactionCount: Number(item.txCount),
     }
