@@ -2,7 +2,7 @@ import React from 'react'
 import { TamaguiProvider } from '@tamagui/web'
 
 import tamaguiConfig from '../../tamagui.config'
-import { toCommaSeparated, toHumanReadableString } from '../../utils/number'
+import { toCommaSeparated } from '../../utils/number'
 
 import { Chart } from './chart-model'
 import { CustomVolumeChartModel } from './volume/custom-volume-chart-model'
