@@ -40,16 +40,28 @@ export default function Analytics() {
     )
   }, [analytics])
 
+  const transactionTypeColorMap = useMemo(() => {
+    const transactionTypes = [
+      ...new Set(
+        analytics.flatMap((item) =>
+          item.transactionTypeSnapshots.map(({ type }) => type),
+        ),
+      ),
+    ].sort()
+
+    return Object.fromEntries(
+      transactionTypes.map((type, index) => {
+        const baseHue = (index * 47) % 360
+        const hue = (baseHue + (index % 2) * 180) % 360
+        return [type, `hsl(${hue}, 70%, 50%)`]
+      }),
+    )
+  }, [analytics])
+
   return (
     <RedirectIfNotMonadTestnetContainer>
       {analytics.length > 0 && (
         <div className="flex flex-col w-full h-full items-center justify-center gap-8 px-16 pb-16">
-          <div className="flex w-full h-12 sm:h-[72px] flex-col justify-start items-center gap-2 sm:gap-3">
-            <div className="self-stretch text-center text-white text-lg sm:text-4xl font-bold">
-              Monad Testnet Analytics
-            </div>
-          </div>
-
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex flex-col">
               <div className="text-white text-sm md:text-base font-bold">
@@ -93,6 +105,17 @@ export default function Analytics() {
                       .filter(({ label }) => label !== undefined)
                       .sort() as any
                   }
+                  defaultValue={analytics.reduce(
+                    (acc, item) =>
+                      acc +
+                      item.volumeSnapshots.reduce(
+                        (acc, { amount, address }) =>
+                          acc +
+                          (amount ?? 0) * (prices[getAddress(address)] ?? 0),
+                        0,
+                      ),
+                    0,
+                  )}
                   height={312}
                 />
               </div>
@@ -109,9 +132,19 @@ export default function Analytics() {
                 <HistogramChart
                   data={analytics.map((item) => ({
                     time: item.timestamp as UTCTimestamp,
-                    values: { Wallet: item.walletCount },
+                    values: {
+                      Returning: item.walletCount - item.newWalletCount,
+                      New: item.newWalletCount,
+                    },
                   }))}
-                  colors={[{ label: 'Wallet', color: '#A457FF' }]}
+                  colors={[
+                    { label: 'New', color: '#40DE7A' },
+                    { label: 'Returning', color: '#3B82F6' },
+                  ]}
+                  defaultValue={analytics.reduce(
+                    (acc, item) => acc + (item.newWalletCount ?? 0),
+                    0,
+                  )}
                   height={312}
                 />
               </div>
@@ -126,9 +159,23 @@ export default function Analytics() {
                 <HistogramChart
                   data={analytics.map((item) => ({
                     time: item.timestamp as UTCTimestamp,
-                    values: { Transaction: item.transactionCount },
+                    values: Object.fromEntries(
+                      item.transactionTypeSnapshots.map(({ type, count }) => [
+                        type,
+                        count,
+                      ]),
+                    ),
                   }))}
-                  colors={[{ label: 'Transaction', color: '#FC72FF' }]}
+                  colors={Object.entries(transactionTypeColorMap).map(
+                    ([type, color]) => ({
+                      label: type,
+                      color,
+                    }),
+                  )}
+                  defaultValue={analytics.reduce(
+                    (acc, item) => acc + (item.transactionCount ?? 0),
+                    0,
+                  )}
                   height={312}
                 />
               </div>

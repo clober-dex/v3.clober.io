@@ -4,8 +4,8 @@ import { findFirstNonZeroIndex } from './bignumber'
 
 export const POLLY_FILL_DECIMALS = 4
 
-export const toCommaSeparated = (number: string) => {
-  const parts = number.split('.')
+export const toCommaSeparated = (number: BigNumber.Value) => {
+  const parts = number.toString().split('.')
   const integer = parts[0]
   const decimal = parts[1]
   const formattedInteger =
