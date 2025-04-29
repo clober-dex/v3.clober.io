@@ -55,7 +55,7 @@ export const fetchDailyActivitySnapshot = async (
       }[]
     }
   }>(
-    'https://api.goldsky.com/api/public/project_clsljw95chutg01w45cio46j0/subgraphs/clober-analytics-subgraph-monad-testnet/v1.0.6/gn',
+    'https://api.goldsky.com/api/public/project_clsljw95chutg01w45cio46j0/subgraphs/clober-analytics-subgraph-monad-testnet/latest/gn',
     '',
     '{ cloberDayDatas { id txCount walletCount newWalletCount tokenVolumes { token volume } transactionTypes { type txCount } } }',
     {},
