@@ -172,6 +172,8 @@ function App({ Component, pageProps }: AppProps) {
       return "sm:bg-[url('../public/base-background.png')] bg-top"
     } else if (pathname.includes('/trading-competition')) {
       return "sm:bg-[url('../public/trading-competition-background.png')] bg-top"
+    } else if (pathname.includes('/leaderboard')) {
+      return "sm:bg-[url('../public/trading-competition-background.png')] bg-top"
     }
   }
 

@@ -1,0 +1,98 @@
+import {
+  createPublicClient,
+  getAddress,
+  http,
+  isAddressEqual,
+  zeroAddress,
+} from 'viem'
+
+import { ANALYTICS_SUBGRAPH_ENDPOINT } from '../constants/subgraph-endpoint'
+import { Chain } from '../model/chain'
+import { Subgraph } from '../model/subgraph'
+import { RPC_URL } from '../constants/rpc-url'
+import { ERC20_PERMIT_ABI } from '../abis/@openzeppelin/erc20-permit-abi'
+import { DailyActivitySnapshot } from '../model/snapshot'
+
+export const fetchWalletDayData = async (
+  chain: Chain,
+  userAddress: `0x${string}`,
+): Promise<
+  {
+    timestamp: number
+    volumeSnapshots: DailyActivitySnapshot['volumeSnapshots']
+  }[]
+> => {
+  if (!ANALYTICS_SUBGRAPH_ENDPOINT[chain.id]) {
+    return []
+  }
+
+  const {
+    data: { walletDayDatas },
+  } = await Subgraph.get<{
+    data: {
+      walletDayDatas: {
+        date: string
+        tokenVolumes: { token: string; volume: string }[]
+      }[]
+    }
+  }>(
+    ANALYTICS_SUBGRAPH_ENDPOINT[chain.id]!,
+    'getWalletDayDatas',
+    'query getWalletDayDatas($userAddress: Bytes!) { walletDayDatas(where: {wallet: $userAddress}) { date tokenVolumes { token volume } } }',
+    {
+      userAddress: userAddress.toLowerCase(),
+    },
+  )
+  const tokenAddresses = [
+    ...new Set(
+      walletDayDatas.flatMap((item) =>
+        item.tokenVolumes.map((volume) => volume.token),
+      ),
+    ),
+  ]
+    .map((address) => getAddress(address))
+    .filter((address) => !isAddressEqual(address, zeroAddress))
+  const publicClient = createPublicClient({
+    chain,
+    transport: http(RPC_URL[chain.id]),
+  })
+  const results = await publicClient.multicall({
+    contracts: tokenAddresses.flatMap((address) => [
+      { address, abi: ERC20_PERMIT_ABI, functionName: 'symbol' },
+      { address, abi: ERC20_PERMIT_ABI, functionName: 'decimals' },
+    ]),
+  })
+
+  const tokenInfoMap = tokenAddresses.reduce(
+    (map, address, i) => {
+      map.set(getAddress(address), {
+        symbol: results[i * 2].result as string,
+        decimals: Number(results[i * 2 + 1].result),
+      })
+      return map
+    },
+    new Map<string, { symbol: string; decimals: number }>([
+      [
+        zeroAddress,
+        {
+          symbol: chain.nativeCurrency.symbol,
+          decimals: chain.nativeCurrency.decimals,
+        },
+      ],
+    ]),
+  )
+
+  return walletDayDatas.map((item) => {
+    const volumeSnapshots = item.tokenVolumes.map(({ volume, token }, i) => ({
+      symbol: tokenInfoMap.get(getAddress(token))?.symbol ?? '',
+      amount:
+        Number(volume) /
+        10 ** (tokenInfoMap.get(getAddress(token))?.decimals ?? 0),
+      address: getAddress(token),
+    }))
+    return {
+      timestamp: Number(item.date),
+      volumeSnapshots,
+    }
+  })
+}
