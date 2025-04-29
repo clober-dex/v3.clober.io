@@ -48,12 +48,22 @@ export const HistogramChart = ({
               )
               return (
                 <ChartHeader
-                  value={`${prefix ?? ''}${toCommaSeparated(
-                    (crosshairData && crosshairData.values
-                      ? total
-                      : defaultValue
-                    ).toFixed(0),
-                  )} ${crosshairData && crosshairData.values ? '' : 'Total'}`}
+                  value={
+                    <div className="flex flex-row gap-0.5 md:gap-1">
+                      <span>
+                        {prefix ?? ''}
+                        {crosshairData && crosshairData.values
+                          ? toCommaSeparated(total.toFixed(0))
+                          : toCommaSeparated(defaultValue.toFixed(0))}
+                        {crosshairData && crosshairData.values ? '' : ' Total'}
+                      </span>
+                      <span className="flex text-gray-500 text-lg md:text-xl font-semibold items-end">
+                        {crosshairData && crosshairData.values
+                          ? `(${toCommaSeparated(defaultValue.toFixed(0))} Total)`
+                          : ''}
+                      </span>
+                    </div>
+                  }
                   time={crosshairData?.time}
                   detailData={
                     crosshairData
