@@ -4,7 +4,7 @@ import { CHAIN_IDS } from '@clober/v2-sdk'
 import { Asset } from '../../model/futures/asset'
 import { Subgraph } from '../../model/subgraph'
 import { FUTURES_COLLATERALS } from '../../constants/futures/collaterals'
-import { FUTURES_SUBGRAPH_ENDPOINT } from '../../constants/futures/subgraph-endpoint'
+import { FUTURES_SUBGRAPH_ENDPOINT } from '../../constants/subgraph-endpoint'
 import { WHITELISTED_CURRENCIES } from '../../constants/currency'
 
 type AssetDto = {

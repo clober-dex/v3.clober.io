@@ -2,7 +2,7 @@ import { CHAIN_IDS } from '@clober/v2-sdk'
 import { getAddress, isAddressEqual } from 'viem'
 
 import { Subgraph } from '../model/subgraph'
-import { FUTURES_SUBGRAPH_ENDPOINT } from '../constants/futures/subgraph-endpoint'
+import { FUTURES_SUBGRAPH_ENDPOINT } from '../constants/subgraph-endpoint'
 import { Prices } from '../model/prices'
 import { formatUnits } from '../utils/bigint'
 import { TradingCompetitionPnl } from '../model/trading-competition-pnl'

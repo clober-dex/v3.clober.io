@@ -7,7 +7,7 @@ import { WHITE_LISTED_ASSETS } from '../../constants/futures/asset'
 import { FUTURES_CONTRACT_ADDRESSES } from '../../constants/futures/contract-addresses'
 import { Asset } from '../../model/futures/asset'
 import { calculateLiquidationPrice, calculateLtv } from '../../utils/ltv'
-import { FUTURES_SUBGRAPH_ENDPOINT } from '../../constants/futures/subgraph-endpoint'
+import { FUTURES_SUBGRAPH_ENDPOINT } from '../../constants/subgraph-endpoint'
 import { Subgraph } from '../../model/subgraph'
 import { Chain } from '../../model/chain'
 

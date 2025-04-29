@@ -6,11 +6,11 @@ import { Subgraph } from '../model/subgraph'
 import {
   LIQUIDITY_VAULT_POINT_PER_SECOND,
   LIQUIDITY_VAULT_POINT_START_AT,
-  LIQUIDITY_VAULT_POINT_SUBGRAPH_ENDPOINT,
 } from '../constants/point'
 import { currentTimestampInSeconds } from '../utils/date'
 import { formatUnits } from '../utils/bigint'
 import { LiquidityVaultPoint } from '../model/liquidity-vault-point'
+import { LIQUIDITY_VAULT_POINT_SUBGRAPH_ENDPOINT } from '../constants/subgraph-endpoint'
 
 type LiquidityVaultPointDto = {
   id: string

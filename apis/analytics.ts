@@ -1,4 +1,3 @@
-import { CHAIN_IDS } from '@clober/v2-sdk'
 import {
   createPublicClient,
   getAddress,
@@ -14,6 +13,7 @@ import { Chain } from '../model/chain'
 import { ERC20_PERMIT_ABI } from '../abis/@openzeppelin/erc20-permit-abi'
 import { formatUnits } from '../utils/bigint'
 import { getStartOfTodayTimestampInSeconds } from '../utils/date'
+import { ANALYTICS_SUBGRAPH_ENDPOINT } from '../constants/subgraph-endpoint'
 
 const BLACKLISTED_TOKENS: `0x${string}`[] = [
   '0x836047a99e11f376522b447bffb6e3495dd0637c',
@@ -38,7 +38,7 @@ const FUNCTION_SIG_MAP: Record<string, string> = {
 export const fetchDailyActivitySnapshot = async (
   chain: Chain,
 ): Promise<DailyActivitySnapshot[]> => {
-  if (chain.id !== CHAIN_IDS.MONAD_TESTNET) {
+  if (!ANALYTICS_SUBGRAPH_ENDPOINT[chain.id]) {
     return []
   }
   const {
