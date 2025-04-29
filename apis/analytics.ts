@@ -127,7 +127,7 @@ export const fetchDailyActivitySnapshot = async (
           type: FUNCTION_SIG_MAP[type] ?? type,
           count: Number(txCount),
         }))
-        // if the type is not in FUNCIONS_SIG_MAP, it means it's a normal transaction
+        // if the type is not in FUNCTION_SIG_MAP, it means it's a normal transaction
         .reduce(
           (acc, { type, count }) => {
             const existing = acc.find((item) => item.type === type)
@@ -143,7 +143,8 @@ export const fetchDailyActivitySnapshot = async (
         .filter(
           (transactionTypeSnapshot) =>
             transactionTypeSnapshot.count > 0 &&
-            transactionTypeSnapshot.type !== '',
+            transactionTypeSnapshot.type !== '' &&
+            transactionTypeSnapshot.type.indexOf('0x') !== 0,
         )
       return {
         timestamp: Number(item.id),
