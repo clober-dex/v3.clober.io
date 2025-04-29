@@ -191,8 +191,18 @@ function App({ Component, pageProps }: AppProps) {
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', '${GOOGLE_ANALYTICS_TRACKING_ID[chain.id]}');
-        `}
+      const urlParams = new URLSearchParams(window.location.search)
+      const utm_source = urlParams.get('utm_source') || undefined
+      const utm_medium = urlParams.get('utm_medium') || undefined
+      const utm_campaign = urlParams.get('utm_campaign') || undefined
+
+      gtag('config', '${GOOGLE_ANALYTICS_TRACKING_ID[chain.id]}', {
+        page_location: window.location.href,
+        campaign_source: utm_source,
+        campaign_medium: utm_medium,
+        campaign_name: utm_campaign
+      });
+    `}
           </Script>
         </>
       )}
