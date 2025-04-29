@@ -118,7 +118,6 @@ const Profit = ({
         })) ?? [],
     [tokenColorMap, trades],
   )
-  console.log('data', trades)
 
   return (
     <div className="flex flex-col sm:flex-row group relative gap-1 sm:gap-2 py-2">
