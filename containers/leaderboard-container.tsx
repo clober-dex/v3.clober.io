@@ -18,7 +18,10 @@ import { Loading } from '../components/loading'
 import { toCommaSeparated } from '../utils/number'
 import { useWindowWidth } from '../hooks/useWindowWidth'
 import { LeaderBoard } from '../components/leader-board'
-import { fetchLiquidVaultPoint } from '../apis/point'
+import {
+  fetchLiquidVaultBalanceLeaderboard,
+  fetchLiquidVaultPoint,
+} from '../apis/point'
 
 type HeatmapProps = {
   userDailyVolumes: {
@@ -279,6 +282,7 @@ function Heatmap({ userDailyVolumes, prices, monthLabels }: HeatmapProps) {
 }
 
 export const LeaderboardContainer = () => {
+  const [tab, setTab] = useState<'lp' | 'volume'>('volume')
   const { address: userAddress } = useAccount()
   const { prices } = useCurrencyContext()
   const { selectedChain } = useChainContext()
@@ -317,6 +321,18 @@ export const LeaderboardContainer = () => {
     }[]
   }
 
+  const { data: allUserLP } = useQuery({
+    queryKey: ['lp-leaderboard', selectedChain.id],
+    queryFn: async () => {
+      return fetchLiquidVaultBalanceLeaderboard(selectedChain.id)
+    },
+  }) as {
+    data: {
+      address: `0x${string}`
+      balance: number
+    }[]
+  }
+
   const { data: userVolume } = useQuery({
     queryKey: ['user-volume', selectedChain.id, userAddress],
     queryFn: async () => {
@@ -333,7 +349,7 @@ export const LeaderboardContainer = () => {
     } | null
   }
 
-  const myRank = useMemo(() => {
+  const myVolumeRank = useMemo(() => {
     if (allUserVolume && userAddress && userVolume) {
       const index = allUserVolume.findIndex(({ address }) =>
         isAddressEqual(getAddress(address), userAddress),
@@ -342,6 +358,16 @@ export const LeaderboardContainer = () => {
     }
     return 0
   }, [allUserVolume, userAddress, userVolume])
+
+  const myLPRank = useMemo(() => {
+    if (allUserLP && userAddress) {
+      const index = allUserVolume.findIndex(({ address }) =>
+        isAddressEqual(getAddress(address), userAddress),
+      )
+      return index + 1
+    }
+    return 0
+  }, [allUserLP, allUserVolume, userAddress])
 
   const countUpFormatter = useCallback((value: number): string => {
     return toCommaSeparated(value.toFixed(2))
@@ -352,12 +378,12 @@ export const LeaderboardContainer = () => {
       <div className="w-full lg:w-[960px] flex flex-col sm:gap-12 items-center">
         <div className="flex w-full h-20 mt-6 sm:mt-0 sm:h-28 px-4 justify-start items-center gap-3 sm:gap-4">
           <div className="grow shrink basis-0 h-full px-6 py-4 sm:px-8 sm:py-6 bg-[rgba(96,165,250,0.10)] rounded-xl sm:rounded-2xl flex-col justify-center items-center gap-3 inline-flex bg-gray-800">
-            <div className="text-center text-gray-400 text-sm sm:text-base font-semibold">
-              Liquidity Point
+            <div className="text-center text-gray-400 text-sm sm:text-base font-semibold text-nowrap">
+              Volume Point
             </div>
             <div className="self-stretch text-center text-white text-lg sm:text-2xl font-bold">
               <CountUp
-                end={myVaultPoint}
+                end={userVolume ? userVolume.totalVolumeUsd / 50 : 0}
                 formattingFn={countUpFormatter}
                 preserveValue
                 useEasing={false}
@@ -365,13 +391,14 @@ export const LeaderboardContainer = () => {
               />
             </div>
           </div>
+
           <div className="grow shrink basis-0 h-full px-6 py-4 sm:px-8 sm:py-6 bg-[rgba(96,165,250,0.10)] rounded-xl sm:rounded-2xl flex-col justify-center items-center gap-3 inline-flex bg-gray-800">
-            <div className="text-center text-gray-400 text-sm sm:text-base font-semibold">
-              Volume Point
+            <div className="text-center text-gray-400 text-sm sm:text-base font-semibold text-nowrap">
+              LP Point
             </div>
             <div className="self-stretch text-center text-white text-lg sm:text-2xl font-bold">
               <CountUp
-                end={userVolume ? userVolume.totalVolumeUsd / 1000 : 0}
+                end={myVaultPoint}
                 formattingFn={countUpFormatter}
                 preserveValue
                 useEasing={false}
@@ -386,8 +413,24 @@ export const LeaderboardContainer = () => {
 
       <div className="w-full md:flex md:justify-center relative">
         <div className="flex flex-col items-center gap-3 sm:gap-4 mt-12 mb-4 md:w-[616px]">
-          <div className="w-full justify-start text-white text-sm sm:text-lg font-bold text-center sm:text-left">
-            Leaderboard
+          <div className="w-full flex flex-col gap-4 sm:gap-0 sm:flex-row text-white text-sm sm:text-lg font-bold">
+            <span className="text-center sm:text-left">Leaderboard</span>
+            <div className="flex ml-auto gap-1">
+              <button
+                onClick={() => setTab('volume')}
+                disabled={tab === 'volume'}
+                className="flex text-sm font-semibold w-full items-center justify-center px-4 sm:px-5 py-1.5 disabled:bg-blue-500/30 rounded-[10px]"
+              >
+                Volume
+              </button>
+              <button
+                onClick={() => setTab('lp')}
+                disabled={tab === 'lp'}
+                className="flex text-sm font-semibold w-full items-center justify-center px-4 sm:px-5 py-1.5 disabled:bg-blue-500/30 rounded-[10px]"
+              >
+                LP
+              </button>
+            </div>
           </div>
 
           <div className="w-full py-3 sm:py-4 bg-[#1d1f27] sm:bg-[#1c1e27] rounded-xl inline-flex flex-col justify-start items-start gap-3">
@@ -401,42 +444,73 @@ export const LeaderboardContainer = () => {
                 </div>
                 <div className="flex flex-1 justify-start items-center gap-2.5">
                   <div className="justify-start text-gray-400">
-                    Total Volume
+                    {tab === 'volume' ? 'Total Volume' : 'LP Balance'}
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {allUserVolume ? (
-            <LeaderBoard
-              explorerUrl={selectedChain.blockExplorers?.default.url ?? ''}
-              myValue={
-                userAddress
-                  ? userVolume
-                    ? {
-                        address: userAddress,
-                        rank: myRank,
-                        value: `$${toCommaSeparated(userVolume.totalVolumeUsd.toFixed(2))}`,
-                      }
-                    : {
-                        address: userAddress,
-                        rank: -1,
-                        value: `$0.00`,
-                      }
-                  : undefined
-              }
-              values={allUserVolume.map(
-                ({ address, totalVolumeUsd }, index) => ({
-                  address: getAddress(address),
-                  value: `$${toCommaSeparated(totalVolumeUsd.toFixed(2))}`,
-                  rank: index + 1,
-                }),
+          {tab === 'volume' && (
+            <>
+              {allUserVolume ? (
+                <LeaderBoard
+                  explorerUrl={selectedChain.blockExplorers?.default.url ?? ''}
+                  myValue={
+                    userAddress
+                      ? userVolume
+                        ? {
+                            address: userAddress,
+                            rank: myVolumeRank,
+                            value: `$${toCommaSeparated(userVolume.totalVolumeUsd.toFixed(2))}`,
+                          }
+                        : {
+                            address: userAddress,
+                            rank: -1,
+                            value: `$0.00`,
+                          }
+                      : undefined
+                  }
+                  values={allUserVolume.map(
+                    ({ address, totalVolumeUsd }, index) => ({
+                      address: getAddress(address),
+                      value: `$${toCommaSeparated(totalVolumeUsd.toFixed(2))}`,
+                      rank: index + 1,
+                    }),
+                  )}
+                  maxDisplayRank={1000}
+                />
+              ) : (
+                <Loading />
               )}
-              maxDisplayRank={1000}
-            />
-          ) : (
-            <Loading />
+            </>
+          )}
+
+          {tab === 'lp' && (
+            <>
+              {allUserLP ? (
+                <LeaderBoard
+                  explorerUrl={selectedChain.blockExplorers?.default.url ?? ''}
+                  myValue={
+                    userAddress
+                      ? {
+                          address: userAddress,
+                          rank: myLPRank,
+                          value: `${toCommaSeparated(myVaultPoint.toFixed(4))}`,
+                        }
+                      : undefined
+                  }
+                  values={allUserLP.map(({ address, balance }, index) => ({
+                    address: getAddress(address),
+                    value: `${toCommaSeparated(balance.toFixed(4))}`,
+                    rank: index + 1,
+                  }))}
+                  maxDisplayRank={1000}
+                />
+              ) : (
+                <Loading />
+              )}
+            </>
           )}
         </div>
       </div>
