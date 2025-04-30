@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
 import { FixedSizeList as List } from 'react-window'
-import { isAddressEqual } from 'viem'
 
 import { shortAddress } from '../utils/address'
 import { useWindowWidth } from '../hooks/useWindowWidth'
@@ -21,6 +20,7 @@ export const LeaderBoard = ({
   }[]
   myValue?: {
     value: React.ReactNode
+    rank: number
     address: `0x${string}`
   }
   maxDisplayRank: number
@@ -109,9 +109,7 @@ export const LeaderBoard = ({
       {myValue && (
         <div className="self-stretch px-4 sm:px-8 min-h-10 bg-[#75b3ff]/20 flex rounded-lg justify-center items-center gap-1.5 sm:text-sm text-xs">
           <div className="w-16 flex justify-start items-center gap-2.5 text-white font-bold">
-            {values.find(({ address }) =>
-              isAddressEqual(address, myValue.address),
-            )?.rank ?? '-'}
+            {myValue.rank > 0 ? myValue.rank : '-'}
           </div>
           <div className="flex w-full">
             <div className="flex flex-1 justify-start items-center text-blue-400 gap-1">

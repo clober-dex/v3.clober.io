@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { createPublicClient, getAddress, http } from 'viem'
+import { createPublicClient, getAddress, http, isAddressEqual } from 'viem'
 import { useAccount, useDisconnect, useWalletClient } from 'wagmi'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import CountUp from 'react-countup'
@@ -746,6 +746,12 @@ export const TradingCompetitionContainer = () => {
               myValue={
                 userAddress && isRegistered
                   ? {
+                      rank:
+                        Object.entries(allUserPnL)
+                          .sort(([, a], [, b]) => b.totalPnl - a.totalPnl)
+                          .findIndex(([address]) =>
+                            isAddressEqual(getAddress(address), userAddress),
+                          ) + 1,
                       address: userAddress,
                       value: (
                         <div className="flex flex-row relative w-full">
