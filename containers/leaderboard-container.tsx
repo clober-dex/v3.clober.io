@@ -409,7 +409,9 @@ export const LeaderboardContainer = () => {
         </div>
       </div>
 
-      <Heatmap userDailyVolumes={userDailyVolumes} prices={prices} />
+      {userAddress && (
+        <Heatmap userDailyVolumes={userDailyVolumes} prices={prices} />
+      )}
 
       <div className="w-full md:flex md:justify-center relative">
         <div className="flex flex-col items-center gap-3 sm:gap-4 mt-12 mb-4 md:w-[616px]">
