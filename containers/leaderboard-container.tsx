@@ -177,7 +177,7 @@ function Heatmap({ userDailyVolumes, prices, monthLabels }: HeatmapProps) {
 
   return (
     <div ref={containerRef} className="relative w-full">
-      <div ref={scrollRef} className="overflow-x-auto">
+      <div ref={scrollRef} className="overflow-x-auto overflow-y-hidden">
         <div className="min-w-[800px] sm:min-w-[964px] max-w-[964px] h-[158px] sm:h-[227px] relative bg-[#18212f] rounded-3xl p-4 sm:p-6 mx-auto">
           {totalVolume === 0 && <Loading />}
           <div className="absolute top-0 left-0 w-full h-full rounded-3xl pointer-events-none" />
@@ -282,7 +282,7 @@ function Heatmap({ userDailyVolumes, prices, monthLabels }: HeatmapProps) {
 }
 
 export const LeaderboardContainer = () => {
-  const [tab, setTab] = useState<'lp' | 'volume'>('volume')
+  const [tab, setTab] = useState<'vault' | 'volume'>('volume')
   const { address: userAddress } = useAccount()
   const { prices } = useCurrencyContext()
   const { selectedChain } = useChainContext()
@@ -394,7 +394,7 @@ export const LeaderboardContainer = () => {
 
           <div className="grow shrink basis-0 h-full px-6 py-4 sm:px-8 sm:py-6 bg-[rgba(96,165,250,0.10)] rounded-xl sm:rounded-2xl flex-col justify-center items-center gap-3 inline-flex bg-gray-800">
             <div className="text-center text-gray-400 text-sm sm:text-base font-semibold text-nowrap">
-              LP Point
+              Vault Point
             </div>
             <div className="self-stretch text-center text-white text-lg sm:text-2xl font-bold">
               <CountUp
@@ -424,11 +424,11 @@ export const LeaderboardContainer = () => {
                 Volume
               </button>
               <button
-                onClick={() => setTab('lp')}
-                disabled={tab === 'lp'}
+                onClick={() => setTab('vault')}
+                disabled={tab === 'vault'}
                 className="flex text-sm font-semibold w-full items-center justify-center px-4 sm:px-5 py-1.5 disabled:bg-blue-500/30 rounded-[10px]"
               >
-                LP
+                Vault
               </button>
             </div>
           </div>
@@ -444,7 +444,7 @@ export const LeaderboardContainer = () => {
                 </div>
                 <div className="flex flex-1 justify-start items-center gap-2.5">
                   <div className="justify-start text-gray-400">
-                    {tab === 'volume' ? 'Total Volume' : 'LP Balance'}
+                    {tab === 'volume' ? 'Total Volume' : 'Vault Balance'}
                   </div>
                 </div>
               </div>
@@ -486,7 +486,7 @@ export const LeaderboardContainer = () => {
             </>
           )}
 
-          {tab === 'lp' && (
+          {tab === 'vault' && (
             <>
               {allUserLP ? (
                 <LeaderBoard
