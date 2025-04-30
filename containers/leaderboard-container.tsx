@@ -351,7 +351,7 @@ export const LeaderboardContainer = () => {
                 </div>
                 <div className="flex flex-1 justify-start items-center gap-2.5">
                   <div className="justify-start text-gray-400">
-                    Total Profit
+                    Total Volume
                   </div>
                 </div>
               </div>
