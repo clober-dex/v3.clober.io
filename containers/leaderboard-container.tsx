@@ -173,7 +173,7 @@ function Heatmap({ userDailyVolumes, prices, monthLabels }: HeatmapProps) {
   return (
     <div ref={containerRef} className="relative w-full">
       <div ref={scrollRef} className="overflow-x-auto">
-        <div className="min-w-[800px] sm:min-w-[964px] max-w-[964px] h-full sm:h-[227px] relative bg-[#18212f] rounded-3xl p-4 sm:p-6 mx-auto">
+        <div className="min-w-[800px] sm:min-w-[964px] max-w-[964px] h-[158px] sm:h-[227px] relative bg-[#18212f] rounded-3xl p-4 sm:p-6 mx-auto">
           {totalVolume === 0 && <Loading />}
           <div className="absolute top-0 left-0 w-full h-full rounded-3xl pointer-events-none" />
 
@@ -332,7 +332,9 @@ export const LeaderboardContainer = () => {
 
   return (
     <div className="w-full flex items-center flex-col text-white mb-4 mt-2 px-4">
-      <Heatmap userDailyVolumes={userDailyVolumes} prices={prices} />
+      {userAddress && (
+        <Heatmap userDailyVolumes={userDailyVolumes} prices={prices} />
+      )}
 
       <div className="w-full md:flex md:justify-center relative">
         <div className="flex flex-col items-center gap-3 sm:gap-4 mt-12 mb-4 md:w-[616px]">
