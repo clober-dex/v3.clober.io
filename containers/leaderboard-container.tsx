@@ -15,7 +15,7 @@ import { Prices } from '../model/prices'
 import { useCurrencyContext } from '../contexts/currency-context'
 import { Legend } from '../components/chart/legend'
 import { Loading } from '../components/loading'
-import { toCommaSeparated, toHumanReadableString } from '../utils/number'
+import { toCommaSeparated } from '../utils/number'
 import { useWindowWidth } from '../hooks/useWindowWidth'
 import { LeaderBoard } from '../components/leader-board'
 import { fetchLiquidVaultPoint } from '../apis/point'
@@ -349,44 +349,40 @@ export const LeaderboardContainer = () => {
 
   return (
     <div className="w-full flex items-center flex-col text-white mb-4 px-4 gap-8">
-      {userAddress && (
-        <div className="w-[960px] flex flex-col sm:gap-12 items-center">
-          <div className="flex w-full h-20 mt-6 sm:mt-0 sm:h-28 px-4 justify-start items-center gap-3 sm:gap-4">
-            <div className="grow shrink basis-0 h-full px-6 py-4 sm:px-8 sm:py-6 bg-[rgba(96,165,250,0.10)] rounded-xl sm:rounded-2xl flex-col justify-center items-center gap-3 inline-flex bg-gray-800">
-              <div className="text-center text-gray-400 text-sm sm:text-base font-semibold">
-                Liquidity Point
-              </div>
-              <div className="self-stretch text-center text-white text-lg sm:text-2xl font-bold">
-                <CountUp
-                  end={myVaultPoint}
-                  formattingFn={countUpFormatter}
-                  preserveValue
-                  useEasing={false}
-                  duration={0.5}
-                />
-              </div>
+      <div className="w-[960px] flex flex-col sm:gap-12 items-center">
+        <div className="flex w-full h-20 mt-6 sm:mt-0 sm:h-28 px-4 justify-start items-center gap-3 sm:gap-4">
+          <div className="grow shrink basis-0 h-full px-6 py-4 sm:px-8 sm:py-6 bg-[rgba(96,165,250,0.10)] rounded-xl sm:rounded-2xl flex-col justify-center items-center gap-3 inline-flex bg-gray-800">
+            <div className="text-center text-gray-400 text-sm sm:text-base font-semibold">
+              Liquidity Point
             </div>
-            <div className="grow shrink basis-0 h-full px-6 py-4 sm:px-8 sm:py-6 bg-[rgba(96,165,250,0.10)] rounded-xl sm:rounded-2xl flex-col justify-center items-center gap-3 inline-flex bg-gray-800">
-              <div className="text-center text-gray-400 text-sm sm:text-base font-semibold">
-                Volume Point
-              </div>
-              <div className="self-stretch text-center text-white text-lg sm:text-2xl font-bold">
-                <CountUp
-                  end={userVolume ? userVolume.totalVolumeUsd / 1000 : 0}
-                  formattingFn={countUpFormatter}
-                  preserveValue
-                  useEasing={false}
-                  duration={0.5}
-                />
-              </div>
+            <div className="self-stretch text-center text-white text-lg sm:text-2xl font-bold">
+              <CountUp
+                end={myVaultPoint}
+                formattingFn={countUpFormatter}
+                preserveValue
+                useEasing={false}
+                duration={0.5}
+              />
+            </div>
+          </div>
+          <div className="grow shrink basis-0 h-full px-6 py-4 sm:px-8 sm:py-6 bg-[rgba(96,165,250,0.10)] rounded-xl sm:rounded-2xl flex-col justify-center items-center gap-3 inline-flex bg-gray-800">
+            <div className="text-center text-gray-400 text-sm sm:text-base font-semibold">
+              Volume Point
+            </div>
+            <div className="self-stretch text-center text-white text-lg sm:text-2xl font-bold">
+              <CountUp
+                end={userVolume ? userVolume.totalVolumeUsd / 1000 : 0}
+                formattingFn={countUpFormatter}
+                preserveValue
+                useEasing={false}
+                duration={0.5}
+              />
             </div>
           </div>
         </div>
-      )}
+      </div>
 
-      {userAddress && (
-        <Heatmap userDailyVolumes={userDailyVolumes} prices={prices} />
-      )}
+      <Heatmap userDailyVolumes={userDailyVolumes} prices={prices} />
 
       <div className="w-full md:flex md:justify-center relative">
         <div className="flex flex-col items-center gap-3 sm:gap-4 mt-12 mb-4 md:w-[616px]">
