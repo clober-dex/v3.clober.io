@@ -35,7 +35,6 @@ import { VaultProvider } from '../contexts/vault/vault-context'
 import { VaultContractProvider } from '../contexts/vault/vault-contract-context'
 import { FuturesProvider } from '../contexts/futures/futures-context'
 import { FuturesContractProvider } from '../contexts/futures/futures-contract-context'
-import { PointProvider } from '../contexts/point-context'
 import { GOOGLE_ANALYTICS_TRACKING_ID } from '../constants/google-analytics'
 
 const CacheProvider = ({ children }: React.PropsWithChildren) => {
