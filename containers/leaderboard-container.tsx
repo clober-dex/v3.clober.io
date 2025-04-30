@@ -4,7 +4,7 @@ import { useAccount } from 'wagmi'
 import { getAddress } from 'viem'
 
 import { useChainContext } from '../contexts/chain-context'
-import { fetchWalletDayData } from '../apis/leaderboard'
+import { fetchVolumeLeaderboard, fetchWalletDayData } from '../apis/leaderboard'
 import { DailyActivitySnapshot } from '../model/snapshot'
 import { Prices } from '../model/prices'
 import { useCurrencyContext } from '../contexts/currency-context'
@@ -12,9 +12,10 @@ import { Legend } from '../components/chart/legend'
 import { Loading } from '../components/loading'
 import { toCommaSeparated } from '../utils/number'
 import { useWindowWidth } from '../hooks/useWindowWidth'
+import { TradingCompetitionPnl } from '../model/trading-competition-pnl'
 
 type HeatmapProps = {
-  leaderboard: {
+  userDailyVolumes: {
     timestamp: number
     volumeSnapshots: DailyActivitySnapshot['volumeSnapshots']
   }[]
@@ -97,7 +98,7 @@ const getMonthLabels = (): string[] => {
   return labels
 }
 
-function Heatmap({ leaderboard, prices, monthLabels }: HeatmapProps) {
+function Heatmap({ userDailyVolumes, prices, monthLabels }: HeatmapProps) {
   const width = useWindowWidth()
   const months = monthLabels ?? getMonthLabels()
   const containerRef = useRef<HTMLDivElement>(null)
@@ -110,7 +111,7 @@ function Heatmap({ leaderboard, prices, monthLabels }: HeatmapProps) {
   } | null>(null)
 
   const heatmapData = useMemo(() => {
-    const grouped = groupSnapshotsByDay(leaderboard, prices)
+    const grouped = groupSnapshotsByDay(userDailyVolumes, prices)
     const start = getStartOfLastMonth()
     const matrix: {
       value: number
@@ -138,7 +139,7 @@ function Heatmap({ leaderboard, prices, monthLabels }: HeatmapProps) {
     }
 
     return matrix
-  }, [leaderboard, prices])
+  }, [userDailyVolumes, prices])
   const startDate = useMemo(() => getStartOfLastMonth(), [])
   const totalVolume = useMemo(() => {
     return heatmapData.reduce(
@@ -150,7 +151,7 @@ function Heatmap({ leaderboard, prices, monthLabels }: HeatmapProps) {
   const tokenColorMap = useMemo(() => {
     const addresses = [
       ...new Set(
-        leaderboard.flatMap((item) =>
+        userDailyVolumes.flatMap((item) =>
           item.volumeSnapshots.map(({ address }) => getAddress(address)),
         ),
       ),
@@ -163,7 +164,7 @@ function Heatmap({ leaderboard, prices, monthLabels }: HeatmapProps) {
         return [address, `hsl(${hue}, 70%, 50%)`]
       }),
     )
-  }, [leaderboard])
+  }, [userDailyVolumes])
 
   return (
     <div ref={containerRef} className="relative w-full">
@@ -182,7 +183,7 @@ function Heatmap({ leaderboard, prices, monthLabels }: HeatmapProps) {
                   const date = new Date(startDate)
                   date.setDate(startDate.getDate() + colIdx * 7 + rowIdx)
                   const dateStr = date.toDateString()
-                  const volumeSnapshots = leaderboard.find(
+                  const volumeSnapshots = userDailyVolumes.find(
                     (item) => item.timestamp === timestamp,
                   )?.volumeSnapshots
 
@@ -276,8 +277,8 @@ export const LeaderboardContainer = () => {
   const { prices } = useCurrencyContext()
   const { selectedChain } = useChainContext()
 
-  const { data: leaderboard } = useQuery({
-    queryKey: ['leaderboard', selectedChain.id, userAddress],
+  const { data: userDailyVolumes } = useQuery({
+    queryKey: ['user-daily-volumes', selectedChain.id, userAddress],
     queryFn: async () => {
       if (!userAddress) {
         return []
@@ -287,13 +288,21 @@ export const LeaderboardContainer = () => {
     initialData: [],
   })
 
+  const { data: allUserVolume } = useQuery({
+    queryKey: ['volume-leaderboard', selectedChain.id],
+    queryFn: async () => {
+      return fetchVolumeLeaderboard(selectedChain.id)
+    },
+  }) as {
+    data: {
+      [user: `0x${string}`]: TradingCompetitionPnl
+    }
+  }
+  console.log('leaderboard', allUserVolume)
+
   return (
     <div className="w-full flex items-center flex-col text-white mb-4 mt-2 px-4">
-      <div className="mb-[86px] sm:mb-[129px] flex flex-col gap-3 lg:gap-7 w-full text-center justify-center items-center text-white text-base sm:text-2xl font-bold">
-        Leaderboard
-      </div>
-
-      <Heatmap leaderboard={leaderboard} prices={prices} />
+      <Heatmap userDailyVolumes={userDailyVolumes} prices={prices} />
     </div>
   )
 }
