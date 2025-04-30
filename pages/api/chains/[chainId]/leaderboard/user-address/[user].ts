@@ -58,7 +58,13 @@ export default async function handler(
       rank: Number(row.rank),
     }
 
-    return res.status(200).json({ my_rank: myRank })
+    return res
+      .setHeader(
+        'Cache-Control',
+        'public, max-age=60, stale-while-revalidate=30',
+      )
+      .status(200)
+      .json({ my_rank: myRank })
   } catch (error) {
     console.error(error)
     res.json({
