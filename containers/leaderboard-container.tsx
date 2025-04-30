@@ -321,7 +321,7 @@ export const LeaderboardContainer = () => {
   }
 
   const myRank = useMemo(() => {
-    if (userAddress && userVolume) {
+    if (allUserVolume && userAddress && userVolume) {
       const index = allUserVolume.findIndex(({ address }) =>
         isAddressEqual(getAddress(address), userAddress),
       )
