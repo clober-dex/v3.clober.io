@@ -16,6 +16,48 @@ import { RPC_URL } from '../constants/rpc-url'
 import { ERC20_PERMIT_ABI } from '../abis/@openzeppelin/erc20-permit-abi'
 import { DailyActivitySnapshot } from '../model/snapshot'
 
+const BLACKLISTED_USER_ADDRESSES = [
+  '0x5F79EE8f8fA862E98201120d83c4eC39D9468D49',
+  '0xCcd0964F534c4583C35e07E47AbE8984A6bB1534',
+].map((address) => getAddress(address))
+
+export const fetchUserVolume = async (
+  chainId: CHAIN_IDS,
+  userAddress: `0x${string}`,
+): Promise<{
+  address: `0x${string}`
+  rank: number
+  totalVolumeUsd: number
+} | null> => {
+  if (chainId !== monadTestnet.id) {
+    return null
+  }
+
+  const {
+    data: { my_rank },
+  } = await axios.get<{
+    my_rank: {
+      wallet: `0x${string}`
+      rank: number
+      total_volume_usd: number
+    } | null
+  }>(`/api/chains/10143/leaderboard/user-address/${userAddress}`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+  if (!my_rank) {
+    return null
+  }
+  return {
+    address: getAddress(my_rank.wallet),
+    rank: BLACKLISTED_USER_ADDRESSES.includes(getAddress(my_rank.wallet))
+      ? -1
+      : my_rank.rank - BLACKLISTED_USER_ADDRESSES.length,
+    totalVolumeUsd: my_rank.total_volume_usd,
+  }
+}
+
 export const fetchVolumeLeaderboard = async (
   chainId: CHAIN_IDS,
 ): Promise<
@@ -41,10 +83,17 @@ export const fetchVolumeLeaderboard = async (
     },
   })
 
-  return results.map((item) => ({
-    address: getAddress(item.wallet),
-    totalVolumeUsd: item.total_volume_usd,
-  }))
+  return results
+    .filter(
+      (item) =>
+        !BLACKLISTED_USER_ADDRESSES.some((address) =>
+          isAddressEqual(getAddress(item.wallet), address),
+        ),
+    )
+    .map((item) => ({
+      address: getAddress(item.wallet),
+      totalVolumeUsd: item.total_volume_usd,
+    }))
 }
 
 export const fetchWalletDayData = async (

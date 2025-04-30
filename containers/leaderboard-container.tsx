@@ -4,7 +4,11 @@ import { useAccount } from 'wagmi'
 import { getAddress } from 'viem'
 
 import { useChainContext } from '../contexts/chain-context'
-import { fetchVolumeLeaderboard, fetchWalletDayData } from '../apis/leaderboard'
+import {
+  fetchUserVolume,
+  fetchVolumeLeaderboard,
+  fetchWalletDayData,
+} from '../apis/leaderboard'
 import { DailyActivitySnapshot } from '../model/snapshot'
 import { Prices } from '../model/prices'
 import { useCurrencyContext } from '../contexts/currency-context'
@@ -12,7 +16,7 @@ import { Legend } from '../components/chart/legend'
 import { Loading } from '../components/loading'
 import { toCommaSeparated } from '../utils/number'
 import { useWindowWidth } from '../hooks/useWindowWidth'
-import { TradingCompetitionPnl } from '../model/trading-competition-pnl'
+import { LeaderBoard } from '../components/leader-board'
 
 type HeatmapProps = {
   userDailyVolumes: {
@@ -295,14 +299,83 @@ export const LeaderboardContainer = () => {
     },
   }) as {
     data: {
-      [user: `0x${string}`]: TradingCompetitionPnl
+      address: `0x${string}`
+      totalVolumeUsd: number
+    }[]
+  }
+
+  const { data: userVolume } = useQuery({
+    queryKey: ['user-volume', selectedChain.id, userAddress],
+    queryFn: async () => {
+      if (!userAddress) {
+        return null
+      }
+      return fetchUserVolume(selectedChain.id, userAddress)
+    },
+  }) as {
+    data: {
+      address: `0x${string}`
+      rank: number
+      totalVolumeUsd: number
     }
   }
-  console.log('leaderboard', allUserVolume)
 
   return (
     <div className="w-full flex items-center flex-col text-white mb-4 mt-2 px-4">
       <Heatmap userDailyVolumes={userDailyVolumes} prices={prices} />
+
+      <div className="w-full md:flex md:justify-center relative">
+        <div className="flex flex-col items-center gap-3 sm:gap-4 mt-12 mb-4 md:w-[616px]">
+          <div className="w-full py-3 sm:py-4 bg-[#1d1f27] sm:bg-[#1c1e27] rounded-xl inline-flex flex-col justify-start items-start gap-3">
+            <div className="self-stretch px-4 sm:px-8 inline-flex justify-start items-start gap-1.5 sm:text-sm text-xs">
+              <div className="w-16 flex justify-start items-center gap-2.5 text-gray-400">
+                Rank
+              </div>
+              <div className="flex w-full">
+                <div className="flex flex-1 justify-start items-center gap-2.5">
+                  <div className="justify-start text-gray-400">User</div>
+                </div>
+                <div className="flex flex-1 justify-start items-center gap-2.5">
+                  <div className="justify-start text-gray-400">
+                    Total Profit
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {allUserVolume ? (
+            <LeaderBoard
+              explorerUrl={selectedChain.blockExplorers?.default.url ?? ''}
+              myValue={
+                userAddress
+                  ? userVolume
+                    ? {
+                        address: userAddress,
+                        rank: userVolume.rank ?? 0,
+                        value: `$${toCommaSeparated(userVolume.totalVolumeUsd.toFixed(2))}`,
+                      }
+                    : {
+                        address: userAddress,
+                        rank: -1,
+                        value: `$0.00`,
+                      }
+                  : undefined
+              }
+              values={allUserVolume.map(
+                ({ address, totalVolumeUsd }, index) => ({
+                  address: getAddress(address),
+                  value: `$${toCommaSeparated(totalVolumeUsd.toFixed(2))}`,
+                  rank: index + 1,
+                }),
+              )}
+              maxDisplayRank={1000}
+            />
+          ) : (
+            <Loading />
+          )}
+        </div>
+      </div>
     </div>
   )
 }
