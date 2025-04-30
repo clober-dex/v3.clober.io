@@ -22,6 +22,7 @@ import ChainIcon from '../components/icon/chain-icon'
 import { textStyles } from '../themes/text-styles'
 import { PAGE_BUTTONS } from '../constants/buttons'
 import { fetchEnsName } from '../apis/ens'
+import { BalloonModal } from '../components/modal/balloon-modal'
 
 const WrongNetwork = ({
   openChainModal,
@@ -129,7 +130,7 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
 
           <div className="flex items-center flex-row gap-1 sm:gap-3">
             {address && selectedChain.id === monadTestnet.id && (
-              <div className="flex w-full">
+              <div className="relative flex w-full">
                 <UserPointButton
                   score={myVaultPoint?.point ?? 0}
                   router={router}
