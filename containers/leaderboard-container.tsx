@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useAccount } from 'wagmi'
-import { getAddress } from 'viem'
+import { getAddress, isAddressEqual } from 'viem'
 
 import { useChainContext } from '../contexts/chain-context'
 import {
@@ -326,6 +326,10 @@ export const LeaderboardContainer = () => {
 
       <div className="w-full md:flex md:justify-center relative">
         <div className="flex flex-col items-center gap-3 sm:gap-4 mt-12 mb-4 md:w-[616px]">
+          <div className="w-full justify-start text-white text-sm sm:text-lg font-bold text-center sm:text-left">
+            Leaderboard
+          </div>
+
           <div className="w-full py-3 sm:py-4 bg-[#1d1f27] sm:bg-[#1c1e27] rounded-xl inline-flex flex-col justify-start items-start gap-3">
             <div className="self-stretch px-4 sm:px-8 inline-flex justify-start items-start gap-1.5 sm:text-sm text-xs">
               <div className="w-16 flex justify-start items-center gap-2.5 text-gray-400">
@@ -352,7 +356,12 @@ export const LeaderboardContainer = () => {
                   ? userVolume
                     ? {
                         address: userAddress,
-                        rank: userVolume.rank ?? 0,
+                        rank:
+                          allUserVolume.findIndex(({ address }) =>
+                            isAddressEqual(getAddress(address), userAddress),
+                          ) + 1 ??
+                          userVolume.rank ??
+                          0,
                         value: `$${toCommaSeparated(userVolume.totalVolumeUsd.toFixed(2))}`,
                       }
                     : {

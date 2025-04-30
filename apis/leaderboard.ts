@@ -53,7 +53,7 @@ export const fetchUserVolume = async (
     address: getAddress(my_rank.wallet),
     rank: BLACKLISTED_USER_ADDRESSES.includes(getAddress(my_rank.wallet))
       ? -1
-      : my_rank.rank - BLACKLISTED_USER_ADDRESSES.length,
+      : my_rank.rank,
     totalVolumeUsd: my_rank.total_volume_usd,
   }
 }
