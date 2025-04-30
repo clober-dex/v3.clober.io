@@ -351,7 +351,7 @@ export const LeaderboardContainer = () => {
 
   const myVolumeRank = useMemo(() => {
     if (allUserVolume && userAddress && userVolume) {
-      const index = allUserVolume.findIndex(({ address }) =>
+      const index = (allUserVolume ?? []).findIndex(({ address }) =>
         isAddressEqual(getAddress(address), userAddress),
       )
       return index === -1 ? userVolume.rank : index + 1
@@ -361,13 +361,13 @@ export const LeaderboardContainer = () => {
 
   const myLPRank = useMemo(() => {
     if (allUserLP && userAddress) {
-      const index = allUserVolume.findIndex(({ address }) =>
+      const index = (allUserLP ?? []).findIndex(({ address }) =>
         isAddressEqual(getAddress(address), userAddress),
       )
       return index + 1
     }
     return 0
-  }, [allUserLP, allUserVolume, userAddress])
+  }, [allUserLP, userAddress])
 
   const countUpFormatter = useCallback((value: number): string => {
     return toCommaSeparated(value.toFixed(2))
