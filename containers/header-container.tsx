@@ -130,7 +130,10 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
           <div className="flex items-center flex-row gap-1 sm:gap-3">
             {address && selectedChain.id === monadTestnet.id && (
               <div className="flex w-full">
-                <UserPointButton score={myVaultPoint?.point ?? 0} />
+                <UserPointButton
+                  score={myVaultPoint?.point ?? 0}
+                  router={router}
+                />
               </div>
             )}
             {status === 'disconnected' || status === 'connecting' ? (
