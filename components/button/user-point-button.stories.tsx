@@ -14,7 +14,5 @@ export default {
 type Story = StoryObj<typeof UserPointButton>
 
 export const Default: Story = {
-  args: {
-    score: 6,
-  },
+  args: {},
 }

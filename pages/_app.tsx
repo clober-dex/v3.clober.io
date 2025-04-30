@@ -217,52 +217,50 @@ function App({ Component, pageProps }: AppProps) {
           <ChainProvider>
             <TransactionProvider>
               <CurrencyProvider>
-                <PointProvider>
-                  <div
-                    className={`flex flex-col w-[100vw] min-h-[100vh] bg-[#0F1013] text-white ${getBackground(
-                      router.pathname,
-                    )} bg-right bg-no-repeat`}
-                  >
-                    <PanelWrapper open={open} setOpen={setOpen} />
-                    <HeaderContainer onMenuClick={() => setOpen(true)} />
+                <div
+                  className={`flex flex-col w-[100vw] min-h-[100vh] bg-[#0F1013] text-white ${getBackground(
+                    router.pathname,
+                  )} bg-right bg-no-repeat`}
+                >
+                  <PanelWrapper open={open} setOpen={setOpen} />
+                  <HeaderContainer onMenuClick={() => setOpen(true)} />
 
-                    {router.pathname.includes('/trade') ? (
-                      <TradeProvidersWrapper>
-                        <div className="flex flex-1 relative justify-center">
-                          <div className="flex w-full flex-col items-center gap-6 md:gap-11 px-2 pb-0 mt-[30px] md:mt-[56px]">
-                            <Component {...pageProps} />
-                          </div>
+                  {router.pathname.includes('/trade') ? (
+                    <TradeProvidersWrapper>
+                      <div className="flex flex-1 relative justify-center">
+                        <div className="flex w-full flex-col items-center gap-6 md:gap-11 px-2 pb-0 mt-[30px] md:mt-[56px]">
+                          <Component {...pageProps} />
                         </div>
-                      </TradeProvidersWrapper>
-                    ) : router.pathname.includes('/earn') ? (
-                      <VaultProvidersWrapper>
-                        <div className="flex flex-1 relative justify-center">
-                          <div className="flex w-full flex-col items-center gap-6 md:gap-11 px-2 pb-0">
-                            <Component {...pageProps} />
-                          </div>
+                      </div>
+                    </TradeProvidersWrapper>
+                  ) : router.pathname.includes('/earn') ? (
+                    <VaultProvidersWrapper>
+                      <div className="flex flex-1 relative justify-center">
+                        <div className="flex w-full flex-col items-center gap-6 md:gap-11 px-2 pb-0">
+                          <Component {...pageProps} />
                         </div>
-                      </VaultProvidersWrapper>
-                    ) : router.pathname.includes('/futures') ? (
-                      <FuturesProvidersWrapper>
-                        <div className="flex flex-1 relative justify-center">
-                          <div className="flex w-full flex-col items-center gap-6 md:gap-11 px-2 pb-0">
-                            <Component {...pageProps} />
-                          </div>
+                      </div>
+                    </VaultProvidersWrapper>
+                  ) : router.pathname.includes('/futures') ? (
+                    <FuturesProvidersWrapper>
+                      <div className="flex flex-1 relative justify-center">
+                        <div className="flex w-full flex-col items-center gap-6 md:gap-11 px-2 pb-0">
+                          <Component {...pageProps} />
                         </div>
-                      </FuturesProvidersWrapper>
-                    ) : (
-                      <TradeProvidersWrapper>
-                        <div className="flex flex-1 relative justify-center">
-                          <div className="flex w-full flex-col items-center gap-6 md:gap-11 px-2 pb-0 mt-[30px] md:mt-[56px]">
-                            <Component {...pageProps} />
-                          </div>
+                      </div>
+                    </FuturesProvidersWrapper>
+                  ) : (
+                    <TradeProvidersWrapper>
+                      <div className="flex flex-1 relative justify-center">
+                        <div className="flex w-full flex-col items-center gap-6 md:gap-11 px-2 pb-0 mt-[30px] md:mt-[56px]">
+                          <Component {...pageProps} />
                         </div>
-                      </TradeProvidersWrapper>
-                    )}
+                      </div>
+                    </TradeProvidersWrapper>
+                  )}
 
-                    <FooterWrapper />
-                  </div>
-                </PointProvider>
+                  <FooterWrapper />
+                </div>
               </CurrencyProvider>
             </TransactionProvider>
           </ChainProvider>

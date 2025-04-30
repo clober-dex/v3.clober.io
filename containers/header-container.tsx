@@ -17,12 +17,10 @@ import { UserButton } from '../components/button/user-button'
 import { UserTransactionsModal } from '../components/modal/user-transactions-modal'
 import { useTransactionContext } from '../contexts/transaction-context'
 import { UserPointButton } from '../components/button/user-point-button'
-import { usePointContext } from '../contexts/point-context'
 import ChainIcon from '../components/icon/chain-icon'
 import { textStyles } from '../themes/text-styles'
 import { PAGE_BUTTONS } from '../constants/buttons'
 import { fetchEnsName } from '../apis/ens'
-import { BalloonModal } from '../components/modal/balloon-modal'
 
 const WrongNetwork = ({
   openChainModal,
@@ -62,7 +60,6 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const { openConnectModal } = useConnectModal()
   const { openAccountModal } = useAccountModal()
   const { disconnectAsync } = useDisconnect()
-  const { myVaultPoint } = usePointContext()
   const [openTransactionHistoryModal, setOpenTransactionHistoryModal] =
     useState(false)
   const { pendingTransactions, transactionHistory } = useTransactionContext()
@@ -131,10 +128,7 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
           <div className="flex items-center flex-row gap-1 sm:gap-3">
             {address && selectedChain.id === monadTestnet.id && (
               <div className="relative flex w-full">
-                <UserPointButton
-                  score={myVaultPoint?.point ?? 0}
-                  router={router}
-                />
+                <UserPointButton router={router} />
               </div>
             )}
             {status === 'disconnected' || status === 'connecting' ? (
