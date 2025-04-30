@@ -320,6 +320,16 @@ export const LeaderboardContainer = () => {
     }
   }
 
+  const myRank = useMemo(() => {
+    if (userAddress && userVolume) {
+      const index = allUserVolume.findIndex(({ address }) =>
+        isAddressEqual(getAddress(address), userAddress),
+      )
+      return index === -1 ? userVolume.rank : index + 1
+    }
+    return 0
+  }, [allUserVolume, userAddress, userVolume])
+
   return (
     <div className="w-full flex items-center flex-col text-white mb-4 mt-2 px-4">
       <Heatmap userDailyVolumes={userDailyVolumes} prices={prices} />
@@ -356,12 +366,7 @@ export const LeaderboardContainer = () => {
                   ? userVolume
                     ? {
                         address: userAddress,
-                        rank:
-                          allUserVolume.findIndex(({ address }) =>
-                            isAddressEqual(getAddress(address), userAddress),
-                          ) + 1 ??
-                          userVolume.rank ??
-                          0,
+                        rank: myRank,
                         value: `$${toCommaSeparated(userVolume.totalVolumeUsd.toFixed(2))}`,
                       }
                     : {
