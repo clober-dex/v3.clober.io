@@ -12,7 +12,6 @@ import type { AppProps } from 'next/app'
 import { WagmiProvider } from 'wagmi'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
-import { Analytics } from '@vercel/analytics/next'
 import Script from 'next/script'
 
 import HeaderContainer from '../containers/header-container'
@@ -265,7 +264,6 @@ function App({ Component, pageProps }: AppProps) {
           </ChainProvider>
         </WalletProvider>
       </ErrorBoundary>
-      <Analytics />
     </>
   )
 }
