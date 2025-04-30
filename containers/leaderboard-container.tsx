@@ -55,8 +55,7 @@ const getColor = (value: number) => {
 }
 
 function getStartOfLastMonth(): Date {
-  const now = new Date()
-  const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+  const lastMonth = new Date(2025, 2, 1)
   lastMonth.setHours(0, 0, 0, 0)
   return lastMonth
 }
