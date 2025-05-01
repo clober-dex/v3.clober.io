@@ -1,4 +1,5 @@
 import { formatUnits, getAddress, isAddressEqual, zeroAddress } from 'viem'
+import { v4 as uuidv4 } from 'uuid'
 
 import { Chain } from '../chain'
 import { Currency } from '../currency'
@@ -15,6 +16,18 @@ export class OpenOceanAggregator implements Aggregator {
   public readonly chain: Chain
   private readonly TIMEOUT = 4000
   private readonly nativeTokenAddress = zeroAddress
+
+  private latestQuoteId: string | undefined
+  private transactionCache: {
+    [quoteId: string]: {
+      data: `0x${string}`
+      gas: bigint
+      value: bigint
+      to: `0x${string}`
+      nonce?: number
+      gasPrice?: bigint
+    }
+  } = {}
 
   constructor(contract: `0x${string}`, chain: Chain) {
     this.contract = contract
@@ -45,6 +58,9 @@ export class OpenOceanAggregator implements Aggregator {
     aggregator: Aggregator
     priceImpact: number
   }> {
+    if (userAddress) {
+      this.latestQuoteId = undefined
+    }
     const response = await fetchApi<{
       code: number
       data: {
@@ -80,6 +96,18 @@ export class OpenOceanAggregator implements Aggregator {
       throw new Error(`Quote failed: ${response.code}`)
     }
 
+    if (userAddress) {
+      this.latestQuoteId = uuidv4()
+      this.transactionCache[this.latestQuoteId] = await this.buildCallData(
+        inputCurrency,
+        amountIn,
+        outputCurrency,
+        slippageLimitPercent,
+        gasPrice,
+        userAddress,
+      )
+    }
+
     return {
       amountOut: BigInt(response.data.outAmount),
       gasLimit: BigInt(response.data.estimatedGas),
@@ -104,6 +132,25 @@ export class OpenOceanAggregator implements Aggregator {
     nonce?: number
     gasPrice?: bigint
   }> {
+    if (!this.latestQuoteId) {
+      await this.quote(
+        inputCurrency,
+        amountIn,
+        outputCurrency,
+        slippageLimitPercent,
+        gasPrice,
+        userAddress,
+      )
+    }
+
+    if (!this.latestQuoteId) {
+      throw new Error('Quote ID is not defined')
+    }
+
+    if (this.transactionCache[this.latestQuoteId]) {
+      return this.transactionCache[this.latestQuoteId]
+    }
+
     const response = await fetchApi<{
       code: number
       data: {

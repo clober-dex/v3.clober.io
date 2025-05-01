@@ -11,6 +11,7 @@ import {
   marketOrder,
 } from '@clober/v2-sdk'
 import { monadTestnet } from 'viem/chains'
+import { v4 as uuidv4 } from 'uuid'
 
 import { Currency } from '../currency'
 import { Prices } from '../prices'
@@ -33,6 +34,17 @@ export class CloberV2Aggregator implements Aggregator {
   public readonly weth: `0x${string}`
 
   private defaultGasLimit = 500_000n
+  private latestQuoteId: string | undefined
+  private transactionCache: {
+    [quoteId: string]: {
+      data: `0x${string}`
+      gas: bigint
+      value: bigint
+      to: `0x${string}`
+      nonce?: number
+      gasPrice?: bigint
+    }
+  } = {}
 
   constructor(contract: `0x${string}`, chain: Chain) {
     this.contract = contract
@@ -97,18 +109,37 @@ export class CloberV2Aggregator implements Aggregator {
     inputCurrency: Currency,
     amountIn: bigint,
     outputCurrency: Currency,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    slippageLimitPercent: number,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    gasPrice: bigint,
+    userAddress?: `0x${string}`,
   ): Promise<{
     amountOut: bigint
     gasLimit: bigint
     pathViz: PathViz | undefined
     aggregator: Aggregator
   }> {
+    if (userAddress) {
+      this.latestQuoteId = undefined
+    }
     if (
       (isAddressEqual(inputCurrency.address, this.nativeTokenAddress) &&
         isAddressEqual(outputCurrency.address, this.weth)) ||
       (isAddressEqual(inputCurrency.address, this.weth) &&
         isAddressEqual(outputCurrency.address, this.nativeTokenAddress))
     ) {
+      if (userAddress) {
+        this.latestQuoteId = uuidv4()
+        this.transactionCache[this.latestQuoteId] = await this.buildCallData(
+          inputCurrency,
+          amountIn,
+          outputCurrency,
+          slippageLimitPercent,
+          gasPrice,
+          userAddress,
+        )
+      }
       return {
         amountOut: amountIn,
         gasLimit: this.defaultGasLimit,
@@ -128,7 +159,17 @@ export class CloberV2Aggregator implements Aggregator {
           useSubgraph: false,
         },
       })
-
+      if (userAddress) {
+        this.latestQuoteId = uuidv4()
+        this.transactionCache[this.latestQuoteId] = await this.buildCallData(
+          inputCurrency,
+          amountIn,
+          outputCurrency,
+          slippageLimitPercent,
+          gasPrice,
+          userAddress,
+        )
+      }
       return {
         amountOut: parseUnits(takenAmount, outputCurrency.decimals),
         gasLimit: this.defaultGasLimit,
