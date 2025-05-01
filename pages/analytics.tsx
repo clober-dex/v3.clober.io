@@ -31,13 +31,19 @@ export default function Analytics() {
       ),
     ].sort()
 
-    return Object.fromEntries(
-      addresses.map((address, index) => {
-        const baseHue = (index * 47) % 360
-        const hue = (baseHue + (index % 2) * 180) % 360
-        return [address, `hsl(${hue}, 70%, 50%)`]
-      }),
-    )
+    return {
+      ...Object.fromEntries(
+        addresses.map((address, index) => {
+          const baseHue = (index * 47) % 360
+          const hue = (baseHue + (index % 2) * 240) % 360
+          return [address, `hsl(${hue}, 70%, 50%)`]
+        }),
+      ),
+      ...{
+        ['0x0000000000000000000000000000000000000000']: '#FC72FF',
+        [getAddress('0xf817257fed379853cDe0fa4F97AB987181B1E5Ea')]: '#4C82FB',
+      },
+    }
   }, [analytics])
 
   const transactionTypeColorMap = useMemo(() => {
