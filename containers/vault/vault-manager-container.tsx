@@ -21,6 +21,11 @@ import { toCommaSeparated } from '../../utils/number'
 
 import { VaultChartContainer } from './vault-chart-container'
 
+const isInvalidAmount = (amount: string) => {
+  const parsedAmount = new BigNumber(amount)
+  return parsedAmount.isNaN() || !parsedAmount.isFinite()
+}
+
 export const VaultManagerContainer = ({
   vault,
   showDashboard,
@@ -74,12 +79,12 @@ export const VaultManagerContainer = ({
         return 0n
       }
       const totalInputUsdValue = new BigNumber(
-        new BigNumber(currency0Amount).isNaN() ? 0 : currency0Amount,
+        isInvalidAmount(currency0Amount) ? 0 : currency0Amount,
       )
         .times(prices[vault.currencyA.address] ?? 0)
         .plus(
           new BigNumber(
-            new BigNumber(currency1Amount).isNaN() ? 0 : currency1Amount,
+            isInvalidAmount(currency1Amount) ? 0 : currency1Amount,
           ).times(prices[vault.currencyB.address] ?? 0),
         )
       return parseUnits(
@@ -149,18 +154,13 @@ export const VaultManagerContainer = ({
             .times(vault.reserveB)
             .toFixed()
           setCurrency1Amount(
-            new BigNumber(_currency1Amount).isNaN() ||
-              !new BigNumber(_currency1Amount).isFinite()
-              ? '0'
-              : _currency1Amount,
+            isInvalidAmount(_currency1Amount) ? '0' : _currency1Amount,
           )
           previousValues.current = {
             currency0Amount,
-            currency1Amount:
-              new BigNumber(_currency1Amount).isNaN() ||
-              !new BigNumber(_currency1Amount).isFinite()
-                ? '0'
-                : _currency1Amount,
+            currency1Amount: isInvalidAmount(_currency1Amount)
+              ? '0'
+              : _currency1Amount,
           }
         }
         // when change currency1Amount
@@ -170,10 +170,10 @@ export const VaultManagerContainer = ({
             .times(vault.reserveA)
             .toFixed()
           setCurrency0Amount(
-            new BigNumber(_currency0Amount).isNaN() ? '0' : _currency0Amount,
+            isInvalidAmount(_currency0Amount) ? '0' : _currency0Amount,
           )
           previousValues.current = {
-            currency0Amount: new BigNumber(_currency0Amount).isNaN()
+            currency0Amount: isInvalidAmount(_currency0Amount)
               ? '0'
               : _currency0Amount,
             currency1Amount,
