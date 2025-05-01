@@ -55,7 +55,7 @@ const getColor = (value: number) => {
 }
 
 function getStartOfLastMonth(): Date {
-  const lastMonth = new Date(2025, 2, 1)
+  const lastMonth = new Date(2025, 1, 1)
   lastMonth.setHours(0, 0, 0, 0)
   return lastMonth
 }
@@ -93,14 +93,12 @@ function groupSnapshotsByDay(
 
 const getMonthLabels = (): string[] => {
   const labels: string[] = []
-  const now = new Date()
-  now.setDate(1)
-  now.setMonth(now.getMonth() - 1)
+  const start = getStartOfLastMonth()
 
   for (let i = 0; i < 8; i++) {
-    const month = now.toLocaleString('en-US', { month: 'short' })
+    const month = start.toLocaleString('en-US', { month: 'short' })
     labels.push(month)
-    now.setMonth(now.getMonth() + 1)
+    start.setMonth(start.getMonth() + 1)
   }
 
   return labels
