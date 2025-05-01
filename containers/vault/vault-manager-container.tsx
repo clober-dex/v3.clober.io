@@ -149,13 +149,18 @@ export const VaultManagerContainer = ({
             .times(vault.reserveB)
             .toFixed()
           setCurrency1Amount(
-            new BigNumber(_currency1Amount).isNaN() ? '0' : _currency1Amount,
+            new BigNumber(_currency1Amount).isNaN() ||
+              !new BigNumber(_currency1Amount).isFinite()
+              ? '0'
+              : _currency1Amount,
           )
           previousValues.current = {
             currency0Amount,
-            currency1Amount: new BigNumber(_currency1Amount).isNaN()
-              ? '0'
-              : _currency1Amount,
+            currency1Amount:
+              new BigNumber(_currency1Amount).isNaN() ||
+              !new BigNumber(_currency1Amount).isFinite()
+                ? '0'
+                : _currency1Amount,
           }
         }
         // when change currency1Amount
