@@ -15,6 +15,7 @@ import { Aggregator } from '../../model/aggregator'
 import { WETH } from '../../constants/currency'
 import { useChainContext } from '../chain-context'
 import { currentTimestampInSeconds } from '../../utils/date'
+import { toPlacesAmountString } from '../../utils/bignumber'
 
 type SwapContractContext = {
   swap: (
@@ -130,20 +131,18 @@ export const SwapContractProvider = ({
               currency: inputCurrency,
               label: inputCurrency.symbol,
               direction: 'in',
-              value: formatUnits(
-                amountIn,
-                inputCurrency.decimals,
-                prices[inputCurrency.address] ?? 0,
+              value: toPlacesAmountString(
+                formatUnits(amountIn, inputCurrency.decimals),
+                prices[getAddress(inputCurrency.address)] ?? 0,
               ),
             },
             {
               currency: outputCurrency,
               label: outputCurrency.symbol,
               direction: 'out',
-              value: formatUnits(
-                expectedAmountOut,
-                outputCurrency.decimals,
-                prices[outputCurrency.address] ?? 0,
+              value: toPlacesAmountString(
+                formatUnits(expectedAmountOut, outputCurrency.decimals),
+                prices[getAddress(outputCurrency.address)] ?? 0,
               ),
             },
           ] as Confirmation['fields'],

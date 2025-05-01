@@ -38,6 +38,7 @@ import { currentTimestampInSeconds } from '../../utils/date'
 import { Currency } from '../../model/currency'
 import { deduplicateCurrencies } from '../../utils/currency'
 import { PYTH_HERMES_ENDPOINT } from '../../constants/pyth'
+import { toPlacesAmountString } from '../../utils/bignumber'
 
 import { useFuturesContext } from './futures-context'
 
@@ -347,9 +348,8 @@ export const FuturesContractProvider = ({
               currency: asset.collateral,
               label: asset.collateral.symbol,
               direction: 'in',
-              value: formatUnits(
-                collateralAmount,
-                asset.collateral.decimals,
+              value: toPlacesAmountString(
+                formatUnits(collateralAmount, asset.collateral.decimals),
                 prices[asset.collateral.address] ?? 0,
               ),
             },
@@ -357,9 +357,8 @@ export const FuturesContractProvider = ({
               currency: asset.currency,
               label: asset.currency.symbol,
               direction: 'out',
-              value: formatUnits(
-                debtAmount,
-                asset.currency.decimals,
+              value: toPlacesAmountString(
+                formatUnits(debtAmount, asset.currency.decimals),
                 prices[asset.currency.address] ?? 0,
               ),
             },
@@ -499,9 +498,8 @@ export const FuturesContractProvider = ({
               currency: asset.currency,
               label: asset.currency.symbol,
               direction: 'in',
-              value: formatUnits(
-                debtAmount,
-                asset.currency.decimals,
+              value: toPlacesAmountString(
+                formatUnits(debtAmount, asset.currency.decimals),
                 prices[asset.currency.address] ?? 0,
               ),
             },
@@ -600,9 +598,11 @@ export const FuturesContractProvider = ({
               currency: userPosition.asset.currency,
               label: userPosition.asset.currency.symbol,
               direction: 'in',
-              value: formatUnits(
-                userPosition?.debtAmount ?? 0n,
-                userPosition.asset.currency.decimals,
+              value: toPlacesAmountString(
+                formatUnits(
+                  userPosition?.debtAmount ?? 0n,
+                  userPosition.asset.currency.decimals,
+                ),
                 prices[userPosition.asset.currency.address] ?? 0,
               ),
             },
@@ -610,9 +610,11 @@ export const FuturesContractProvider = ({
               currency: userPosition.asset.collateral,
               label: userPosition.asset.collateral.symbol,
               direction: 'out',
-              value: formatUnits(
-                userPosition?.collateralAmount ?? 0n,
-                userPosition.asset.collateral.decimals,
+              value: toPlacesAmountString(
+                formatUnits(
+                  userPosition?.collateralAmount ?? 0n,
+                  userPosition.asset.collateral.decimals,
+                ),
                 prices[userPosition.asset.collateral.address] ?? 0,
               ),
             },
@@ -850,9 +852,8 @@ export const FuturesContractProvider = ({
               currency: asset.collateral,
               label: asset.collateral.symbol,
               direction: 'out',
-              value: formatUnits(
-                collateralReceived,
-                asset.collateral.decimals,
+              value: toPlacesAmountString(
+                formatUnits(collateralReceived, asset.collateral.decimals),
                 prices[asset.collateral.address] ?? 0,
               ),
             },
@@ -931,9 +932,8 @@ export const FuturesContractProvider = ({
               currency: asset.currency,
               label: asset.currency.symbol,
               direction: 'in',
-              value: formatUnits(
-                amount,
-                asset.currency.decimals,
+              value: toPlacesAmountString(
+                formatUnits(amount, asset.currency.decimals),
                 prices[asset.currency.address] ?? 0,
               ),
             },
@@ -941,9 +941,8 @@ export const FuturesContractProvider = ({
               currency: asset.collateral,
               label: asset.collateral.symbol,
               direction: 'out',
-              value: formatUnits(
-                collateralReceived,
-                asset.collateral.decimals,
+              value: toPlacesAmountString(
+                formatUnits(collateralReceived, asset.collateral.decimals),
                 prices[asset.collateral.address] ?? 0,
               ),
             },
@@ -1022,9 +1021,8 @@ export const FuturesContractProvider = ({
               currency: asset.collateral,
               label: asset.collateral.symbol,
               direction: 'in',
-              value: formatUnits(
-                amount,
-                asset.collateral.decimals,
+              value: toPlacesAmountString(
+                formatUnits(amount, asset.collateral.decimals),
                 prices[asset.collateral.address] ?? 0,
               ),
             },
@@ -1108,9 +1106,8 @@ export const FuturesContractProvider = ({
               currency: asset.collateral,
               label: asset.collateral.symbol,
               direction: 'out',
-              value: formatUnits(
-                amount,
-                asset.collateral.decimals,
+              value: toPlacesAmountString(
+                formatUnits(amount, asset.collateral.decimals),
                 prices[asset.collateral.address] ?? 0,
               ),
             },
