@@ -124,8 +124,8 @@ export class CloberV2Aggregator implements Aggregator {
         outputToken: outputCurrency.address,
         amountIn: formatUnits(amountIn, inputCurrency.decimals),
         options: {
-          // rpcUrl: RPC_URL[this.chain.id],
-          useSubgraph: true,
+          rpcUrl: RPC_URL[this.chain.id],
+          useSubgraph: false,
         },
       })
 
