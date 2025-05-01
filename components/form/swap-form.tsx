@@ -264,39 +264,35 @@ export const SwapForm = ({
 
         <div className="flex flex-col gap-5 mb-1 md:mb-2 text-[13px] sm:text-sm font-medium">
           <div className="flex flex-col items-start gap-3 md:gap-4 self-stretch justify-end text-white text-[13px] sm:text-sm">
-            {!chain.testnet ? (
-              <div className="flex items-center gap-2 self-stretch">
-                <div className="text-gray-400">Price Impact</div>
-                <div className="flex ml-auto">
-                  <div className="flex relative h-full sm:h-[20px] items-center text-xs sm:text-sm text-white ml-auto">
-                    {isLoadingResults ? (
-                      <span className="w-[50px] h-full mx-1 rounded animate-pulse bg-gray-500" />
-                    ) : (
-                      <div
-                        className={`text-xs sm:text-sm ${priceImpact < -5 ? 'text-yellow-500' : 'text-white'} flex flex-row gap-0.5 items-center`}
-                      >
-                        {Number.isNaN(priceImpact)
-                          ? 'N/A'
-                          : `${priceImpact.toFixed(2)}%`}
-                        {priceImpact < -5 && (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 16 16"
-                            className="fill-yellow-500 stroke-amber-500 w-4 h-4"
-                          >
-                            <path d="M7.9999 4.16036L12.7918 12.4396H3.20798L7.9999 4.16036ZM8.86533 3.11604C8.48016 2.45076 7.51964 2.45076 7.13448 3.11604L1.86878 12.2113C1.48281 12.878 1.96387 13.7124 2.7342 13.7124H13.2656C14.0359 13.7124 14.517 12.878 14.131 12.2113L8.86533 3.11604Z" />
-                            <path d="M8.63628 11.1669C8.63628 10.8154 8.35136 10.5305 7.9999 10.5305C7.64844 10.5305 7.36353 10.8154 7.36353 11.1669C7.36353 11.5184 7.64844 11.8033 7.9999 11.8033C8.35136 11.8033 8.63628 11.5184 8.63628 11.1669Z" />
-                            <path d="M8.63628 7.34878C8.63628 6.99732 8.35136 6.7124 7.9999 6.7124C7.64844 6.7124 7.36353 6.99732 7.36353 7.34878V9.25791C7.36353 9.60937 7.64844 9.89429 7.9999 9.89429C8.35136 9.89429 8.63628 9.60937 8.63628 9.25791V7.34878Z" />
-                          </svg>
-                        )}
-                      </div>
-                    )}
-                  </div>
+            <div className="flex items-center gap-2 self-stretch">
+              <div className="text-gray-400">Price Impact</div>
+              <div className="flex ml-auto">
+                <div className="flex relative h-full sm:h-[20px] items-center text-xs sm:text-sm text-white ml-auto">
+                  {isLoadingResults ? (
+                    <span className="w-[50px] h-full mx-1 rounded animate-pulse bg-gray-500" />
+                  ) : (
+                    <div
+                      className={`text-xs sm:text-sm ${priceImpact < -5 ? 'text-yellow-500' : 'text-white'} flex flex-row gap-0.5 items-center`}
+                    >
+                      {Number.isNaN(priceImpact)
+                        ? 'N/A'
+                        : `${priceImpact.toFixed(2)}%`}
+                      {priceImpact < -5 && (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 16 16"
+                          className="fill-yellow-500 stroke-amber-500 w-4 h-4"
+                        >
+                          <path d="M7.9999 4.16036L12.7918 12.4396H3.20798L7.9999 4.16036ZM8.86533 3.11604C8.48016 2.45076 7.51964 2.45076 7.13448 3.11604L1.86878 12.2113C1.48281 12.878 1.96387 13.7124 2.7342 13.7124H13.2656C14.0359 13.7124 14.517 12.878 14.131 12.2113L8.86533 3.11604Z" />
+                          <path d="M8.63628 11.1669C8.63628 10.8154 8.35136 10.5305 7.9999 10.5305C7.64844 10.5305 7.36353 10.8154 7.36353 11.1669C7.36353 11.5184 7.64844 11.8033 7.9999 11.8033C8.35136 11.8033 8.63628 11.5184 8.63628 11.1669Z" />
+                          <path d="M8.63628 7.34878C8.63628 6.99732 8.35136 6.7124 7.9999 6.7124C7.64844 6.7124 7.36353 6.99732 7.36353 7.34878V9.25791C7.36353 9.60937 7.64844 9.89429 7.9999 9.89429C8.35136 9.89429 8.63628 9.60937 8.63628 9.25791V7.34878Z" />
+                        </svg>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
-            ) : (
-              <></>
-            )}
+            </div>
 
             <div className="flex items-center gap-2 self-stretch">
               <div className="text-gray-400">Gas Fee</div>

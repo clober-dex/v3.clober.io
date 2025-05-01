@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { isAddressEqual, parseUnits, zeroAddress } from 'viem'
+import { getAddress, isAddressEqual, parseUnits, zeroAddress } from 'viem'
 import { useAccount, useGasPrice, useWalletClient } from 'wagmi'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { getMarketId, getQuoteToken } from '@clober/v2-sdk'
@@ -399,17 +399,14 @@ export const TradeContainer = () => {
     },
   })
   const priceImpact = useMemo(() => {
-    if (quotes && quotes.priceImpact) {
-      return quotes.priceImpact
-    }
     if (
       quotes &&
       quotes.amountIn > 0n &&
       quotes.amountOut > 0n &&
       inputCurrency &&
       outputCurrency &&
-      prices[inputCurrency.address] &&
-      prices[outputCurrency.address]
+      prices[getAddress(inputCurrency.address)] &&
+      prices[getAddress(outputCurrency.address)]
     ) {
       const amountIn = Number(
         formatUnits(quotes.amountIn, inputCurrency.decimals),
@@ -417,8 +414,8 @@ export const TradeContainer = () => {
       const amountOut = Number(
         formatUnits(quotes.amountOut, outputCurrency.decimals),
       )
-      const inputValue = amountIn * prices[inputCurrency.address]
-      const outputValue = amountOut * prices[outputCurrency.address]
+      const inputValue = amountIn * prices[getAddress(inputCurrency.address)]
+      const outputValue = amountOut * prices[getAddress(outputCurrency.address)]
       return inputValue > outputValue
         ? ((outputValue - inputValue) / inputValue) * 100
         : 0
