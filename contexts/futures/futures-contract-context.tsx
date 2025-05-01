@@ -295,6 +295,7 @@ export const FuturesContractProvider = ({
       if (!walletClient) {
         return
       }
+      let isAllowanceChanged = false
 
       try {
         setConfirmation({
@@ -336,6 +337,7 @@ export const FuturesContractProvider = ({
               type: 'approve',
               timestamp: currentTimestampInSeconds(),
             })
+            isAllowanceChanged = true
           }
         }
 
@@ -456,7 +458,9 @@ export const FuturesContractProvider = ({
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: ['futures-positions'] }),
           queryClient.invalidateQueries({ queryKey: ['balances'] }),
-          queryClient.invalidateQueries({ queryKey: ['allowances'] }),
+          isAllowanceChanged
+            ? queryClient.invalidateQueries({ queryKey: ['allowances'] })
+            : undefined,
         ])
         setConfirmation(undefined)
       }

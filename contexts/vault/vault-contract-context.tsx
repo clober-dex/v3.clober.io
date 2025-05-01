@@ -85,6 +85,7 @@ export const VaultContractProvider = ({
       disableSwap: boolean,
       slippage: number,
     ) => {
+      let isAllowanceChanged = false
       if (!walletClient || !selectedChain) {
         return
       }
@@ -137,6 +138,7 @@ export const VaultContractProvider = ({
               blockNumber: Number(transactionReceipt.blockNumber),
               timestamp: currentTimestampInSeconds(),
             })
+            isAllowanceChanged = true
           }
         }
 
@@ -169,6 +171,7 @@ export const VaultContractProvider = ({
               blockNumber: Number(transactionReceipt.blockNumber),
               timestamp: currentTimestampInSeconds(),
             })
+            isAllowanceChanged = true
           }
         }
 
@@ -266,7 +269,9 @@ export const VaultContractProvider = ({
       } finally {
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: ['balances'] }),
-          queryClient.invalidateQueries({ queryKey: ['allowances'] }),
+          isAllowanceChanged
+            ? queryClient.invalidateQueries({ queryKey: ['allowances'] })
+            : undefined,
           queryClient.invalidateQueries({ queryKey: ['vault'] }),
           queryClient.invalidateQueries({ queryKey: ['vault-lp-balances'] }),
         ])

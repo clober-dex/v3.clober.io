@@ -80,6 +80,7 @@ export const SwapContractProvider = ({
       if (!walletClient) {
         return
       }
+      let isAllowanceChanged = false
 
       try {
         setConfirmation({
@@ -119,6 +120,7 @@ export const SwapContractProvider = ({
               type: 'approve',
               timestamp: currentTimestampInSeconds(),
             })
+            isAllowanceChanged = true
           }
         }
 
@@ -181,7 +183,9 @@ export const SwapContractProvider = ({
       } finally {
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: ['balances'] }),
-          queryClient.invalidateQueries({ queryKey: ['allowances'] }),
+          isAllowanceChanged
+            ? queryClient.invalidateQueries({ queryKey: ['allowances'] })
+            : undefined,
         ])
         setConfirmation(undefined)
       }
