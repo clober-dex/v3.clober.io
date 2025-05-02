@@ -735,7 +735,6 @@ export const TradeContainer = () => {
                     disabled:
                       (Number(inputCurrencyAmount) > 0 &&
                         (quotes?.amountOut ?? 0n) === 0n) ||
-                      !walletClient ||
                       !inputCurrency ||
                       !outputCurrency ||
                       amount === 0n ||
@@ -1094,7 +1093,6 @@ export const TradeContainer = () => {
                   disabled:
                     (Number(inputCurrencyAmount) > 0 &&
                       (quotes?.amountOut ?? 0n) === 0n) ||
-                    !walletClient ||
                     !inputCurrency ||
                     !outputCurrency ||
                     amount === 0n ||

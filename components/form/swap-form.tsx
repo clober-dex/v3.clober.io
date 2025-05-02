@@ -377,7 +377,9 @@ export const SwapForm = ({
         </div>
       </div>
 
-      <ActionButton {...actionButtonProps} />
+      <div className="flex mt-auto">
+        <ActionButton {...actionButtonProps} />
+      </div>
     </div>
   )
 }
