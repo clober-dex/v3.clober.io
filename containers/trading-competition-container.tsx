@@ -96,6 +96,8 @@ const ASSETS: Currency[] = [
   },
 ]
 
+const SEASON_1_END_TIMESTAMP = 1747353600
+
 const Profit = ({
   chain,
   profit,
@@ -587,15 +589,23 @@ export const TradingCompetitionContainer = () => {
       </div>
 
       <div className="w-full md:flex md:justify-center mt-3 sm:mt-6">
-        <Countdown initialSeconds={1747353600 - currentTimestampInSeconds()} />
+        <Countdown
+          initialSeconds={SEASON_1_END_TIMESTAMP - currentTimestampInSeconds()}
+        />
       </div>
 
       <div className="flex w-full justify-center mt-4 sm:mt-8 lg:mt-10">
         <div className="flex text-base lg:text-lg w-full sm:w-[410px]">
           <ActionButton
-            disabled={!userAddress}
+            disabled={
+              !userAddress ||
+              currentTimestampInSeconds() > SEASON_1_END_TIMESTAMP
+            }
             onClick={async () => {
-              if (!userAddress) {
+              if (
+                !userAddress ||
+                currentTimestampInSeconds() > SEASON_1_END_TIMESTAMP
+              ) {
                 return
               }
               if (isRegistered) {
@@ -609,9 +619,11 @@ export const TradingCompetitionContainer = () => {
             }}
             text={
               userAddress
-                ? isRegistered
-                  ? 'Welcome to the arena, trader'
-                  : 'Register'
+                ? currentTimestampInSeconds() > SEASON_1_END_TIMESTAMP
+                  ? 'Trading Competition has ended'
+                  : isRegistered
+                    ? 'Welcome to the arena, trader'
+                    : 'Register'
                 : 'Connect Wallet to Register'
             }
           />
