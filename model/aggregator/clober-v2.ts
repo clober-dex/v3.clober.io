@@ -201,8 +201,7 @@ export class CloberV2Aggregator implements Aggregator {
     amountIn: bigint,
     outputCurrency: Currency,
     slippageLimitPercent: number,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _gasPrice: bigint,
+    gasPrice: bigint,
     userAddress: `0x${string}`,
   ): Promise<{
     data: `0x${string}`
@@ -213,6 +212,25 @@ export class CloberV2Aggregator implements Aggregator {
     gasPrice?: bigint
     takenAmount?: bigint
   }> {
+    if (!this.latestQuoteId) {
+      await this.quote(
+        inputCurrency,
+        amountIn,
+        outputCurrency,
+        slippageLimitPercent,
+        gasPrice,
+        userAddress,
+      )
+    }
+
+    if (!this.latestQuoteId) {
+      throw new Error('Quote ID is not defined')
+    }
+
+    if (this.transactionCache[this.latestQuoteId]) {
+      return this.transactionCache[this.latestQuoteId]
+    }
+
     if (
       isAddressEqual(inputCurrency.address, this.nativeTokenAddress) &&
       isAddressEqual(outputCurrency.address, this.weth)
