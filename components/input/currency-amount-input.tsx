@@ -18,6 +18,7 @@ const CurrencyAmountInput = ({
   availableAmount,
   price,
   onCurrencyClick,
+  children,
   ...props
 }: {
   chain: Chain
@@ -27,10 +28,13 @@ const CurrencyAmountInput = ({
   availableAmount: bigint
   price?: number
   onCurrencyClick?: () => void
-} & React.DetailedHTMLProps<
-  React.InputHTMLAttributes<HTMLInputElement>,
-  HTMLInputElement
->) => {
+} & React.PropsWithChildren<{
+  children?: React.ReactNode
+}> &
+  React.DetailedHTMLProps<
+    React.InputHTMLAttributes<HTMLInputElement>,
+    HTMLInputElement
+  >) => {
   const decimals = useMemo(() => currency?.decimals ?? 18, [currency])
 
   const onBlur = useCallback(() => {
@@ -110,8 +114,11 @@ const CurrencyAmountInput = ({
       </div>
       <div className="flex items-end justify-between">
         {price ? (
-          <div className="text-gray-500 text-xs sm:text-sm">
-            ~{formatDollarValue(parseUnits(value, decimals), decimals, price)}
+          <div className="flex flex-row gap-0.5 sm:gap-1">
+            <div className="text-gray-500 text-xs sm:text-sm">
+              ~{formatDollarValue(parseUnits(value, decimals), decimals, price)}
+            </div>
+            <div>{children}</div>
           </div>
         ) : (
           <div></div>

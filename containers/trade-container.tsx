@@ -585,7 +585,7 @@ export const TradeContainer = () => {
                 Limit
               </button>
             </div>
-            <div className="hidden sm:flex flex-col rounded-2xl bg-[#171b24] p-6 w-fit sm:w-[480px] h-[644px]">
+            <div className="hidden sm:flex flex-col rounded-2xl bg-[#171b24] p-6 w-fit sm:w-[480px] h-[616px]">
               {tab === 'limit' ? (
                 <LimitForm
                   chain={selectedChain}
