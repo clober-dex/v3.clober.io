@@ -752,7 +752,8 @@ export const TradeContainer = () => {
                         !outputCurrency ||
                         !inputCurrencyAmount ||
                         !quotes ||
-                        amountIn !== quotes.amountIn
+                        amountIn !== quotes.amountIn ||
+                        !quotes.transaction
                       ) {
                         return
                       }
@@ -761,13 +762,11 @@ export const TradeContainer = () => {
                         amountIn,
                         outputCurrency,
                         quotes.amountOut,
-                        parseFloat(slippageInput),
-                        gasPrice,
-                        userAddress,
                         AGGREGATORS[selectedChain.id].find(
                           (aggregator) =>
                             aggregator.name === quotes.aggregator.name,
                         )!,
+                        quotes.transaction,
                       )
                     },
                     text:
@@ -1112,7 +1111,8 @@ export const TradeContainer = () => {
                       !outputCurrency ||
                       !inputCurrencyAmount ||
                       !quotes ||
-                      amountIn !== quotes.amountIn
+                      amountIn !== quotes.amountIn ||
+                      !quotes.transaction
                     ) {
                       return
                     }
@@ -1121,13 +1121,11 @@ export const TradeContainer = () => {
                       amountIn,
                       outputCurrency,
                       quotes.amountOut,
-                      parseFloat(slippageInput),
-                      gasPrice,
-                      userAddress,
                       AGGREGATORS[selectedChain.id].find(
                         (aggregator) =>
                           aggregator.name === quotes.aggregator.name,
                       )!,
+                      quotes.transaction,
                     )
                   },
                   text:

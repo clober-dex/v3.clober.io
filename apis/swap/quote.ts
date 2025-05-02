@@ -1,3 +1,5 @@
+import { Transaction } from '@clober/v2-sdk'
+
 import { Currency } from '../../model/currency'
 import { Aggregator } from '../../model/aggregator'
 import { PathViz } from '../../model/pathviz'
@@ -16,7 +18,7 @@ export async function fetchQuotes(
   gasLimit: bigint
   pathViz: PathViz | undefined
   aggregator: Aggregator
-  priceImpact?: number
+  transaction: Transaction | undefined
 }> {
   const quotes = (
     await Promise.allSettled(
@@ -47,7 +49,7 @@ export async function fetchQuotes(
         gasLimit: bigint
         pathViz: PathViz | undefined
         aggregator: Aggregator
-        priceImpact?: number
+        transaction: Transaction | undefined
       } => quote !== undefined,
     )
   if (quotes.length === 0) {

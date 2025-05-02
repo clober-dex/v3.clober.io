@@ -1,4 +1,5 @@
 import { getAddress } from 'viem'
+import { Transaction } from '@clober/v2-sdk'
 
 import { Currency } from '../currency'
 import { fetchApi } from '../../apis/utils'
@@ -14,18 +15,6 @@ export class OdosAggregator implements Aggregator {
   public readonly contract: `0x${string}`
   public readonly chain: Chain
   private readonly TIMEOUT = 4000
-
-  private latestPathId: string | undefined
-  private transactionCache: {
-    [quoteId: string]: {
-      data: `0x${string}`
-      gas: bigint
-      value: bigint
-      to: `0x${string}`
-      nonce?: number
-      gasPrice?: bigint
-    }
-  } = {}
 
   constructor(contract: `0x${string}`, chain: Chain) {
     this.contract = contract
@@ -72,11 +61,8 @@ export class OdosAggregator implements Aggregator {
     gasLimit: bigint
     pathViz: PathViz | undefined
     aggregator: Aggregator
-    priceImpact: number
+    transaction: Transaction | undefined
   }> {
-    if (userAddress) {
-      this.latestPathId = undefined
-    }
     const result: {
       outAmounts: string[]
       pathViz: PathViz
@@ -114,15 +100,14 @@ export class OdosAggregator implements Aggregator {
     })
 
     if (userAddress) {
-      this.latestPathId = result.pathId
-      this.transactionCache[result.pathId] = await this.buildCallData(
-        inputCurrency,
-        amountIn,
-        outputCurrency,
-        slippageLimitPercent,
-        gasPrice,
-        userAddress,
-      )
+      const transaction = await this.buildCallData(result.pathId, userAddress)
+      return {
+        amountOut: BigInt(result.outAmounts[0]),
+        gasLimit: BigInt(result.gasEstimate),
+        pathViz: result.pathViz,
+        aggregator: this,
+        transaction,
+      }
     }
 
     return {
@@ -130,44 +115,14 @@ export class OdosAggregator implements Aggregator {
       gasLimit: BigInt(result.gasEstimate),
       pathViz: result.pathViz,
       aggregator: this,
-      priceImpact: Number(result.priceImpact),
+      transaction: undefined,
     }
   }
 
-  public async buildCallData(
-    inputCurrency: Currency,
-    amountIn: bigint,
-    outputCurrency: Currency,
-    slippageLimitPercent: number,
-    gasPrice: bigint,
+  private async buildCallData(
+    pathId: string,
     userAddress: `0x${string}`,
-  ): Promise<{
-    data: `0x${string}`
-    gas: bigint
-    value: bigint
-    to: `0x${string}`
-    nonce?: number
-    gasPrice?: bigint
-  }> {
-    if (!this.latestPathId) {
-      await this.quote(
-        inputCurrency,
-        amountIn,
-        outputCurrency,
-        slippageLimitPercent,
-        gasPrice,
-        userAddress,
-      )
-    }
-
-    if (!this.latestPathId) {
-      throw new Error('Path ID is not defined')
-    }
-
-    if (this.transactionCache[this.latestPathId]) {
-      return this.transactionCache[this.latestPathId]
-    }
-
+  ): Promise<Transaction> {
     const result = await fetchApi<{
       transaction: {
         data: `0x${string}`
@@ -185,7 +140,7 @@ export class OdosAggregator implements Aggregator {
       },
       timeout: this.TIMEOUT,
       data: {
-        pathId: this.latestPathId,
+        pathId,
         simulate: true,
         userAddr: userAddress,
       },
@@ -199,8 +154,8 @@ export class OdosAggregator implements Aggregator {
       gas,
       value: BigInt(result.transaction.value),
       to: result.transaction.to,
-      nonce: result.transaction.nonce,
       gasPrice: BigInt(result.transaction.gasPrice),
+      from: userAddress,
     }
   }
 }

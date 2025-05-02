@@ -1,3 +1,5 @@
+import { Transaction } from '@clober/v2-sdk'
+
 import { Chain } from '../chain'
 import { Currency } from '../currency'
 import { Prices } from '../prices'
@@ -21,20 +23,6 @@ export interface Aggregator {
     gasLimit: bigint
     pathViz: PathViz | undefined
     aggregator: Aggregator
-    priceImpact?: number
-  }>
-
-  buildCallData(
-    inputCurrency: Currency,
-    amountIn: bigint,
-    outputCurrency: Currency,
-    ...args: any[]
-  ): Promise<{
-    data: `0x${string}`
-    gas: bigint
-    value: bigint
-    to: `0x${string}`
-    nonce?: number
-    gasPrice?: bigint
+    transaction: Transaction | undefined
   }>
 }

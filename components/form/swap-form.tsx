@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 import { isAddressEqual, parseUnits } from 'viem'
 import BigNumber from 'bignumber.js'
+import { getQuoteToken } from '@clober/v2-sdk'
 
 import CurrencyAmountInput from '../input/currency-amount-input'
 import { Currency } from '../../model/currency'
@@ -13,7 +14,6 @@ import { ExchangeSvg } from '../svg/exchange-svg'
 import CloseSvg from '../svg/close-svg'
 import { SlippageToggle } from '../toggle/slippage-toggle'
 import { Chain } from '../../model/chain'
-import { toCommaSeparated } from '../../utils/number'
 
 export const SwapForm = ({
   chain,
@@ -95,10 +95,29 @@ export const SwapForm = ({
     setInputCurrencyAmount,
     setOutputCurrency,
   ])
+
+  const [quoteCurrency, baseCurrency] = useMemo(() => {
+    if (!inputCurrency || !outputCurrency) {
+      return [undefined, undefined]
+    }
+    const quoteTokenAddress = getQuoteToken({
+      chainId: chain.id,
+      token0: inputCurrency.address,
+      token1: outputCurrency.address,
+    })
+    return isAddressEqual(inputCurrency.address, quoteTokenAddress)
+      ? [inputCurrency, outputCurrency]
+      : [outputCurrency, inputCurrency]
+  }, [chain.id, inputCurrency, outputCurrency])
+
   const exchangeRate = useMemo(() => {
     const rate = new BigNumber(outputCurrencyAmount).div(inputCurrencyAmount)
-    return rate.isNaN() || rate.isZero() ? new BigNumber(0) : rate
-  }, [inputCurrencyAmount, outputCurrencyAmount])
+    return !inputCurrency || !quoteCurrency || rate.isNaN() || rate.isZero()
+      ? new BigNumber(0)
+      : isAddressEqual(inputCurrency.address, quoteCurrency.address)
+        ? new BigNumber(1).div(rate)
+        : rate
+  }, [inputCurrency, inputCurrencyAmount, outputCurrencyAmount, quoteCurrency])
 
   return showInputCurrencySelect ? (
     <CurrencySelect
@@ -328,19 +347,24 @@ export const SwapForm = ({
             <div className="flex items-center gap-2 self-stretch">
               <div className="text-gray-400">Exchange Ratio</div>
               <div className="flex ml-auto">
-                {inputCurrency && outputCurrency ? (
+                {baseCurrency && quoteCurrency ? (
                   <div className="flex relative h-full sm:h-[20px] items-center text-xs sm:text-sm text-white ml-auto">
                     {isLoadingResults ? (
                       <span className="w-[50px] h-full mx-1 rounded animate-pulse bg-gray-500" />
                     ) : (
                       <div className="text-xs sm:text-sm text-gray-400 flex flex-row gap-1 items-center">
                         <span className="text-white">
-                          1 {inputCurrency.symbol}
+                          1 {baseCurrency.symbol}
                         </span>
                         =
                         <span className="text-white">
-                          {toCommaSeparated(toPlacesAmountString(exchangeRate))}{' '}
-                          {outputCurrency.symbol}
+                          {toPlacesAmountString(
+                            exchangeRate,
+                            baseCurrency
+                              ? prices[baseCurrency.address]
+                              : undefined,
+                          )}{' '}
+                          {quoteCurrency.symbol}
                         </span>
                       </div>
                     )}

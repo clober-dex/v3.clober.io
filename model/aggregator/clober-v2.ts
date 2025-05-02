@@ -9,9 +9,9 @@ import {
   getExpectedOutput,
   getSubgraphEndpoint,
   marketOrder,
+  Transaction,
 } from '@clober/v2-sdk'
 import { monadTestnet } from 'viem/chains'
-import { v4 as uuidv4 } from 'uuid'
 
 import { Currency } from '../currency'
 import { Prices } from '../prices'
@@ -32,19 +32,7 @@ export class CloberV2Aggregator implements Aggregator {
   private readonly nativeTokenAddress = zeroAddress
   public readonly chain: Chain
   public readonly weth: `0x${string}`
-
   private defaultGasLimit = 500_000n
-  private latestQuoteId: string | undefined
-  private transactionCache: {
-    [quoteId: string]: {
-      data: `0x${string}`
-      gas: bigint
-      value: bigint
-      to: `0x${string}`
-      nonce?: number
-      gasPrice?: bigint
-    }
-  } = {}
 
   constructor(contract: `0x${string}`, chain: Chain) {
     this.contract = contract
@@ -109,9 +97,7 @@ export class CloberV2Aggregator implements Aggregator {
     inputCurrency: Currency,
     amountIn: bigint,
     outputCurrency: Currency,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     slippageLimitPercent: number,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     gasPrice: bigint,
     userAddress?: `0x${string}`,
   ): Promise<{
@@ -119,10 +105,8 @@ export class CloberV2Aggregator implements Aggregator {
     gasLimit: bigint
     pathViz: PathViz | undefined
     aggregator: Aggregator
+    transaction: Transaction | undefined
   }> {
-    if (userAddress) {
-      this.latestQuoteId = undefined
-    }
     if (
       (isAddressEqual(inputCurrency.address, this.nativeTokenAddress) &&
         isAddressEqual(outputCurrency.address, this.weth)) ||
@@ -130,8 +114,7 @@ export class CloberV2Aggregator implements Aggregator {
         isAddressEqual(outputCurrency.address, this.nativeTokenAddress))
     ) {
       if (userAddress) {
-        this.latestQuoteId = uuidv4()
-        this.transactionCache[this.latestQuoteId] = await this.buildCallData(
+        const { transaction, amountOut } = await this.buildCallData(
           inputCurrency,
           amountIn,
           outputCurrency,
@@ -139,19 +122,26 @@ export class CloberV2Aggregator implements Aggregator {
           gasPrice,
           userAddress,
         )
+        return {
+          amountOut,
+          gasLimit: this.defaultGasLimit,
+          pathViz: undefined,
+          aggregator: this,
+          transaction,
+        }
       }
       return {
         amountOut: amountIn,
         gasLimit: this.defaultGasLimit,
         pathViz: undefined,
         aggregator: this,
+        transaction: undefined,
       }
     }
 
     try {
       if (userAddress) {
-        this.latestQuoteId = uuidv4()
-        const results = await this.buildCallData(
+        const { transaction, amountOut } = await this.buildCallData(
           inputCurrency,
           amountIn,
           outputCurrency,
@@ -159,14 +149,12 @@ export class CloberV2Aggregator implements Aggregator {
           gasPrice,
           userAddress,
         )
-        this.transactionCache[this.latestQuoteId] = {
-          ...results,
-        }
         return {
-          amountOut: results.takenAmount ?? 0n,
+          amountOut,
           gasLimit: this.defaultGasLimit,
           pathViz: undefined,
           aggregator: this,
+          transaction,
         }
       } else {
         const { takenAmount } = await getExpectedOutput({
@@ -184,6 +172,7 @@ export class CloberV2Aggregator implements Aggregator {
           gasLimit: this.defaultGasLimit,
           pathViz: undefined,
           aggregator: this,
+          transaction: undefined,
         }
       }
     } catch {
@@ -192,11 +181,12 @@ export class CloberV2Aggregator implements Aggregator {
         gasLimit: this.defaultGasLimit,
         pathViz: undefined,
         aggregator: this,
+        transaction: undefined,
       }
     }
   }
 
-  public async buildCallData(
+  private async buildCallData(
     inputCurrency: Currency,
     amountIn: bigint,
     outputCurrency: Currency,
@@ -204,59 +194,45 @@ export class CloberV2Aggregator implements Aggregator {
     gasPrice: bigint,
     userAddress: `0x${string}`,
   ): Promise<{
-    data: `0x${string}`
-    gas: bigint
-    value: bigint
-    to: `0x${string}`
-    nonce?: number
-    gasPrice?: bigint
-    takenAmount?: bigint
+    transaction: Transaction
+    amountOut: bigint
   }> {
-    if (!this.latestQuoteId) {
-      await this.quote(
-        inputCurrency,
-        amountIn,
-        outputCurrency,
-        slippageLimitPercent,
-        gasPrice,
-        userAddress,
-      )
-    }
-
-    if (!this.latestQuoteId) {
-      throw new Error('Quote ID is not defined')
-    }
-
-    if (this.transactionCache[this.latestQuoteId]) {
-      return this.transactionCache[this.latestQuoteId]
-    }
-
     if (
       isAddressEqual(inputCurrency.address, this.nativeTokenAddress) &&
       isAddressEqual(outputCurrency.address, this.weth)
     ) {
       return {
-        data: encodeFunctionData({
-          abi: WETH_ABI,
-          functionName: 'deposit',
-        }),
-        gas: this.defaultGasLimit,
-        value: amountIn,
-        to: WETH[this.chain.id].address,
+        transaction: {
+          data: encodeFunctionData({
+            abi: WETH_ABI,
+            functionName: 'deposit',
+          }),
+          gas: this.defaultGasLimit,
+          value: amountIn,
+          to: WETH[this.chain.id].address,
+          gasPrice,
+          from: userAddress,
+        },
+        amountOut: amountIn,
       }
     } else if (
       isAddressEqual(inputCurrency.address, this.weth) &&
       isAddressEqual(outputCurrency.address, this.nativeTokenAddress)
     ) {
       return {
-        data: encodeFunctionData({
-          abi: WETH_ABI,
-          functionName: 'withdraw',
-          args: [amountIn],
-        }),
-        gas: this.defaultGasLimit,
-        value: 0n,
-        to: WETH[this.chain.id].address,
+        transaction: {
+          data: encodeFunctionData({
+            abi: WETH_ABI,
+            functionName: 'withdraw',
+            args: [amountIn],
+          }),
+          gas: this.defaultGasLimit,
+          value: 0n,
+          to: WETH[this.chain.id].address,
+          gasPrice,
+          from: userAddress,
+        },
+        amountOut: amountIn,
       }
     }
 
@@ -280,6 +256,6 @@ export class CloberV2Aggregator implements Aggregator {
         slippage: slippageLimitPercent,
       },
     })
-    return { ...transaction, takenAmount: parseUnits(amount, decimals) }
+    return { transaction, amountOut: parseUnits(amount, decimals) }
   }
 }

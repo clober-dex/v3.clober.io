@@ -1,4 +1,5 @@
 import { encodeFunctionData, isAddressEqual, zeroAddress } from 'viem'
+import { Transaction } from '@clober/v2-sdk'
 
 import { Chain } from '../chain'
 import { Currency } from '../currency'
@@ -29,7 +30,7 @@ export class AggregatorRouterGateway implements Aggregator {
     return this.aggregator.prices()
   }
 
-  quote(
+  async quote(
     inputCurrency: Currency,
     amountIn: bigint,
     outputCurrency: Currency,
@@ -39,76 +40,66 @@ export class AggregatorRouterGateway implements Aggregator {
     gasLimit: bigint
     pathViz: PathViz | undefined
     aggregator: Aggregator
-    priceImpact?: number
+    transaction: Transaction | undefined
   }> {
-    return this.aggregator.quote(
+    const { amountOut, transaction } = await this.aggregator.quote(
       inputCurrency,
       amountIn,
       outputCurrency,
       ...args,
     )
-  }
 
-  public async buildCallData(
-    inputCurrency: Currency,
-    amountIn: bigint,
-    outputCurrency: Currency,
-    slippageLimitPercent: number,
-    gasPrice: bigint,
-    userAddress: `0x${string}`,
-  ): Promise<{
-    data: `0x${string}`
-    gas: bigint
-    value: bigint
-    to: `0x${string}`
-    nonce?: number
-    gasPrice?: bigint
-  }> {
-    const {
-      data: swapData,
-      gas,
-      gasPrice: _gasPrice,
-    } = await this.aggregator.buildCallData(
-      inputCurrency,
-      amountIn,
-      outputCurrency,
-      slippageLimitPercent,
-      gasPrice,
-      userAddress,
-    )
-    const data = encodeFunctionData({
-      abi: [
-        {
-          inputs: [
-            { internalType: 'address', name: 'inToken', type: 'address' },
-            { internalType: 'address', name: 'outToken', type: 'address' },
-            { internalType: 'uint256', name: 'amountIn', type: 'uint256' },
-            { internalType: 'address', name: 'router', type: 'address' },
-            { internalType: 'bytes', name: 'data', type: 'bytes' },
-          ],
-          name: 'swap',
-          outputs: [
-            { internalType: 'uint256', name: 'amountOut', type: 'uint256' },
-          ],
-          stateMutability: 'payable',
-          type: 'function',
+    if (transaction) {
+      const data = encodeFunctionData({
+        abi: [
+          {
+            inputs: [
+              { internalType: 'address', name: 'inToken', type: 'address' },
+              { internalType: 'address', name: 'outToken', type: 'address' },
+              { internalType: 'uint256', name: 'amountIn', type: 'uint256' },
+              { internalType: 'address', name: 'router', type: 'address' },
+              { internalType: 'bytes', name: 'data', type: 'bytes' },
+            ],
+            name: 'swap',
+            outputs: [
+              { internalType: 'uint256', name: 'amountOut', type: 'uint256' },
+            ],
+            stateMutability: 'payable',
+            type: 'function',
+          },
+        ] as const,
+        functionName: 'swap',
+        args: [
+          inputCurrency.address,
+          outputCurrency.address,
+          amountIn,
+          this.aggregator.contract,
+          transaction.data,
+        ],
+      })
+      return {
+        amountOut,
+        gasLimit: transaction?.gas ?? 0n,
+        pathViz: undefined,
+        aggregator: this,
+        transaction: {
+          data,
+          gas: transaction.gas + 300_000n,
+          value: isAddressEqual(inputCurrency.address, zeroAddress)
+            ? amountIn
+            : 0n,
+          to: this.contract,
+          from: transaction.from,
+          gasPrice: transaction.gasPrice,
         },
-      ] as const,
-      functionName: 'swap',
-      args: [
-        inputCurrency.address,
-        outputCurrency.address,
-        amountIn,
-        this.aggregator.contract,
-        swapData,
-      ],
-    })
+      }
+    }
     return {
-      data,
-      gas: gas + 300_000n,
-      value: isAddressEqual(inputCurrency.address, zeroAddress) ? amountIn : 0n,
-      to: this.contract,
-      gasPrice: _gasPrice,
+      amountOut,
+      gasLimit: 0n,
+      pathViz: undefined,
+      aggregator: this,
+      transaction: undefined,
     }
   }
 }
