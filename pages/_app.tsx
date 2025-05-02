@@ -175,6 +175,30 @@ function App({ Component, pageProps }: AppProps) {
     }
   }
 
+  useEffect(() => {
+    const handleRouteChange = (url: string) => {
+      if (GOOGLE_ANALYTICS_TRACKING_ID[chain.id]) {
+        const urlParams = new URLSearchParams(window.location.search)
+        const utm_source = urlParams.get('utm_source') || undefined
+        const utm_medium = urlParams.get('utm_medium') || undefined
+        const utm_campaign = urlParams.get('utm_campaign') || undefined
+
+        // @ts-ignore
+        window.gtag('config', GOOGLE_ANALYTICS_TRACKING_ID[chain.id], {
+          page_path: url,
+          campaign_source: utm_source,
+          campaign_medium: utm_medium,
+          campaign_name: utm_campaign,
+        })
+      }
+    }
+
+    router.events.on('routeChangeComplete', handleRouteChange)
+    return () => {
+      router.events.off('routeChangeComplete', handleRouteChange)
+    }
+  }, [chain.id, router])
+
   return (
     <>
       {GOOGLE_ANALYTICS_TRACKING_ID[chain.id] && (
@@ -188,18 +212,6 @@ function App({ Component, pageProps }: AppProps) {
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
-      const urlParams = new URLSearchParams(window.location.search)
-      const utm_source = urlParams.get('utm_source') || undefined
-      const utm_medium = urlParams.get('utm_medium') || undefined
-      const utm_campaign = urlParams.get('utm_campaign') || undefined
-
-      gtag('config', '${GOOGLE_ANALYTICS_TRACKING_ID[chain.id]}', {
-        page_location: window.location.href,
-        campaign_source: utm_source,
-        campaign_medium: utm_medium,
-        campaign_name: utm_campaign
-      });
     `}
           </Script>
         </>
