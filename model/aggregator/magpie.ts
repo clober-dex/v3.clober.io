@@ -1,5 +1,5 @@
 import { getAddress, isAddressEqual, zeroAddress } from 'viem'
-import { CHAIN_IDS } from '@clober/v2-sdk'
+import { CHAIN_IDS, Transaction } from '@clober/v2-sdk'
 
 import { Chain } from '../chain'
 import { Currency } from '../currency'
@@ -16,19 +16,7 @@ export class MagpieAggregator implements Aggregator {
   public readonly chain: Chain
   private readonly TIMEOUT = 2000
   private readonly nativeTokenAddress = zeroAddress
-
   private chainName: string
-  private latestQuoteId: string | undefined
-  private transactionCache: {
-    [quoteId: string]: {
-      data: `0x${string}`
-      gas: bigint
-      value: bigint
-      to: `0x${string}`
-      nonce?: number
-      gasPrice?: bigint
-    }
-  } = {}
 
   constructor(contract: `0x${string}`, chain: Chain) {
     this.contract = contract
@@ -106,10 +94,8 @@ export class MagpieAggregator implements Aggregator {
     gasLimit: bigint
     pathViz: PathViz | undefined
     aggregator: Aggregator
+    transaction: Transaction | undefined
   }> {
-    if (userAddress) {
-      this.latestQuoteId = undefined
-    }
     const response = await fetchApi<{
       id: string
       amountOut: string
@@ -154,15 +140,18 @@ export class MagpieAggregator implements Aggregator {
     }
 
     if (userAddress) {
-      this.latestQuoteId = response.id
-      this.transactionCache[this.latestQuoteId] = await this.buildCallData(
-        inputCurrency,
-        amountIn,
-        outputCurrency,
-        slippageLimitPercent,
-        gasPrice,
+      const transaction = await this.buildCallData(
+        response.id,
         userAddress,
+        gasPrice,
       )
+      return {
+        amountOut: BigInt(response.amountOut),
+        gasLimit: BigInt(response.resourceEstimate.gasLimit),
+        pathViz: undefined,
+        aggregator: this,
+        transaction,
+      }
     }
 
     return {
@@ -170,43 +159,15 @@ export class MagpieAggregator implements Aggregator {
       gasLimit: BigInt(response.resourceEstimate.gasLimit),
       pathViz: undefined,
       aggregator: this,
+      transaction: undefined,
     }
   }
 
-  public async buildCallData(
-    inputCurrency: Currency,
-    amountIn: bigint,
-    outputCurrency: Currency,
-    slippageLimitPercent: number,
-    gasPrice: bigint,
+  private async buildCallData(
+    quoteId: string,
     userAddress: `0x${string}`,
-  ): Promise<{
-    data: `0x${string}`
-    gas: bigint
-    value: bigint
-    to: `0x${string}`
-    nonce?: number
-    gasPrice?: bigint
-  }> {
-    if (!this.latestQuoteId) {
-      await this.quote(
-        inputCurrency,
-        amountIn,
-        outputCurrency,
-        slippageLimitPercent,
-        gasPrice,
-        userAddress,
-      )
-    }
-
-    if (!this.latestQuoteId) {
-      throw new Error('Quote ID is not defined')
-    }
-
-    if (this.transactionCache[this.latestQuoteId]) {
-      return this.transactionCache[this.latestQuoteId]
-    }
-
+    gasPrice: bigint,
+  ): Promise<Transaction> {
     const response = await fetchApi<{
       data: string
       gasLimit: string
@@ -215,7 +176,7 @@ export class MagpieAggregator implements Aggregator {
     }>(this.baseUrl, 'aggregator/transaction', {
       method: 'GET',
       params: {
-        quoteId: this.latestQuoteId,
+        quoteId,
         estimateGas: false, // if true, result will be 404 when the user balance is not enough
       },
       headers: {
@@ -230,6 +191,7 @@ export class MagpieAggregator implements Aggregator {
       value: BigInt(response.value),
       to: response.to as `0x${string}`,
       gasPrice: gasPrice,
+      from: userAddress,
     }
   }
 

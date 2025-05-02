@@ -2,11 +2,10 @@ import React, { useCallback, useEffect } from 'react'
 import { getAddress, isAddressEqual, zeroAddress } from 'viem'
 import { useDisconnect, useWalletClient } from 'wagmi'
 import { useQueryClient } from '@tanstack/react-query'
-import { Transaction as SdkTransaction } from '@clober/v2-sdk'
+import { Transaction, Transaction as SdkTransaction } from '@clober/v2-sdk'
 
 import { Currency } from '../../model/currency'
 import { formatUnits } from '../../utils/bigint'
-import { fetchSwapData } from '../../apis/swap/data'
 import { Confirmation, useTransactionContext } from '../transaction-context'
 import { sendTransaction } from '../../utils/transaction'
 import { useCurrencyContext } from '../currency-context'
@@ -23,10 +22,8 @@ type SwapContractContext = {
     amountIn: bigint,
     outputCurrency: Currency,
     expectedAmountOut: bigint,
-    slippageLimitPercent: number,
-    gasPrice: bigint,
-    userAddress: `0x${string}`,
     aggregator: Aggregator,
+    transaction: Transaction,
   ) => Promise<void>
 }
 
@@ -72,10 +69,8 @@ export const SwapContractProvider = ({
       amountIn: bigint,
       outputCurrency: Currency,
       expectedAmountOut: bigint,
-      slippageLimitPercent: number,
-      gasPrice: bigint,
-      userAddress: `0x${string}`,
       aggregator: Aggregator,
+      transaction: Transaction,
     ) => {
       if (!walletClient) {
         return
@@ -151,20 +146,10 @@ export const SwapContractProvider = ({
         }
         setConfirmation(confirmation)
 
-        const swapData = await fetchSwapData(
-          aggregator,
-          inputCurrency,
-          amountIn,
-          outputCurrency,
-          slippageLimitPercent,
-          gasPrice,
-          userAddress,
-        )
-
         const transactionReceipt = await sendTransaction(
           selectedChain,
           walletClient,
-          swapData.transaction as SdkTransaction,
+          transaction as SdkTransaction,
           disconnectAsync,
         )
         if (transactionReceipt) {

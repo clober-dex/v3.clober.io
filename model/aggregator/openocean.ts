@@ -1,5 +1,5 @@
 import { formatUnits, getAddress, isAddressEqual, zeroAddress } from 'viem'
-import { v4 as uuidv4 } from 'uuid'
+import { Transaction } from '@clober/v2-sdk'
 
 import { Chain } from '../chain'
 import { Currency } from '../currency'
@@ -16,18 +16,6 @@ export class OpenOceanAggregator implements Aggregator {
   public readonly chain: Chain
   private readonly TIMEOUT = 4000
   private readonly nativeTokenAddress = zeroAddress
-
-  private latestQuoteId: string | undefined
-  private transactionCache: {
-    [quoteId: string]: {
-      data: `0x${string}`
-      gas: bigint
-      value: bigint
-      to: `0x${string}`
-      nonce?: number
-      gasPrice?: bigint
-    }
-  } = {}
 
   constructor(contract: `0x${string}`, chain: Chain) {
     this.contract = contract
@@ -46,24 +34,18 @@ export class OpenOceanAggregator implements Aggregator {
     inputCurrency: Currency,
     amountIn: bigint,
     outputCurrency: Currency,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     slippageLimitPercent: number,
     gasPrice: bigint,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     userAddress?: `0x${string}`,
   ): Promise<{
     amountOut: bigint
     gasLimit: bigint
     pathViz: PathViz | undefined
     aggregator: Aggregator
+    transaction: Transaction | undefined
   }> {
     if (userAddress) {
-      this.latestQuoteId = undefined
-    }
-
-    if (userAddress) {
-      this.latestQuoteId = uuidv4()
-      const results = await this.buildCallData(
+      const { transaction, amountOut } = await this.buildCallData(
         inputCurrency,
         amountIn,
         outputCurrency,
@@ -71,14 +53,12 @@ export class OpenOceanAggregator implements Aggregator {
         gasPrice,
         userAddress,
       )
-      this.transactionCache[this.latestQuoteId] = {
-        ...results,
-      }
       return {
-        amountOut: results.takenAmount ?? 0n,
-        gasLimit: results.gas,
+        amountOut,
+        gasLimit: transaction.gas,
         pathViz: undefined,
         aggregator: this,
+        transaction,
       }
     } else {
       const response = await fetchApi<{
@@ -121,11 +101,12 @@ export class OpenOceanAggregator implements Aggregator {
         gasLimit: BigInt(response.data.estimatedGas),
         pathViz: undefined,
         aggregator: this,
+        transaction: undefined,
       }
     }
   }
 
-  public async buildCallData(
+  private async buildCallData(
     inputCurrency: Currency,
     amountIn: bigint,
     outputCurrency: Currency,
@@ -133,33 +114,9 @@ export class OpenOceanAggregator implements Aggregator {
     gasPrice: bigint,
     userAddress: `0x${string}`,
   ): Promise<{
-    data: `0x${string}`
-    gas: bigint
-    value: bigint
-    to: `0x${string}`
-    nonce?: number
-    gasPrice?: bigint
-    takenAmount?: bigint
+    transaction: Transaction
+    amountOut: bigint
   }> {
-    if (!this.latestQuoteId) {
-      await this.quote(
-        inputCurrency,
-        amountIn,
-        outputCurrency,
-        slippageLimitPercent,
-        gasPrice,
-        userAddress,
-      )
-    }
-
-    if (!this.latestQuoteId) {
-      throw new Error('Quote ID is not defined')
-    }
-
-    if (this.transactionCache[this.latestQuoteId]) {
-      return this.transactionCache[this.latestQuoteId]
-    }
-
     const response = await fetchApi<{
       code: number
       data: {
@@ -201,12 +158,15 @@ export class OpenOceanAggregator implements Aggregator {
     }
 
     return {
-      data: response.data.data,
-      gas: BigInt(response.data.estimatedGas),
-      value: BigInt(response.data.value),
-      to: response.data.to,
-      gasPrice: gasPrice,
-      takenAmount: BigInt(response.data.outAmount ?? 0),
+      transaction: {
+        data: response.data.data,
+        gas: BigInt(response.data.estimatedGas),
+        value: BigInt(response.data.value),
+        to: response.data.to,
+        gasPrice: gasPrice,
+        from: userAddress,
+      },
+      amountOut: BigInt(response.data.outAmount ?? 0),
     }
   }
 }
