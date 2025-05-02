@@ -54,8 +54,10 @@ const TimeUnit = ({
 }
 
 export const Countdown = ({ initialSeconds }: { initialSeconds: number }) => {
-  const [secondsLeft, setSecondsLeft] = useState(initialSeconds)
-  const [prevParts, setPrevParts] = useState(getTimeParts(initialSeconds))
+  const [secondsLeft, setSecondsLeft] = useState(Math.max(initialSeconds, 0))
+  const [prevParts, setPrevParts] = useState(
+    getTimeParts(Math.max(initialSeconds, 0)),
+  )
 
   useEffect(() => {
     const interval = setInterval(() => {
