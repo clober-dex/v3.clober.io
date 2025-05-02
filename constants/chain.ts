@@ -1,6 +1,14 @@
 import { base, monadTestnet } from 'viem/chains'
 import { getDefaultConfig } from '@rainbow-me/rainbowkit'
 import { http } from 'viem'
+import {
+  backpackWallet,
+  coinbaseWallet,
+  metaMaskWallet,
+  phantomWallet,
+  rainbowWallet,
+  walletConnectWallet,
+} from '@rainbow-me/rainbowkit/wallets'
 
 import { Chain } from '../model/chain'
 
@@ -51,6 +59,19 @@ export const getClientConfig = () => {
     transports: {
       [chain.id]: http(RPC_URL[chain.id]),
     },
+    wallets: [
+      {
+        groupName: 'Recommended',
+        wallets: [
+          backpackWallet,
+          metaMaskWallet,
+          coinbaseWallet,
+          rainbowWallet,
+          walletConnectWallet,
+          phantomWallet,
+        ],
+      },
+    ],
   })
 
   return config
