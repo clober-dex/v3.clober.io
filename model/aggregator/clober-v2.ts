@@ -149,19 +149,9 @@ export class CloberV2Aggregator implements Aggregator {
     }
 
     try {
-      const { takenAmount } = await getExpectedOutput({
-        chainId: this.chain.id,
-        inputToken: inputCurrency.address,
-        outputToken: outputCurrency.address,
-        amountIn: formatUnits(amountIn, inputCurrency.decimals),
-        options: {
-          rpcUrl: RPC_URL[this.chain.id],
-          useSubgraph: false,
-        },
-      })
       if (userAddress) {
         this.latestQuoteId = uuidv4()
-        this.transactionCache[this.latestQuoteId] = await this.buildCallData(
+        const results = await this.buildCallData(
           inputCurrency,
           amountIn,
           outputCurrency,
@@ -169,12 +159,32 @@ export class CloberV2Aggregator implements Aggregator {
           gasPrice,
           userAddress,
         )
-      }
-      return {
-        amountOut: parseUnits(takenAmount, outputCurrency.decimals),
-        gasLimit: this.defaultGasLimit,
-        pathViz: undefined,
-        aggregator: this,
+        this.transactionCache[this.latestQuoteId] = {
+          ...results,
+        }
+        return {
+          amountOut: results.takenAmount ?? 0n,
+          gasLimit: this.defaultGasLimit,
+          pathViz: undefined,
+          aggregator: this,
+        }
+      } else {
+        const { takenAmount } = await getExpectedOutput({
+          chainId: this.chain.id,
+          inputToken: inputCurrency.address,
+          outputToken: outputCurrency.address,
+          amountIn: formatUnits(amountIn, inputCurrency.decimals),
+          options: {
+            rpcUrl: RPC_URL[this.chain.id],
+            useSubgraph: false,
+          },
+        })
+        return {
+          amountOut: parseUnits(takenAmount, outputCurrency.decimals),
+          gasLimit: this.defaultGasLimit,
+          pathViz: undefined,
+          aggregator: this,
+        }
       }
     } catch {
       return {
@@ -201,6 +211,7 @@ export class CloberV2Aggregator implements Aggregator {
     to: `0x${string}`
     nonce?: number
     gasPrice?: bigint
+    takenAmount?: bigint
   }> {
     if (
       isAddressEqual(inputCurrency.address, this.nativeTokenAddress) &&
@@ -231,7 +242,15 @@ export class CloberV2Aggregator implements Aggregator {
       }
     }
 
-    const { transaction } = await marketOrder({
+    const {
+      transaction,
+      result: {
+        taken: {
+          amount,
+          currency: { decimals },
+        },
+      },
+    } = await marketOrder({
       chainId: this.chain.id,
       userAddress,
       inputToken: inputCurrency.address,
@@ -243,6 +262,6 @@ export class CloberV2Aggregator implements Aggregator {
         slippage: slippageLimitPercent,
       },
     })
-    return transaction
+    return { ...transaction, takenAmount: parseUnits(amount, decimals) }
   }
 }

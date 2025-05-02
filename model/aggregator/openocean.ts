@@ -56,49 +56,14 @@ export class OpenOceanAggregator implements Aggregator {
     gasLimit: bigint
     pathViz: PathViz | undefined
     aggregator: Aggregator
-    priceImpact: number
   }> {
     if (userAddress) {
       this.latestQuoteId = undefined
     }
-    const response = await fetchApi<{
-      code: number
-      data: {
-        outAmount: string
-        estimatedGas: string
-        price_impact: string
-      }
-    }>(this.baseUrl, `v4/${this.chain.id}/quote`, {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-      },
-      timeout: this.TIMEOUT,
-      params: {
-        inTokenAddress: isAddressEqual(
-          inputCurrency.address,
-          this.nativeTokenAddress,
-        )
-          ? this.nativeTokenAddress
-          : getAddress(inputCurrency.address),
-        outTokenAddress: isAddressEqual(
-          outputCurrency.address,
-          this.nativeTokenAddress,
-        )
-          ? this.nativeTokenAddress
-          : getAddress(outputCurrency.address),
-        amount: formatUnits(amountIn, inputCurrency.decimals),
-        gasPrice: formatUnits(gasPrice, 9),
-      },
-    })
-
-    if (response.code !== 200) {
-      throw new Error(`Quote failed: ${response.code}`)
-    }
 
     if (userAddress) {
       this.latestQuoteId = uuidv4()
-      this.transactionCache[this.latestQuoteId] = await this.buildCallData(
+      const results = await this.buildCallData(
         inputCurrency,
         amountIn,
         outputCurrency,
@@ -106,14 +71,57 @@ export class OpenOceanAggregator implements Aggregator {
         gasPrice,
         userAddress,
       )
-    }
+      this.transactionCache[this.latestQuoteId] = {
+        ...results,
+      }
+      return {
+        amountOut: results.takenAmount ?? 0n,
+        gasLimit: results.gas,
+        pathViz: undefined,
+        aggregator: this,
+      }
+    } else {
+      const response = await fetchApi<{
+        code: number
+        data: {
+          outAmount: string
+          estimatedGas: string
+          price_impact: string
+        }
+      }>(this.baseUrl, `v4/${this.chain.id}/quote`, {
+        method: 'GET',
+        headers: {
+          accept: 'application/json',
+        },
+        timeout: this.TIMEOUT,
+        params: {
+          inTokenAddress: isAddressEqual(
+            inputCurrency.address,
+            this.nativeTokenAddress,
+          )
+            ? this.nativeTokenAddress
+            : getAddress(inputCurrency.address),
+          outTokenAddress: isAddressEqual(
+            outputCurrency.address,
+            this.nativeTokenAddress,
+          )
+            ? this.nativeTokenAddress
+            : getAddress(outputCurrency.address),
+          amount: formatUnits(amountIn, inputCurrency.decimals),
+          gasPrice: formatUnits(gasPrice, 9),
+        },
+      })
 
-    return {
-      amountOut: BigInt(response.data.outAmount),
-      gasLimit: BigInt(response.data.estimatedGas),
-      pathViz: undefined,
-      aggregator: this,
-      priceImpact: Number(response.data.price_impact.replace('%', '')) / 100,
+      if (response.code !== 200) {
+        throw new Error(`Quote failed: ${response.code}`)
+      }
+
+      return {
+        amountOut: BigInt(response.data.outAmount),
+        gasLimit: BigInt(response.data.estimatedGas),
+        pathViz: undefined,
+        aggregator: this,
+      }
     }
   }
 
@@ -131,6 +139,7 @@ export class OpenOceanAggregator implements Aggregator {
     to: `0x${string}`
     nonce?: number
     gasPrice?: bigint
+    takenAmount?: bigint
   }> {
     if (!this.latestQuoteId) {
       await this.quote(
@@ -156,6 +165,7 @@ export class OpenOceanAggregator implements Aggregator {
       data: {
         data: `0x${string}`
         estimatedGas: string
+        outAmount: string
         value: string
         to: `0x${string}`
       }
@@ -196,6 +206,7 @@ export class OpenOceanAggregator implements Aggregator {
       value: BigInt(response.data.value),
       to: response.data.to,
       gasPrice: gasPrice,
+      takenAmount: BigInt(response.data.outAmount ?? 0),
     }
   }
 }
