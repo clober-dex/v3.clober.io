@@ -8,6 +8,7 @@ import {
 } from '@rainbow-me/rainbowkit'
 import { useQuery } from '@tanstack/react-query'
 import { monadTestnet } from 'viem/chains'
+import Image from 'next/image'
 
 import { useChainContext } from '../contexts/chain-context'
 import MenuSvg from '../components/svg/menu-svg'
@@ -102,14 +103,24 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
               <img className="h-7 sm:h-9" src="/futures-logo.svg" alt="logo" />
             </a>
           ) : (
-            <a
-              className="flex gap-2 items-center"
-              target="_blank"
-              href="https://clober.io"
-              rel="noopener noreferrer"
-            >
-              <img className="h-5 md:h-7" src="/logo.svg" alt="logo" />
-            </a>
+            <>
+              <a
+                className="hidden md:flex gap-2 items-center h-7"
+                target="_blank"
+                href="https://clober.io"
+                rel="noopener noreferrer"
+              >
+                <Image width={123} height={28} src="/logo.svg" alt="logo" />
+              </a>
+              <a
+                className="flex md:hidden gap-2 items-center h-5"
+                target="_blank"
+                href="https://clober.io"
+                rel="noopener noreferrer"
+              >
+                <Image width={88} height={20} src="/logo.svg" alt="logo" />
+              </a>
+            </>
           )}
           <div className="hidden xl:flex py-1 justify-start items-center gap-8">
             <PageButtons />
