@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import '../styles/globals.css'
 import '@rainbow-me/rainbowkit/styles.css'
 import { darkTheme, RainbowKitProvider } from '@rainbow-me/rainbowkit'
@@ -138,6 +138,7 @@ function App({ Component, pageProps }: AppProps) {
   const [open, setOpen] = useState(false)
   const [history, setHistory] = useState<string[]>([])
   const router = useRouter()
+  const isFirstPageViewSent = useRef(false)
 
   const handlePopState = useCallback(async () => {
     if (history.length > 1) {
@@ -176,22 +177,65 @@ function App({ Component, pageProps }: AppProps) {
   }
 
   useEffect(() => {
-    const handleRouteChange = (url: string) => {
-      if (GOOGLE_ANALYTICS_TRACKING_ID[chain.id]) {
-        const [pathname, search] = url.split('?')
-        const urlParams = new URLSearchParams(search || '')
-        const utm_source = urlParams.get('utm_source') || undefined
-        const utm_medium = urlParams.get('utm_medium') || undefined
-        const utm_campaign = urlParams.get('utm_campaign') || undefined
+    if (!GOOGLE_ANALYTICS_TRACKING_ID[chain.id]) {
+      return
+    }
 
-        // @ts-ignore
-        window.gtag('config', GOOGLE_ANALYTICS_TRACKING_ID[chain.id], {
-          page_path: pathname,
-          campaign_source: utm_source,
-          campaign_medium: utm_medium,
-          campaign_name: utm_campaign,
-        })
+    const id = GOOGLE_ANALYTICS_TRACKING_ID[chain.id]
+
+    const sendPageView = (pathname: string, search: string) => {
+      const urlParams = new URLSearchParams(search || '')
+      const utm_source = urlParams.get('utm_source') || undefined
+      const utm_medium = urlParams.get('utm_medium') || undefined
+      const utm_campaign = urlParams.get('utm_campaign') || undefined
+
+      console.log('config', id, {
+        page_path: pathname,
+        campaign_source: utm_source,
+        campaign_medium: utm_medium,
+        campaign_name: utm_campaign,
+      })
+
+      // @ts-ignore
+      window.gtag?.('config', id, {
+        page_path: pathname,
+        campaign_source: utm_source,
+        campaign_medium: utm_medium,
+        campaign_name: utm_campaign,
+      })
+    }
+
+    const initialPathname = window.location.pathname
+    const initialSearch = window.location.search
+
+    const init = () => {
+      if (!isFirstPageViewSent.current) {
+        sendPageView(initialPathname, initialSearch)
+        isFirstPageViewSent.current = true
       }
+    }
+
+    // @ts-ignore
+    if (typeof window.gtag === 'function') {
+      init()
+    } else {
+      const interval = setInterval(() => {
+        // @ts-ignore
+        if (typeof window.gtag === 'function') {
+          init()
+          clearInterval(interval)
+        }
+      }, 100)
+    }
+
+    const handleRouteChange = (url: string) => {
+      const [pathname, search] = url.split('?')
+      // 중복 호출 방지: 현재 pathname과 같은 경우 skip
+      if (pathname === initialPathname && !search) {
+        return
+      }
+
+      sendPageView(pathname, search || '')
     }
 
     router.events.on('routeChangeComplete', handleRouteChange)
