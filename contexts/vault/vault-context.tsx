@@ -124,9 +124,6 @@ export const VaultProvider = ({ children }: React.PropsWithChildren<{}>) => {
       }
 
       setCurrencies(deduplicateCurrencies(whitelistCurrencies))
-
-      const url = new URL(window.location.href)
-      window.history.pushState({}, '', `${url.origin}${url.pathname}`)
     }
     if (window.location.href.includes('/earn')) {
       action()
