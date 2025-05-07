@@ -178,14 +178,15 @@ function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
     const handleRouteChange = (url: string) => {
       if (GOOGLE_ANALYTICS_TRACKING_ID[chain.id]) {
-        const urlParams = new URLSearchParams(window.location.search)
+        const [pathname, search] = url.split('?')
+        const urlParams = new URLSearchParams(search || '')
         const utm_source = urlParams.get('utm_source') || undefined
         const utm_medium = urlParams.get('utm_medium') || undefined
         const utm_campaign = urlParams.get('utm_campaign') || undefined
 
         // @ts-ignore
         window.gtag('config', GOOGLE_ANALYTICS_TRACKING_ID[chain.id], {
-          page_path: url,
+          page_path: pathname,
           campaign_source: utm_source,
           campaign_medium: utm_medium,
           campaign_name: utm_campaign,
