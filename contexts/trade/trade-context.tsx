@@ -235,9 +235,18 @@ export const TradeProvider = ({ children }: React.PropsWithChildren<{}>) => {
           }
           // remove only `inputCurrency` and `outputCurrency` query params
           const newUrl = new URL(window.location.href)
-          newUrl.searchParams.delete('inputCurrency')
-          newUrl.searchParams.delete('outputCurrency')
-          window.history.pushState({}, '', `${newUrl.pathname}${newUrl.search}`)
+          if (
+            newUrl.searchParams.has('inputCurrency') ||
+            newUrl.searchParams.has('outputCurrency')
+          ) {
+            newUrl.searchParams.delete('inputCurrency')
+            newUrl.searchParams.delete('outputCurrency')
+            window.history.pushState(
+              {},
+              '',
+              `${newUrl.pathname}${newUrl.search}`,
+            )
+          }
         } else {
           setIsBid(true)
         }
