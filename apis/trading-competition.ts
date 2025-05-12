@@ -12,6 +12,7 @@ const BLACKLISTED_USER_ADDRESSES = [
   '0x5F79EE8f8fA862E98201120d83c4eC39D9468D49',
   '0xFC5899D93df81CA11583BEE03865b7B13cE093A7',
   '0x605fCbDCba6C99b70A0028593a61CA9205e93739',
+  '0x255EC4A7dfefeed4889DbEB03d7aC06ADcCc2D24',
 ].map((address) => getAddress(address))
 
 export const fetchTotalRegisteredUsers = async (
