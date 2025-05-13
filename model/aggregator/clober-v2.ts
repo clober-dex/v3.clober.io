@@ -32,7 +32,7 @@ export class CloberV2Aggregator implements Aggregator {
   private readonly nativeTokenAddress = zeroAddress
   public readonly chain: Chain
   public readonly weth: `0x${string}`
-  private defaultGasLimit = 500_000n
+  private defaultGasLimit = 700_000n
 
   constructor(contract: `0x${string}`, chain: Chain) {
     this.contract = contract
@@ -254,6 +254,7 @@ export class CloberV2Aggregator implements Aggregator {
         rpcUrl: RPC_URL[this.chain.id],
         useSubgraph: false,
         slippage: slippageLimitPercent,
+        gasLimit: this.defaultGasLimit,
       },
     })
     return { transaction, amountOut: parseUnits(amount, decimals) }
