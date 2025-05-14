@@ -1,4 +1,4 @@
-import { base, monadTestnet } from 'viem/chains'
+import { monadTestnet } from 'viem/chains'
 import React from 'react'
 
 import { DiscoverPageSvg } from '../components/svg/discover-page-svg'
@@ -20,13 +20,13 @@ export const PAGE_BUTTONS = [
     path: '/trade',
     label: 'Trade',
     icon: <SwapPageSvg className="w-4 h-4" />,
-    chains: [base.id, monadTestnet.id, riseSepolia.id],
+    chains: [monadTestnet.id, riseSepolia.id],
   },
   {
     path: '/earn',
     label: 'Earn',
     icon: <VaultPageSvg className="w-4 h-4" />,
-    chains: [base.id, monadTestnet.id],
+    chains: [monadTestnet.id],
   },
   {
     path: '/trading-competition',

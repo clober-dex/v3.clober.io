@@ -1,4 +1,4 @@
-import { base, monadTestnet } from 'viem/chains'
+import { monadTestnet } from 'viem/chains'
 import { getDefaultConfig } from '@rainbow-me/rainbowkit'
 import { http } from 'viem'
 import {
@@ -17,7 +17,7 @@ import { riseSepolia } from './chains/rise-sepolia'
 
 let config: any | null = null
 
-export const supportedChains: Chain[] = [base, monadTestnet, riseSepolia]
+export const supportedChains: Chain[] = [monadTestnet, riseSepolia]
 
 export const getChain = (): Chain => {
   const url = window.location.href
@@ -33,8 +33,6 @@ export const getChain = (): Chain => {
     return _monadTestnet
   } else if (url.includes('monad-testnet.clober.io')) {
     return _monadTestnet
-  } else if (url.includes('base.clober.io')) {
-    return base
   } else if (url.includes('rise.clober.io')) {
     return _riseTestnet
   }
