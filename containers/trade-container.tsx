@@ -27,7 +27,6 @@ import WarningLimitModal from '../components/modal/warning-limit-modal'
 import { useTradeContext } from '../contexts/trade/trade-context'
 import { SwapForm } from '../components/form/swap-form'
 import { useSwapContractContext } from '../contexts/trade/swap-contract-context'
-import { fetchTokenInfo } from '../apis/dexscreener'
 import { DEFAULT_TOKEN_INFO } from '../model/token-info'
 import { WETH } from '../constants/currency'
 import { fetchPrice } from '../apis/price'
@@ -144,27 +143,11 @@ export const TradeContainer = () => {
       if (!selectedMarket) {
         return DEFAULT_TOKEN_INFO
       }
-      if (selectedChain.testnet) {
-        return fetchTokenInfoFromOrderBook(
-          selectedChain,
-          selectedMarket,
-          prices[selectedMarket.quote.address] ?? 0,
-        )
-      }
-      const tokenInfo = await fetchTokenInfo({
-        chainId: selectedChain.id,
-        base: selectedMarket.base.address,
-        quote: selectedMarket.quote.address,
-      })
-      if (tokenInfo) {
-        return tokenInfo
-      } else {
-        return fetchTokenInfoFromOrderBook(
-          selectedChain,
-          selectedMarket,
-          prices[selectedMarket.quote.address] ?? 0,
-        )
-      }
+      return fetchTokenInfoFromOrderBook(
+        selectedChain,
+        selectedMarket,
+        prices[selectedMarket.quote.address] ?? 0,
+      )
     },
     refetchInterval: 2000, // checked
     refetchIntervalInBackground: true,
