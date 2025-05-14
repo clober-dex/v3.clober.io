@@ -52,7 +52,7 @@ const Context = React.createContext<TransactionContext>({
   dequeuePendingTransaction: () => {},
   latestSubgraphBlockNumber: {
     blockNumber: 0,
-    chainId: CHAIN_IDS.BASE,
+    chainId: CHAIN_IDS.MONAD_TESTNET,
   },
 })
 

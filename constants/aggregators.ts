@@ -1,9 +1,8 @@
 import { CHAIN_IDS, getContractAddresses } from '@clober/v2-sdk'
 import { getAddress } from 'viem'
-import { base, monadTestnet } from 'viem/chains'
+import { monadTestnet } from 'viem/chains'
 
 import { Aggregator } from '../model/aggregator'
-import { MagpieAggregator } from '../model/aggregator/magpie'
 import { OpenOceanAggregator } from '../model/aggregator/openocean'
 import { CloberV2Aggregator } from '../model/aggregator/clober-v2'
 import { AggregatorRouterGateway } from '../model/aggregator/router-gateway'
@@ -13,16 +12,6 @@ import { riseSepolia } from './chains/rise-sepolia'
 export const AGGREGATORS: {
   [chain in CHAIN_IDS]: Aggregator[]
 } = {
-  [CHAIN_IDS.BASE]: [
-    // new OdosAggregator(
-    //   getAddress('0x19cEeAd7105607Cd444F5ad10dd51356436095a1'),
-    //   findSupportChain(CHAIN_IDS.BASE.valueOf())!,
-    // ),
-    new MagpieAggregator(
-      getAddress('0xef42f78d25f4c681dcad2597fa04877ff802ef4b'),
-      base,
-    ),
-  ],
   [CHAIN_IDS.MONAD_TESTNET]: [
     new CloberV2Aggregator(
       getContractAddresses({ chainId: CHAIN_IDS.MONAD_TESTNET }).Controller,

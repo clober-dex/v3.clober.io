@@ -1,39 +1,10 @@
 import { CHAIN_IDS } from '@clober/v2-sdk'
-import { zeroHash } from 'viem'
 
 import { VaultImmutableInfo } from '../model/vault'
 
 export const WHITELISTED_VAULTS: {
   [chain in CHAIN_IDS]: VaultImmutableInfo[]
 } = {
-  [CHAIN_IDS.BASE]: [
-    {
-      // https://basescan.org/tx/0x12dc122f8d1bd78b3f2be55d6e228c9926b4ab0d97bc766bb37e0b7ec8e353ea#eventlog
-      currencyA: {
-        address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
-        name: 'USD Coin',
-        symbol: 'USDC',
-        decimals: 6,
-      },
-      currencyB: {
-        address: '0x4200000000000000000000000000000000000006',
-        name: 'Wrapped Ether',
-        symbol: 'WETH',
-        decimals: 18,
-      },
-      salt: zeroHash,
-      key: '0xc8cbe608c82ee9c4c30f01d7c0eefd977538ac396ed34430aa3993bfe0d363ae',
-      hasDashboard: true,
-      hasPoint: true,
-      initialLPInfo: {
-        quoteTokenAmount: 271.254,
-        baseTokenAmount: 0.1,
-        lpTokenAmount: 271.254,
-        timestamp: 1739260397,
-        initialPriceMultiplier: 1,
-      },
-    },
-  ],
   [CHAIN_IDS.MONAD_TESTNET]: [
     {
       currencyA: {
