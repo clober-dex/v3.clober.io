@@ -15,7 +15,6 @@ import { monadTestnet } from 'viem/chains'
 
 import { Currency } from '../currency'
 import { Prices } from '../prices'
-import { PathViz } from '../pathviz'
 import { RPC_URL } from '../../constants/rpc-url'
 import { formatUnits } from '../../utils/bigint'
 import { WETH } from '../../constants/currency'
@@ -103,7 +102,6 @@ export class CloberV2Aggregator implements Aggregator {
   ): Promise<{
     amountOut: bigint
     gasLimit: bigint
-    pathViz: PathViz | undefined
     aggregator: Aggregator
     transaction: Transaction | undefined
   }> {
@@ -125,7 +123,6 @@ export class CloberV2Aggregator implements Aggregator {
         return {
           amountOut,
           gasLimit: this.defaultGasLimit,
-          pathViz: undefined,
           aggregator: this,
           transaction,
         }
@@ -133,7 +130,6 @@ export class CloberV2Aggregator implements Aggregator {
       return {
         amountOut: amountIn,
         gasLimit: this.defaultGasLimit,
-        pathViz: undefined,
         aggregator: this,
         transaction: undefined,
       }
@@ -152,7 +148,6 @@ export class CloberV2Aggregator implements Aggregator {
         return {
           amountOut,
           gasLimit: this.defaultGasLimit,
-          pathViz: undefined,
           aggregator: this,
           transaction,
         }
@@ -170,7 +165,6 @@ export class CloberV2Aggregator implements Aggregator {
         return {
           amountOut: parseUnits(takenAmount, outputCurrency.decimals),
           gasLimit: this.defaultGasLimit,
-          pathViz: undefined,
           aggregator: this,
           transaction: undefined,
         }
@@ -179,7 +173,6 @@ export class CloberV2Aggregator implements Aggregator {
       return {
         amountOut: 0n,
         gasLimit: this.defaultGasLimit,
-        pathViz: undefined,
         aggregator: this,
         transaction: undefined,
       }

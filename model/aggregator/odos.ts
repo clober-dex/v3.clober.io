@@ -4,7 +4,6 @@ import { Transaction } from '@clober/v2-sdk'
 import { Currency } from '../currency'
 import { fetchApi } from '../../apis/utils'
 import { Prices } from '../prices'
-import { PathViz } from '../pathviz'
 import { Chain } from '../chain'
 
 import { Aggregator } from './index'
@@ -59,13 +58,11 @@ export class OdosAggregator implements Aggregator {
   ): Promise<{
     amountOut: bigint
     gasLimit: bigint
-    pathViz: PathViz | undefined
     aggregator: Aggregator
     transaction: Transaction | undefined
   }> {
     const result: {
       outAmounts: string[]
-      pathViz: PathViz
       pathId: string
       gasEstimate: number
       priceImpact: number
@@ -104,7 +101,6 @@ export class OdosAggregator implements Aggregator {
       return {
         amountOut: BigInt(result.outAmounts[0]),
         gasLimit: BigInt(result.gasEstimate),
-        pathViz: result.pathViz,
         aggregator: this,
         transaction,
       }
@@ -113,7 +109,6 @@ export class OdosAggregator implements Aggregator {
     return {
       amountOut: BigInt(result.outAmounts[0]),
       gasLimit: BigInt(result.gasEstimate),
-      pathViz: result.pathViz,
       aggregator: this,
       transaction: undefined,
     }

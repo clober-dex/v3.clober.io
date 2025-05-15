@@ -3,7 +3,6 @@ import { Transaction } from '@clober/v2-sdk'
 import { Chain } from '../chain'
 import { Currency } from '../currency'
 import { Prices } from '../prices'
-import { PathViz } from '../pathviz'
 
 export interface Aggregator {
   name: string
@@ -21,7 +20,6 @@ export interface Aggregator {
   ): Promise<{
     amountOut: bigint
     gasLimit: bigint
-    pathViz: PathViz | undefined
     aggregator: Aggregator
     transaction: Transaction | undefined
   }>
