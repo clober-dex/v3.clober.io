@@ -20,8 +20,6 @@ import { aggregators } from '../chain-configs/aggregators'
 import { Allowances } from '../model/allowances'
 import { deduplicateCurrencies } from '../utils/currency'
 import { FUTURES_CONTRACT_ADDRESSES } from '../constants/futures/contract-addresses'
-import { fetchPricesFromPyth } from '../apis/price'
-import { PRICE_FEED_ID_LIST } from '../constants/currency'
 import { CHAIN_CONFIG } from '../chain-configs'
 
 import { useChainContext } from './chain-context'
@@ -148,15 +146,7 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { data: prices } = useQuery({
     queryKey: ['prices', selectedChain.id],
     queryFn: async () => {
-      return (
-        await Promise.all([
-          fetchPricesFromPyth(
-            selectedChain.id,
-            PRICE_FEED_ID_LIST[selectedChain.id],
-          ),
-          fetchPrices(),
-        ])
-      ).reduce((acc, price) => ({ ...acc, ...price }), {} as Prices)
+      return fetchPrices()
     },
     refetchInterval: 5 * 1000, // checked
     refetchIntervalInBackground: true,

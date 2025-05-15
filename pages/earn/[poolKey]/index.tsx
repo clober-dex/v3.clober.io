@@ -4,7 +4,6 @@ import { useQuery } from '@tanstack/react-query'
 
 import { VaultManagerContainer } from '../../../containers/vault/vault-manager-container'
 import { WHITELISTED_VAULTS } from '../../../constants/vault'
-import { fetchOnChainVault } from '../../../apis/vault'
 import { useChainContext } from '../../../contexts/chain-context'
 import { useCurrencyContext } from '../../../contexts/currency-context'
 import { Loading } from '../../../components/loading'
@@ -28,7 +27,8 @@ export default function PoolManage() {
       if (!vaultImmutableInfo) {
         return null
       }
-      return fetchOnChainVault(selectedChain, prices, vaultImmutableInfo)
+      // return fetchOnChainVault(selectedChain, prices, vaultImmutableInfo)
+      return null
     },
     initialData: null,
   })
