@@ -4,7 +4,6 @@ import { Transaction } from '@clober/v2-sdk'
 import { Chain } from '../chain'
 import { Currency } from '../currency'
 import { Prices } from '../prices'
-import { PathViz } from '../pathviz'
 
 import { Aggregator } from './index'
 
@@ -38,7 +37,6 @@ export class AggregatorRouterGateway implements Aggregator {
   ): Promise<{
     amountOut: bigint
     gasLimit: bigint
-    pathViz: PathViz | undefined
     aggregator: Aggregator
     transaction: Transaction | undefined
   }> {
@@ -80,7 +78,6 @@ export class AggregatorRouterGateway implements Aggregator {
       return {
         amountOut,
         gasLimit: transaction?.gas ?? 0n,
-        pathViz: undefined,
         aggregator: this,
         transaction: {
           data,
@@ -97,7 +94,6 @@ export class AggregatorRouterGateway implements Aggregator {
     return {
       amountOut,
       gasLimit: 0n,
-      pathViz: undefined,
       aggregator: this,
       transaction: undefined,
     }

@@ -5,7 +5,6 @@ import { Chain } from '../chain'
 import { Currency } from '../currency'
 import { fetchApi } from '../../apis/utils'
 import { Prices } from '../prices'
-import { PathViz } from '../pathviz'
 
 import { Aggregator } from './index'
 
@@ -92,7 +91,6 @@ export class MagpieAggregator implements Aggregator {
   ): Promise<{
     amountOut: bigint
     gasLimit: bigint
-    pathViz: PathViz | undefined
     aggregator: Aggregator
     transaction: Transaction | undefined
   }> {
@@ -148,7 +146,6 @@ export class MagpieAggregator implements Aggregator {
       return {
         amountOut: BigInt(response.amountOut),
         gasLimit: BigInt(response.resourceEstimate.gasLimit),
-        pathViz: undefined,
         aggregator: this,
         transaction,
       }
@@ -157,7 +154,6 @@ export class MagpieAggregator implements Aggregator {
     return {
       amountOut: BigInt(response.amountOut),
       gasLimit: BigInt(response.resourceEstimate.gasLimit),
-      pathViz: undefined,
       aggregator: this,
       transaction: undefined,
     }

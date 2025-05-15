@@ -10,8 +10,7 @@ import { ERC20_PERMIT_ABI } from '../abis/@openzeppelin/erc20-permit-abi'
 import { RPC_URL } from '../constants/rpc-url'
 import { Chain } from '../model/chain'
 
-import { buildTransaction } from './build-transaction'
-import { sendTransaction } from './transaction'
+import { buildTransaction, sendTransaction } from './transaction'
 
 export const maxApprove = async (
   chain: Chain,

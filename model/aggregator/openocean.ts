@@ -5,7 +5,6 @@ import { Chain } from '../chain'
 import { Currency } from '../currency'
 import { fetchApi } from '../../apis/utils'
 import { Prices } from '../prices'
-import { PathViz } from '../pathviz'
 
 import { Aggregator } from './index'
 
@@ -40,7 +39,6 @@ export class OpenOceanAggregator implements Aggregator {
   ): Promise<{
     amountOut: bigint
     gasLimit: bigint
-    pathViz: PathViz | undefined
     aggregator: Aggregator
     transaction: Transaction | undefined
   }> {
@@ -56,7 +54,6 @@ export class OpenOceanAggregator implements Aggregator {
       return {
         amountOut,
         gasLimit: transaction.gas,
-        pathViz: undefined,
         aggregator: this,
         transaction,
       }
@@ -99,7 +96,6 @@ export class OpenOceanAggregator implements Aggregator {
       return {
         amountOut: BigInt(response.data.outAmount),
         gasLimit: BigInt(response.data.estimatedGas),
-        pathViz: undefined,
         aggregator: this,
         transaction: undefined,
       }

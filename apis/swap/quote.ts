@@ -2,7 +2,6 @@ import { Transaction } from '@clober/v2-sdk'
 
 import { Currency } from '../../model/currency'
 import { Aggregator } from '../../model/aggregator'
-import { PathViz } from '../../model/pathviz'
 
 export async function fetchQuotes(
   aggregators: Aggregator[],
@@ -16,7 +15,6 @@ export async function fetchQuotes(
   amountIn: bigint
   amountOut: bigint
   gasLimit: bigint
-  pathViz: PathViz | undefined
   aggregator: Aggregator
   transaction: Transaction | undefined
 }> {
@@ -47,7 +45,6 @@ export async function fetchQuotes(
       ): quote is {
         amountOut: bigint
         gasLimit: bigint
-        pathViz: PathViz | undefined
         aggregator: Aggregator
         transaction: Transaction | undefined
       } => quote !== undefined,
