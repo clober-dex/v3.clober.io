@@ -11,13 +11,13 @@ import {
 } from '@rainbow-me/rainbowkit/wallets'
 import { getNativeCurrency, getReferenceCurrency } from '@clober/v2-sdk'
 
-import { Currency } from '../model/currency'
+import { ChainConfig } from './type'
 
 const CHAIN = {
   ...monadTestnet,
   icon: '/monad.png',
 }
-export const CHAIN_CONFIG = {
+export const CHAIN_CONFIG: ChainConfig = {
   CHAIN,
   GOOGLE_ANALYTICS_TRACKING_ID: 'G-TE8CSB6JP2',
   RPC_URL:
@@ -54,7 +54,7 @@ export const CHAIN_CONFIG = {
     '0x4a2e3a99de223d7caa8dccd007ede11bfeb4562a002fe2a700c5f3f6bd5753fb', // TSLA-250516
     '0xc72b2145027dc9a9ac57f1e3d7e6c8bd5aa07bd3c622cf65b61edbd90ffc45d4', // BRK-A-250516
     '0x41d76a57de6d5b77eae21428db3474981b1a4ef4583b4952fd137827f0e887bd', // US30Y-250516
-  ] as `0x${string}`[],
+  ],
   REFERENCE_CURRENCY: getReferenceCurrency({ chainId: CHAIN.id }),
   DEFAULT_INPUT_CURRENCY: getNativeCurrency({ chainId: CHAIN.id }),
   WHITELISTED_CURRENCIES: [
@@ -262,7 +262,7 @@ export const CHAIN_CONFIG = {
       decimals: 6,
       icon: '/asset-icon/USDT.png',
     },
-  ] as Currency[],
+  ],
 }
 
 let config: any | null = null
