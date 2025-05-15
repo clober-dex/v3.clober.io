@@ -2,7 +2,6 @@ import React, { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { NextRouter } from 'next/router'
-import { CHAIN_IDS } from '@clober/v2-sdk'
 
 import { PAGE_BUTTONS } from '../constants/buttons'
 
@@ -13,12 +12,10 @@ import { PageButton } from './button/page-button'
 import { GithubLogoSvg } from './svg/github-logo-svg'
 
 const Panel = ({
-  chainId,
   open,
   setOpen,
   router,
 }: {
-  chainId: CHAIN_IDS
   open: boolean
   setOpen: (open: boolean) => void
   router: NextRouter
@@ -59,25 +56,20 @@ const Panel = ({
                     </div>
                     <div className="flex flex-col text-white text-base font-bold relative mb-6 flex-1 pl-8 pr-16 gap-[40px]">
                       <div className="flex flex-col gap-8 items-start">
-                        {PAGE_BUTTONS.map(
-                          (button, index) =>
-                            (button.chains as number[]).includes(chainId) && (
-                              <div key={index}>
-                                <PageButton
-                                  disabled={router.pathname.includes(
-                                    button.path,
-                                  )}
-                                  onClick={() => {
-                                    router.push(button.path)
-                                    setOpen(false)
-                                  }}
-                                >
-                                  {button.icon}
-                                  {button.label}
-                                </PageButton>
-                              </div>
-                            ),
-                        )}
+                        {PAGE_BUTTONS.map((button, index) => (
+                          <div key={index}>
+                            <PageButton
+                              disabled={router.pathname.includes(button.path)}
+                              onClick={() => {
+                                router.push(button.path)
+                                setOpen(false)
+                              }}
+                            >
+                              {button.icon}
+                              {button.label}
+                            </PageButton>
+                          </div>
+                        ))}
                       </div>
 
                       <svg

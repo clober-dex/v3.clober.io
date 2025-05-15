@@ -15,7 +15,7 @@ import { useRouter } from 'next/router'
 import Script from 'next/script'
 
 import HeaderContainer from '../containers/header-container'
-import { ChainProvider, useChainContext } from '../contexts/chain-context'
+import { ChainProvider } from '../contexts/chain-context'
 import { MarketProvider } from '../contexts/trade/market-context'
 import { getChain, getClientConfig } from '../constants/chain'
 import {
@@ -113,15 +113,9 @@ const PanelWrapper = ({
   setOpen: (open: boolean) => void
 } & React.PropsWithChildren) => {
   const router = useRouter()
-  const { selectedChain } = useChainContext()
 
   return (
-    <Panel
-      chainId={selectedChain.id}
-      open={open}
-      setOpen={setOpen}
-      router={router}
-    >
+    <Panel open={open} setOpen={setOpen} router={router}>
       {children}
     </Panel>
   )
