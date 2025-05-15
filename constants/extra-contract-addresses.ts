@@ -1,6 +1,6 @@
 import { getAddress } from 'viem'
 
-export const FUTURES_CONTRACT_ADDRESSES: {
+export const EXTRA_CONTRACT_ADDRESSES: {
   FuturesMarket: `0x${string}`
   PythOracle: `0x${string}`
   TradingCompetitionRegistration: `0x${string}`

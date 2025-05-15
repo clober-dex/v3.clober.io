@@ -13,7 +13,7 @@ import { ClipboardSvg } from '../svg/clipboard-svg'
 import { Toast } from '../toast'
 import { ActionButton } from '../button/action-button'
 import { Chain } from '../../model/chain'
-import { WHITELISTED_ASSETS } from '../../constants/futures/asset'
+import { WHITELISTED_ASSETS } from '../../constants/asset'
 
 export const MarketInfoCard = ({
   chain,

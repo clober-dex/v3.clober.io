@@ -19,7 +19,7 @@ import { fetchPrices } from '../apis/swap/price'
 import { AGGREGATORS } from '../constants/aggregators'
 import { Allowances } from '../model/allowances'
 import { deduplicateCurrencies } from '../utils/currency'
-import { FUTURES_CONTRACT_ADDRESSES } from '../constants/futures/contract-addresses'
+import { EXTRA_CONTRACT_ADDRESSES } from '../constants/extra-contract-addresses'
 import { fetchPricesFromPyth } from '../apis/price'
 import { PRICE_FEED_ID_LIST } from '../constants/currency'
 import { RPC_URL } from '../constants/rpc-url'
@@ -154,7 +154,7 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
             selectedChain.id,
             PRICE_FEED_ID_LIST[selectedChain.id],
           ),
-          fetchPrices(AGGREGATORS[selectedChain.id]),
+          fetchPrices(AGGREGATORS),
         ])
       ).reduce((acc, price) => ({ ...acc, ...price }), {} as Prices)
     },
@@ -177,12 +177,10 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
       let spenders: `0x${string}`[] = [
         getContractAddresses({ chainId: selectedChain.id }).Controller,
         getContractAddresses({ chainId: selectedChain.id }).Minter,
-        ...AGGREGATORS[selectedChain.id].map(
-          (aggregator) => aggregator.contract,
-        ),
+        ...AGGREGATORS.map((aggregator) => aggregator.contract),
       ]
-      if (FUTURES_CONTRACT_ADDRESSES.FuturesMarket) {
-        spenders = spenders.concat(FUTURES_CONTRACT_ADDRESSES.FuturesMarket)
+      if (EXTRA_CONTRACT_ADDRESSES.FuturesMarket) {
+        spenders = spenders.concat(EXTRA_CONTRACT_ADDRESSES.FuturesMarket)
       }
       const _currencies = currencies.filter(
         (currency) => !isAddressEqual(currency.address, zeroAddress),

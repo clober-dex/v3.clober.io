@@ -12,7 +12,7 @@ import { useChainContext } from '../contexts/chain-context'
 import { buildTransaction, sendTransaction } from '../utils/transaction'
 import { useTransactionContext } from '../contexts/transaction-context'
 import { currentTimestampInSeconds } from '../utils/date'
-import { FUTURES_CONTRACT_ADDRESSES } from '../constants/futures/contract-addresses'
+import { EXTRA_CONTRACT_ADDRESSES } from '../constants/extra-contract-addresses'
 import { LeaderBoard } from '../components/leader-board'
 import {
   fetchTotalRegisteredUsers,
@@ -230,7 +230,7 @@ export const TradingCompetitionContainer = () => {
         return false
       }
       return publicClient.readContract({
-        address: FUTURES_CONTRACT_ADDRESSES.TradingCompetitionRegistration,
+        address: EXTRA_CONTRACT_ADDRESSES.TradingCompetitionRegistration,
         abi: [
           {
             type: 'function',
@@ -265,7 +265,7 @@ export const TradingCompetitionContainer = () => {
         publicClient,
         {
           chain: selectedChain,
-          address: FUTURES_CONTRACT_ADDRESSES.TradingCompetitionRegistration,
+          address: EXTRA_CONTRACT_ADDRESSES.TradingCompetitionRegistration,
           abi: [
             {
               type: 'function',

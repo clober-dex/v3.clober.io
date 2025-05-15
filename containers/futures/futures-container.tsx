@@ -12,7 +12,7 @@ import { useFuturesContext } from '../../contexts/futures/futures-context'
 import { FuturesRedeemCard } from '../../components/card/futures-redeem-card'
 import { formatUnits } from '../../utils/bigint'
 import { useFuturesContractContext } from '../../contexts/futures/futures-contract-context'
-import { WHITELISTED_ASSETS } from '../../constants/futures/asset'
+import { WHITELISTED_ASSETS } from '../../constants/asset'
 import { useChainContext } from '../../contexts/chain-context'
 import { Loading } from '../../components/loading'
 

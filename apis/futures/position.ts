@@ -3,8 +3,8 @@ import { createPublicClient, getAddress, http, isAddressEqual } from 'viem'
 import { FuturesPosition } from '../../model/futures/futures-position'
 import { Prices } from '../../model/prices'
 import { RPC_URL } from '../../constants/rpc-url'
-import { WHITELISTED_ASSETS } from '../../constants/futures/asset'
-import { FUTURES_CONTRACT_ADDRESSES } from '../../constants/futures/contract-addresses'
+import { WHITELISTED_ASSETS } from '../../constants/asset'
+import { EXTRA_CONTRACT_ADDRESSES } from '../../constants/extra-contract-addresses'
 import { Asset } from '../../model/futures/asset'
 import { calculateLiquidationPrice, calculateLtv } from '../../utils/ltv'
 import { FUTURES_SUBGRAPH_ENDPOINT } from '../../constants/subgraph-endpoint'
@@ -80,7 +80,7 @@ export const fetchFuturesPositions = async (
 ): Promise<FuturesPosition[]> => {
   if (
     !FUTURES_SUBGRAPH_ENDPOINT[chain.id] ||
-    !FUTURES_CONTRACT_ADDRESSES?.FuturesMarket
+    !EXTRA_CONTRACT_ADDRESSES?.FuturesMarket
   ) {
     return []
   }
@@ -106,7 +106,7 @@ export const fetchFuturesPositions = async (
 
   const results = await publicClient.multicall({
     contracts: WHITELISTED_ASSETS.map((asset) => ({
-      address: FUTURES_CONTRACT_ADDRESSES.FuturesMarket,
+      address: EXTRA_CONTRACT_ADDRESSES.FuturesMarket,
       abi: _abi,
       functionName: 'getPosition',
       args: [asset, userAddress],

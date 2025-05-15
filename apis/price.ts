@@ -29,7 +29,7 @@ export const fetchPrice = async (
     : [currency1, currency0]
   try {
     const { amountOut } = await fetchQuotes(
-      AGGREGATORS[chainId],
+      AGGREGATORS,
       baseCurrency,
       parseUnits('1', baseCurrency.decimals),
       quoteCurrency,

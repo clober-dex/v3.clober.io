@@ -369,7 +369,7 @@ export const TradeContainer = () => {
           amountIn,
         })
         return fetchQuotes(
-          AGGREGATORS[selectedChain.id],
+          AGGREGATORS,
           inputCurrency,
           amountIn,
           outputCurrency,
@@ -744,7 +744,7 @@ export const TradeContainer = () => {
                         amountIn,
                         outputCurrency,
                         quotes.amountOut,
-                        AGGREGATORS[selectedChain.id].find(
+                        AGGREGATORS.find(
                           (aggregator) =>
                             aggregator.name === quotes.aggregator.name,
                         )!,
@@ -1102,7 +1102,7 @@ export const TradeContainer = () => {
                       amountIn,
                       outputCurrency,
                       quotes.amountOut,
-                      AGGREGATORS[selectedChain.id].find(
+                      AGGREGATORS.find(
                         (aggregator) =>
                           aggregator.name === quotes.aggregator.name,
                       )!,

@@ -36,7 +36,7 @@ export default async function handler(
       const priceMap = (
         await Promise.all([
           fetchPricesFromPyth(chainId, PRICE_FEED_ID_LIST[chainId]),
-          fetchPrices(AGGREGATORS[chainId]),
+          fetchPrices(AGGREGATORS),
         ])
       ).reduce((acc, price) => ({ ...acc, ...price }), {} as Prices)
 

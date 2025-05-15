@@ -9,7 +9,7 @@ export async function fetchWhitelistCurrencies(
 ): Promise<Currency[]> {
   try {
     const currencies = await Promise.all(
-      AGGREGATORS[chainId].map((aggregator) => aggregator.currencies()),
+      AGGREGATORS.map((aggregator) => aggregator.currencies()),
     )
     return WHITELISTED_CURRENCIES[chainId]
       .concat(currencies.flat())
