@@ -80,7 +80,7 @@ export const fetchFuturesPositions = async (
 ): Promise<FuturesPosition[]> => {
   if (
     !FUTURES_SUBGRAPH_ENDPOINT[chain.id] ||
-    !FUTURES_CONTRACT_ADDRESSES[chain.id]?.FuturesMarket
+    !FUTURES_CONTRACT_ADDRESSES?.FuturesMarket
   ) {
     return []
   }
@@ -106,7 +106,7 @@ export const fetchFuturesPositions = async (
 
   const results = await publicClient.multicall({
     contracts: WHITELISTED_ASSETS.map((asset) => ({
-      address: FUTURES_CONTRACT_ADDRESSES[chain.id]!.FuturesMarket,
+      address: FUTURES_CONTRACT_ADDRESSES.FuturesMarket,
       abi: _abi,
       functionName: 'getPosition',
       args: [asset, userAddress],

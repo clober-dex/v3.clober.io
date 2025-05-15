@@ -181,13 +181,8 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
           (aggregator) => aggregator.contract,
         ),
       ]
-      if (
-        FUTURES_CONTRACT_ADDRESSES[selectedChain.id] &&
-        FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!.FuturesMarket
-      ) {
-        spenders = spenders.concat(
-          FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!.FuturesMarket,
-        )
+      if (FUTURES_CONTRACT_ADDRESSES.FuturesMarket) {
+        spenders = spenders.concat(FUTURES_CONTRACT_ADDRESSES.FuturesMarket)
       }
       const _currencies = currencies.filter(
         (currency) => !isAddressEqual(currency.address, zeroAddress),

@@ -218,9 +218,6 @@ export const FuturesContractProvider = ({
         if (!walletClient) {
           throw new Error('Wallet not connected')
         }
-        if (FUTURES_CONTRACT_ADDRESSES[selectedChain.id] === undefined) {
-          throw new Error('Contract address not found')
-        }
 
         const evmPriceServiceConnection = new EvmPriceServiceConnection(
           PYTH_HERMES_ENDPOINT[selectedChain.id],
@@ -232,7 +229,7 @@ export const FuturesContractProvider = ({
           ])
 
         const fee = await publicClient.readContract({
-          address: FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!.PythOracle,
+          address: FUTURES_CONTRACT_ADDRESSES.PythOracle,
           abi: PYTH_ORACLE_ABI,
           functionName: 'getUpdateFee',
           args: [priceFeedUpdateData as any],
@@ -240,7 +237,7 @@ export const FuturesContractProvider = ({
 
         await publicClient.simulateContract({
           chain: walletClient.chain,
-          address: FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!.FuturesMarket,
+          address: FUTURES_CONTRACT_ADDRESSES.FuturesMarket,
           functionName: 'multicall',
           abi: FUTURES_MARKET_ABI,
           value: fee,
@@ -304,8 +301,7 @@ export const FuturesContractProvider = ({
           fields: [],
         })
 
-        const spender =
-          FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!.FuturesMarket
+        const spender = FUTURES_CONTRACT_ADDRESSES.FuturesMarket
         if (
           !isAddressEqual(spender, WETH[selectedChain.id].address) &&
           !isAddressEqual(asset.collateral.address, zeroAddress) &&
@@ -382,7 +378,7 @@ export const FuturesContractProvider = ({
         }
 
         const fee = await publicClient.readContract({
-          address: FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!.PythOracle,
+          address: FUTURES_CONTRACT_ADDRESSES.PythOracle,
           abi: PYTH_ORACLE_ABI,
           functionName: 'getUpdateFee',
           args: [priceFeedUpdateData as any],
@@ -514,8 +510,7 @@ export const FuturesContractProvider = ({
           publicClient,
           {
             chain: selectedChain,
-            address:
-              FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!.FuturesMarket,
+            address: FUTURES_CONTRACT_ADDRESSES.FuturesMarket,
             functionName: 'multicall',
             abi: FUTURES_MARKET_ABI,
             args: [
@@ -640,7 +635,7 @@ export const FuturesContractProvider = ({
         }
 
         const fee = await publicClient.readContract({
-          address: FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!.PythOracle,
+          address: FUTURES_CONTRACT_ADDRESSES.PythOracle,
           abi: PYTH_ORACLE_ABI,
           functionName: 'getUpdateFee',
           args: [priceFeedUpdateData as any],
@@ -650,8 +645,7 @@ export const FuturesContractProvider = ({
           publicClient,
           {
             chain: selectedChain,
-            address:
-              FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!.FuturesMarket,
+            address: FUTURES_CONTRACT_ADDRESSES.FuturesMarket,
             functionName: 'multicall',
             abi: FUTURES_MARKET_ABI,
             value: fee,
@@ -763,7 +757,7 @@ export const FuturesContractProvider = ({
         }
 
         const fee = await publicClient.readContract({
-          address: FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!.PythOracle,
+          address: FUTURES_CONTRACT_ADDRESSES.PythOracle,
           abi: PYTH_ORACLE_ABI,
           functionName: 'getUpdateFee',
           args: [priceFeedUpdateData as any],
@@ -773,8 +767,7 @@ export const FuturesContractProvider = ({
           publicClient,
           {
             chain: selectedChain,
-            address:
-              FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!.FuturesMarket,
+            address: FUTURES_CONTRACT_ADDRESSES.FuturesMarket,
             functionName: 'multicall',
             abi: FUTURES_MARKET_ABI,
             value: fee,
@@ -868,8 +861,7 @@ export const FuturesContractProvider = ({
           publicClient,
           {
             chain: selectedChain,
-            address:
-              FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!.FuturesMarket,
+            address: FUTURES_CONTRACT_ADDRESSES.FuturesMarket,
             functionName: 'close',
             abi: FUTURES_MARKET_ABI,
             args: [asset.currency.address, walletClient.account.address],
@@ -957,8 +949,7 @@ export const FuturesContractProvider = ({
           publicClient,
           {
             chain: selectedChain,
-            address:
-              FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!.FuturesMarket,
+            address: FUTURES_CONTRACT_ADDRESSES.FuturesMarket,
             functionName: 'redeem',
             abi: FUTURES_MARKET_ABI,
             args: [
@@ -1037,8 +1028,7 @@ export const FuturesContractProvider = ({
           publicClient,
           {
             chain: selectedChain,
-            address:
-              FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!.FuturesMarket,
+            address: FUTURES_CONTRACT_ADDRESSES.FuturesMarket,
             functionName: 'deposit',
             abi: FUTURES_MARKET_ABI,
             args: [
@@ -1133,7 +1123,7 @@ export const FuturesContractProvider = ({
         }
 
         const fee = await publicClient.readContract({
-          address: FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!.PythOracle,
+          address: FUTURES_CONTRACT_ADDRESSES.PythOracle,
           abi: PYTH_ORACLE_ABI,
           functionName: 'getUpdateFee',
           args: [priceFeedUpdateData as any],
@@ -1143,8 +1133,7 @@ export const FuturesContractProvider = ({
           publicClient,
           {
             chain: selectedChain,
-            address:
-              FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!.FuturesMarket,
+            address: FUTURES_CONTRACT_ADDRESSES.FuturesMarket,
             functionName: 'multicall',
             abi: FUTURES_MARKET_ABI,
             value: fee,

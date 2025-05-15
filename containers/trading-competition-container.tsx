@@ -230,9 +230,7 @@ export const TradingCompetitionContainer = () => {
         return false
       }
       return publicClient.readContract({
-        address:
-          FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!
-            .TradingCompetitionRegistration,
+        address: FUTURES_CONTRACT_ADDRESSES.TradingCompetitionRegistration,
         abi: [
           {
             type: 'function',
@@ -267,9 +265,7 @@ export const TradingCompetitionContainer = () => {
         publicClient,
         {
           chain: selectedChain,
-          address:
-            FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!
-              .TradingCompetitionRegistration,
+          address: FUTURES_CONTRACT_ADDRESSES.TradingCompetitionRegistration,
           abi: [
             {
               type: 'function',
