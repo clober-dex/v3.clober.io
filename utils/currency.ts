@@ -12,7 +12,7 @@ import { Currency } from '../model/currency'
 import { WETH } from '../constants/currency'
 import { Chain } from '../model/chain'
 import { fetchApi } from '../apis/utils'
-import { RPC_URL } from '../constants/rpc-url'
+import { CHAIN_CONFIG } from '../chain-configs'
 
 export const LOCAL_STORAGE_INPUT_CURRENCY_KEY = (
   context: string,
@@ -55,7 +55,7 @@ export const fetchCurrency = async (
 
   const publicClient = createPublicClient({
     chain,
-    transport: http(RPC_URL[chain.id]),
+    transport: http(CHAIN_CONFIG.RPC_URL),
   })
   const [{ result: name }, { result: symbol }, { result: decimals }] =
     await publicClient.multicall({

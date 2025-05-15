@@ -12,8 +12,8 @@ import { Prices } from '../model/prices'
 import { Vault, VaultImmutableInfo } from '../model/vault'
 import { calculateApy } from '../utils/apy'
 import { StackedLineData } from '../components/chart/vault-performance-chart-model'
-import { RPC_URL } from '../constants/rpc-url'
 import { Chain } from '../model/chain'
+import { CHAIN_CONFIG } from '../chain-configs'
 
 export async function fetchVaults(
   chain: Chain,
@@ -195,7 +195,7 @@ export async function fetchOnChainVault(
       salt: vaultImmutableInfo.salt,
       options: {
         useSubgraph: true,
-        rpcUrl: RPC_URL[chain.id],
+        rpcUrl: CHAIN_CONFIG.RPC_URL,
       },
     }),
     getPoolPerformance({

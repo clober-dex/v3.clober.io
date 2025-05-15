@@ -2,7 +2,6 @@ import { createPublicClient, getAddress, http, isAddressEqual } from 'viem'
 
 import { FuturesPosition } from '../../model/futures/futures-position'
 import { Prices } from '../../model/prices'
-import { RPC_URL } from '../../constants/rpc-url'
 import { WHITE_LISTED_ASSETS } from '../../constants/futures/asset'
 import { FUTURES_CONTRACT_ADDRESSES } from '../../constants/futures/contract-addresses'
 import { Asset } from '../../model/futures/asset'
@@ -10,6 +9,7 @@ import { calculateLiquidationPrice, calculateLtv } from '../../utils/ltv'
 import { FUTURES_SUBGRAPH_ENDPOINT } from '../../constants/subgraph-endpoint'
 import { Subgraph } from '../../model/subgraph'
 import { Chain } from '../../model/chain'
+import { CHAIN_CONFIG } from '../../chain-configs'
 
 type PositionDto = {
   id: string
@@ -86,7 +86,7 @@ export const fetchFuturesPositions = async (
   }
   const publicClient = createPublicClient({
     chain,
-    transport: http(RPC_URL[chain.id]),
+    transport: http(CHAIN_CONFIG.RPC_URL),
   })
 
   const {

@@ -32,12 +32,12 @@ import { FUTURES_MARKET_ABI } from '../../abis/futures/futures-market-abi'
 import { PYTH_ORACLE_ABI } from '../../abis/futures/pyth-oracle-abi'
 import { FuturesPosition } from '../../model/futures/futures-position'
 import { buildTransaction, sendTransaction } from '../../utils/transaction'
-import { RPC_URL } from '../../constants/rpc-url'
 import { currentTimestampInSeconds } from '../../utils/date'
 import { Currency } from '../../model/currency'
 import { deduplicateCurrencies } from '../../utils/currency'
 import { PYTH_HERMES_ENDPOINT } from '../../constants/pyth'
 import { toPlacesAmountString } from '../../utils/bignumber'
+import { CHAIN_CONFIG } from '../../chain-configs'
 
 import { useFuturesContext } from './futures-context'
 
@@ -99,7 +99,7 @@ export const FuturesContractProvider = ({
   const publicClient = useMemo(() => {
     return createPublicClient({
       chain: selectedChain,
-      transport: http(RPC_URL[selectedChain.id]),
+      transport: http(CHAIN_CONFIG.RPC_URL),
     })
   }, [selectedChain])
 

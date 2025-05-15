@@ -12,7 +12,7 @@ import {
 import { useChainContext } from '../chain-context'
 import { useCurrencyContext } from '../currency-context'
 import { WHITELISTED_VAULTS } from '../../constants/vault'
-import { RPC_URL } from '../../constants/rpc-url'
+import { CHAIN_CONFIG } from '../../chain-configs'
 
 type VaultContext = {
   lpCurrencyAmount: string
@@ -54,7 +54,7 @@ export const VaultProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const publicClient = useMemo(() => {
     return createPublicClient({
       chain: selectedChain,
-      transport: http(RPC_URL[selectedChain.id]),
+      transport: http(CHAIN_CONFIG.RPC_URL),
     })
   }, [selectedChain])
 

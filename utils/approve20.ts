@@ -7,8 +7,8 @@ import {
 
 import { Currency } from '../model/currency'
 import { ERC20_PERMIT_ABI } from '../abis/@openzeppelin/erc20-permit-abi'
-import { RPC_URL } from '../constants/rpc-url'
 import { Chain } from '../model/chain'
+import { CHAIN_CONFIG } from '../chain-configs'
 
 import { buildTransaction, sendTransaction } from './transaction'
 
@@ -24,7 +24,7 @@ export const maxApprove = async (
   }
   const publicClient = createPublicClient({
     chain,
-    transport: http(RPC_URL[chain.id]),
+    transport: http(CHAIN_CONFIG.RPC_URL),
   })
   const transaction = await buildTransaction(publicClient, {
     address: currency.address,

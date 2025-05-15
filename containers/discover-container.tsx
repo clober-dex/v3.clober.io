@@ -9,13 +9,13 @@ import { useChainContext } from '../contexts/chain-context'
 import { SearchSvg } from '../components/svg/search-svg'
 import { fetchAllMarkets } from '../apis/market'
 import { useCurrencyContext } from '../contexts/currency-context'
-import { RPC_URL } from '../constants/rpc-url'
 import { QuestionMarkSvg } from '../components/svg/question-mark-svg'
 import { TriangleDownSvg } from '../components/svg/triangle-down-svg'
 import { Market } from '../model/market'
 import { useTransactionContext } from '../contexts/transaction-context'
 import { Chain } from '../model/chain'
 import { Loading } from '../components/loading'
+import { CHAIN_CONFIG } from '../chain-configs'
 
 const MOBILE_ROW_HEIGHT = 168
 
@@ -70,7 +70,7 @@ export const DiscoverContainer = () => {
   const publicClient = useMemo(() => {
     return createPublicClient({
       chain: selectedChain,
-      transport: http(RPC_URL[selectedChain.id]),
+      transport: http(CHAIN_CONFIG.RPC_URL),
     })
   }, [selectedChain])
   const prevMarkets = useRef<Market[]>([])

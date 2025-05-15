@@ -7,7 +7,6 @@ import { useRouter } from 'next/router'
 
 import { ActionButton } from '../components/button/action-button'
 import { toCommaSeparated } from '../utils/number'
-import { RPC_URL } from '../constants/rpc-url'
 import { useChainContext } from '../contexts/chain-context'
 import { buildTransaction, sendTransaction } from '../utils/transaction'
 import { useTransactionContext } from '../contexts/transaction-context'
@@ -28,6 +27,7 @@ import { Countdown } from '../components/countdown'
 import { Currency } from '../model/currency'
 import { Loading } from '../components/loading'
 import { TradingCompetitionPnlCard } from '../components/card/trading-competition-pnl-card'
+import { CHAIN_CONFIG } from '../chain-configs'
 
 const ASSETS: Currency[] = [
   {
@@ -168,7 +168,7 @@ export const TradingCompetitionContainer = () => {
   const publicClient = useMemo(() => {
     return createPublicClient({
       chain: selectedChain,
-      transport: http(RPC_URL[selectedChain.id]),
+      transport: http(CHAIN_CONFIG.RPC_URL),
     })
   }, [selectedChain])
 

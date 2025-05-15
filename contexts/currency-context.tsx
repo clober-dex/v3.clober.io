@@ -22,7 +22,7 @@ import { deduplicateCurrencies } from '../utils/currency'
 import { FUTURES_CONTRACT_ADDRESSES } from '../constants/futures/contract-addresses'
 import { fetchPricesFromPyth } from '../apis/price'
 import { PRICE_FEED_ID_LIST } from '../constants/currency'
-import { RPC_URL } from '../constants/rpc-url'
+import { CHAIN_CONFIG } from '../chain-configs'
 
 import { useChainContext } from './chain-context'
 
@@ -79,7 +79,7 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const publicClient = useMemo(() => {
     return createPublicClient({
       chain: selectedChain,
-      transport: http(RPC_URL[selectedChain.id]),
+      transport: http(CHAIN_CONFIG.RPC_URL),
     })
   }, [selectedChain])
 

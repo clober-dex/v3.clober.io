@@ -10,14 +10,14 @@ import {
   walletConnectWallet,
 } from '@rainbow-me/rainbowkit/wallets'
 
-import { RPC_URL } from '../constants/rpc-url'
-
 export const CHAIN_CONFIG = {
   CHAIN: {
     ...monadTestnet,
     icon: '/monad.png',
   },
   GOOGLE_ANALYTICS_TRACKING_ID: 'G-TE8CSB6JP2',
+  RPC_URL:
+    'https://proud-tiniest-flower.monad-testnet.quiknode.pro/a4ebe00fca2e7bf01201f3b0f7fe2f0077c52a36',
 }
 
 let config: any | null = null
@@ -34,7 +34,7 @@ export const getClientConfig = () => {
     projectId: '14e09398dd595b0d1dccabf414ac4531',
     chains: [CHAIN_CONFIG.CHAIN],
     transports: {
-      [CHAIN_CONFIG.CHAIN.id]: http(RPC_URL[CHAIN_CONFIG.CHAIN.id]),
+      [CHAIN_CONFIG.CHAIN.id]: http(CHAIN_CONFIG.RPC_URL),
     },
     wallets: [
       {
