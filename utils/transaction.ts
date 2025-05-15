@@ -12,8 +12,8 @@ import {
 } from 'viem'
 import { Transaction } from '@clober/v2-sdk'
 
-import { RPC_URL } from '../constants/rpc-url'
 import { Chain } from '../model/chain'
+import { CHAIN_CONFIG } from '../chain-configs'
 
 export async function sendTransaction(
   chain: Chain,
@@ -30,7 +30,7 @@ export async function sendTransaction(
   try {
     const publicClient = createPublicClient({
       chain,
-      transport: http(RPC_URL[chain.id]),
+      transport: http(CHAIN_CONFIG.RPC_URL),
     })
     const hash = await walletClient.sendTransaction({
       data: transaction.data,
@@ -50,7 +50,7 @@ export async function sendTransaction(
 export async function waitTransaction(chain: Chain, hash: Hash): Promise<void> {
   const publicClient = createPublicClient({
     chain,
-    transport: http(RPC_URL[chain.id]),
+    transport: http(CHAIN_CONFIG.RPC_URL),
   })
   await publicClient.waitForTransactionReceipt({ hash })
 }

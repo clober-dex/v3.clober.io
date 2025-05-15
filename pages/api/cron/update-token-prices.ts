@@ -1,33 +1,19 @@
 import { Chain, monadTestnet } from 'viem/chains'
 import { getAddress } from 'viem'
-import { Pool } from 'pg'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import { fetchPricesFromPyth } from '../../../apis/price'
-import {
-  PRICE_FEED_ID_LIST,
-  WHITELISTED_CURRENCIES,
-} from '../../../constants/currency'
+import { PRICE_FEED_ID_LIST } from '../../../constants/currency'
 import { fetchPrices } from '../../../apis/swap/price'
-import { AGGREGATORS } from '../../../constants/aggregators'
 import { Prices } from '../../../model/prices'
+import { query } from '../../../utils/query'
+import { CHAIN_CONFIG } from '../../../chain-configs'
 
 const BLACKLISTED_TOKENS: `0x${string}`[] = [
   '0x836047a99e11f376522b447bffb6e3495dd0637c',
   '0xA296f47E8Ff895Ed7A092b4a9498bb13C46ac768',
   '0xB5a30b0FDc5EA94A52fDc42e3E9760Cb8449Fb37',
 ]
-
-const pool = new Pool({ connectionString: process.env.POSTGRES_URL })
-
-async function query(text: string, params?: any[]) {
-  const client = await pool.connect()
-  try {
-    return client.query(text, params)
-  } finally {
-    client.release()
-  }
-}
 
 export const dynamic = 'force-dynamic'
 
@@ -47,7 +33,7 @@ export default async function handler(
       const priceMap = (
         await Promise.all([
           fetchPricesFromPyth(chainId, PRICE_FEED_ID_LIST[chainId]),
-          fetchPrices(AGGREGATORS[chainId]),
+          fetchPrices(),
         ])
       ).reduce((acc, price) => ({ ...acc, ...price }), {} as Prices)
 
@@ -57,10 +43,9 @@ export default async function handler(
         ),
       )
 
-      const whitelist = WHITELISTED_CURRENCIES[chainId] || []
       const updates: { token: Buffer; price: number; decimals: number }[] = []
 
-      for (const token of whitelist) {
+      for (const token of CHAIN_CONFIG.WHITELISTED_CURRENCIES) {
         const addr = getAddress(token.address)
         const price = filteredPriceMap[addr]
         if (!price) {

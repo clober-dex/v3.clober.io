@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import '../styles/globals.css'
 import '@rainbow-me/rainbowkit/styles.css'
 import { darkTheme, RainbowKitProvider } from '@rainbow-me/rainbowkit'
@@ -15,9 +15,8 @@ import { useRouter } from 'next/router'
 import Script from 'next/script'
 
 import HeaderContainer from '../containers/header-container'
-import { ChainProvider, useChainContext } from '../contexts/chain-context'
+import { ChainProvider } from '../contexts/chain-context'
 import { MarketProvider } from '../contexts/trade/market-context'
-import { getChain, getClientConfig } from '../constants/chain'
 import {
   TransactionProvider,
   useTransactionContext,
@@ -34,7 +33,7 @@ import { VaultProvider } from '../contexts/vault/vault-context'
 import { VaultContractProvider } from '../contexts/vault/vault-contract-context'
 import { FuturesProvider } from '../contexts/futures/futures-context'
 import { FuturesContractProvider } from '../contexts/futures/futures-contract-context'
-import { GOOGLE_ANALYTICS_TRACKING_ID } from '../constants/google-analytics'
+import { CHAIN_CONFIG, getClientConfig } from '../chain-configs'
 
 const CacheProvider = ({ children }: React.PropsWithChildren) => {
   const queryClient = useQueryClient()
@@ -113,15 +112,9 @@ const PanelWrapper = ({
   setOpen: (open: boolean) => void
 } & React.PropsWithChildren) => {
   const router = useRouter()
-  const { selectedChain } = useChainContext()
 
   return (
-    <Panel
-      chainId={selectedChain.id}
-      open={open}
-      setOpen={setOpen}
-      router={router}
-    >
+    <Panel open={open} setOpen={setOpen} router={router}>
       {children}
     </Panel>
   )
@@ -156,8 +149,6 @@ function App({ Component, pageProps }: AppProps) {
     return () => window.removeEventListener('popstate', handlePopState)
   }, [handlePopState])
 
-  const chain = useMemo(() => getChain(), [])
-
   const getBackground = (pathname: string) => {
     if (pathname.includes('/trade')) {
       return "lg:bg-[url('../public/trade-background.png')] lg:bg-top"
@@ -177,27 +168,14 @@ function App({ Component, pageProps }: AppProps) {
   }
 
   useEffect(() => {
-    if (!GOOGLE_ANALYTICS_TRACKING_ID[chain.id]) {
-      return
-    }
-
-    const id = GOOGLE_ANALYTICS_TRACKING_ID[chain.id]
-
     const sendPageView = (pathname: string, search: string) => {
       const urlParams = new URLSearchParams(search || '')
       const utm_source = urlParams.get('utm_source') || undefined
       const utm_medium = urlParams.get('utm_medium') || undefined
       const utm_campaign = urlParams.get('utm_campaign') || undefined
 
-      console.log('config', id, {
-        page_path: pathname,
-        campaign_source: utm_source,
-        campaign_medium: utm_medium,
-        campaign_name: utm_campaign,
-      })
-
       // @ts-ignore
-      window.gtag?.('config', id, {
+      window.gtag?.('config', CHAIN_CONFIG.GOOGLE_ANALYTICS_TRACKING_ID, {
         page_path: pathname,
         campaign_source: utm_source,
         campaign_medium: utm_medium,
@@ -230,7 +208,6 @@ function App({ Component, pageProps }: AppProps) {
 
     const handleRouteChange = (url: string) => {
       const [pathname, search] = url.split('?')
-      // 중복 호출 방지: 현재 pathname과 같은 경우 skip
       if (pathname === initialPathname && !search) {
         return
       }
@@ -242,25 +219,21 @@ function App({ Component, pageProps }: AppProps) {
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [chain.id, router])
+  }, [router])
 
   return (
     <>
-      {GOOGLE_ANALYTICS_TRACKING_ID[chain.id] && (
-        <>
-          <Script
-            src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_TRACKING_ID[chain.id]}`}
-            strategy="afterInteractive"
-          />
-          <Script id="google-analytics" strategy="afterInteractive">
-            {`
+      <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=${CHAIN_CONFIG.GOOGLE_ANALYTICS_TRACKING_ID}`}
+        strategy="afterInteractive"
+      />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
     `}
-          </Script>
-        </>
-      )}
+      </Script>
 
       <ErrorBoundary>
         <Head>

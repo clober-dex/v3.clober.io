@@ -11,10 +11,10 @@ import { sendTransaction } from '../../utils/transaction'
 import { useCurrencyContext } from '../currency-context'
 import { maxApprove } from '../../utils/approve20'
 import { Aggregator } from '../../model/aggregator'
-import { WETH } from '../../constants/currency'
 import { useChainContext } from '../chain-context'
 import { currentTimestampInSeconds } from '../../utils/date'
 import { toPlacesAmountString } from '../../utils/bignumber'
+import { CHAIN_CONFIG } from '../../chain-configs'
 
 type SwapContractContext = {
   swap: (
@@ -87,7 +87,7 @@ export const SwapContractProvider = ({
 
         const spender = getAddress(aggregator.contract)
         if (
-          !isAddressEqual(spender, WETH[selectedChain.id].address) &&
+          !isAddressEqual(spender, CHAIN_CONFIG.REFERENCE_CURRENCY.address) &&
           !isAddressEqual(inputCurrency.address, zeroAddress) &&
           allowances[getAddress(spender)][getAddress(inputCurrency.address)] <
             amountIn

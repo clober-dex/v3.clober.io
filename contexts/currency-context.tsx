@@ -13,16 +13,12 @@ import { getContractAddresses } from '@clober/v2-sdk'
 import { Currency } from '../model/currency'
 import { Prices } from '../model/prices'
 import { Balances } from '../model/balances'
-import { fetchWhitelistCurrencies } from '../apis/currency'
 import { ERC20_PERMIT_ABI } from '../abis/@openzeppelin/erc20-permit-abi'
 import { fetchPrices } from '../apis/swap/price'
-import { AGGREGATORS } from '../constants/aggregators'
+import { aggregators } from '../chain-configs/aggregators'
 import { Allowances } from '../model/allowances'
 import { deduplicateCurrencies } from '../utils/currency'
-import { FUTURES_CONTRACT_ADDRESSES } from '../constants/futures/contract-addresses'
-import { fetchPricesFromPyth } from '../apis/price'
-import { PRICE_FEED_ID_LIST } from '../constants/currency'
-import { RPC_URL } from '../constants/rpc-url'
+import { CHAIN_CONFIG } from '../chain-configs'
 
 import { useChainContext } from './chain-context'
 
@@ -79,14 +75,17 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const publicClient = useMemo(() => {
     return createPublicClient({
       chain: selectedChain,
-      transport: http(RPC_URL[selectedChain.id]),
+      transport: http(CHAIN_CONFIG.RPC_URL),
     })
   }, [selectedChain])
 
   const { data: whitelistCurrencies } = useQuery({
     queryKey: ['currencies', selectedChain.id],
     queryFn: async () => {
-      return fetchWhitelistCurrencies(selectedChain.id)
+      return CHAIN_CONFIG.WHITELISTED_CURRENCIES.map((currency) => ({
+        ...currency,
+        isVerified: true,
+      }))
     },
     initialData: [],
   }) as {
@@ -148,15 +147,7 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { data: prices } = useQuery({
     queryKey: ['prices', selectedChain.id],
     queryFn: async () => {
-      return (
-        await Promise.all([
-          fetchPricesFromPyth(
-            selectedChain.id,
-            PRICE_FEED_ID_LIST[selectedChain.id],
-          ),
-          fetchPrices(AGGREGATORS[selectedChain.id]),
-        ])
-      ).reduce((acc, price) => ({ ...acc, ...price }), {} as Prices)
+      return fetchPrices()
     },
     refetchInterval: 5 * 1000, // checked
     refetchIntervalInBackground: true,
@@ -174,21 +165,12 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
         .join(''),
     ],
     queryFn: async () => {
-      let spenders: `0x${string}`[] = [
+      const spenders: `0x${string}`[] = [
         getContractAddresses({ chainId: selectedChain.id }).Controller,
         getContractAddresses({ chainId: selectedChain.id }).Minter,
-        ...AGGREGATORS[selectedChain.id].map(
-          (aggregator) => aggregator.contract,
-        ),
+        ...aggregators.map((aggregator) => aggregator.contract),
+        CHAIN_CONFIG.EXTERNAL_CONTRACT_ADDRESSES.FuturesMarket,
       ]
-      if (
-        FUTURES_CONTRACT_ADDRESSES[selectedChain.id] &&
-        FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!.FuturesMarket
-      ) {
-        spenders = spenders.concat(
-          FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!.FuturesMarket,
-        )
-      }
       const _currencies = currencies.filter(
         (currency) => !isAddressEqual(currency.address, zeroAddress),
       )

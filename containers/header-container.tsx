@@ -31,24 +31,20 @@ const WrongNetwork = ({
 
 const PageButtons = () => {
   const router = useRouter()
-  const { selectedChain } = useChainContext()
 
   return (
     <>
-      {PAGE_BUTTONS.map(
-        (page) =>
-          (page.chains as number[]).includes(selectedChain.id) && (
-            <div key={page.path}>
-              <PageButton
-                disabled={router.pathname.includes(page.path)}
-                onClick={() => router.push(page.path)}
-              >
-                {page.icon}
-                {page.label}
-              </PageButton>
-            </div>
-          ),
-      )}
+      {PAGE_BUTTONS.map((page) => (
+        <div key={page.path}>
+          <PageButton
+            disabled={router.pathname.includes(page.path)}
+            onClick={() => router.push(page.path)}
+          >
+            {page.icon}
+            {page.label}
+          </PageButton>
+        </div>
+      ))}
     </>
   )
 }

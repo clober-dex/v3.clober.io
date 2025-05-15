@@ -8,12 +8,12 @@ import {
 
 import { Subgraph } from '../model/subgraph'
 import { DailyActivitySnapshot } from '../model/snapshot'
-import { RPC_URL } from '../constants/rpc-url'
 import { Chain } from '../model/chain'
 import { ERC20_PERMIT_ABI } from '../abis/@openzeppelin/erc20-permit-abi'
 import { formatUnits } from '../utils/bigint'
 import { getStartOfTodayTimestampInSeconds } from '../utils/date'
 import { ANALYTICS_SUBGRAPH_ENDPOINT } from '../constants/subgraph-endpoint'
+import { CHAIN_CONFIG } from '../chain-configs'
 
 const BLACKLISTED_TOKENS: `0x${string}`[] = [
   '0x836047a99e11f376522b447bffb6e3495dd0637c',
@@ -71,7 +71,7 @@ export const fetchDailyActivitySnapshot = async (
     .filter((address) => !isAddressEqual(address, zeroAddress))
   const publicClient = createPublicClient({
     chain,
-    transport: http(RPC_URL[chain.id]),
+    transport: http(CHAIN_CONFIG.RPC_URL),
   })
   const results = await publicClient.multicall({
     contracts: tokenAddresses.flatMap((address) => [

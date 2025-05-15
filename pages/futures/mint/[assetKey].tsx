@@ -4,7 +4,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { isAddressEqual } from 'viem'
 
-import { TRADING_VIEW_SYMBOLS } from '../../../constants/futures/asset'
+import { TRADING_VIEW_SYMBOLS } from '../../../constants/futures'
 import { FuturesManagerContainer } from '../../../containers/futures/futures-manager-container'
 import BackSvg from '../../../components/svg/back-svg'
 import { TradingViewContainer } from '../../../containers/chart/trading-view-container'

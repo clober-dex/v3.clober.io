@@ -2,14 +2,12 @@ import { createPublicClient, getAddress, http, isAddressEqual } from 'viem'
 
 import { FuturesPosition } from '../../model/futures/futures-position'
 import { Prices } from '../../model/prices'
-import { RPC_URL } from '../../constants/rpc-url'
-import { WHITE_LISTED_ASSETS } from '../../constants/futures/asset'
-import { FUTURES_CONTRACT_ADDRESSES } from '../../constants/futures/contract-addresses'
+import { WHITELISTED_FUTURES_ASSETS } from '../../constants/futures'
 import { Asset } from '../../model/futures/asset'
 import { calculateLiquidationPrice, calculateLtv } from '../../utils/ltv'
-import { FUTURES_SUBGRAPH_ENDPOINT } from '../../constants/subgraph-endpoint'
 import { Subgraph } from '../../model/subgraph'
 import { Chain } from '../../model/chain'
+import { CHAIN_CONFIG } from '../../chain-configs'
 
 type PositionDto = {
   id: string
@@ -78,15 +76,9 @@ export const fetchFuturesPositions = async (
   prices: Prices,
   assets: Asset[],
 ): Promise<FuturesPosition[]> => {
-  if (
-    !FUTURES_SUBGRAPH_ENDPOINT[chain.id] ||
-    !FUTURES_CONTRACT_ADDRESSES[chain.id]?.FuturesMarket
-  ) {
-    return []
-  }
   const publicClient = createPublicClient({
     chain,
-    transport: http(RPC_URL[chain.id]),
+    transport: http(CHAIN_CONFIG.RPC_URL),
   })
 
   const {
@@ -96,7 +88,7 @@ export const fetchFuturesPositions = async (
       positions: PositionDto[]
     }
   }>(
-    FUTURES_SUBGRAPH_ENDPOINT[chain.id]!,
+    CHAIN_CONFIG.EXTERNAL_SUBGRAPH_ENDPOINTS.FUTURES,
     'getPositions',
     'query getPositions($userAddress: String!) { positions (where: {user: $userAddress }) { id user asset { id assetId currency { id name symbol decimals } collateral { id name symbol decimals } expiration maxLTV settlePrice liquidationThreshold minDebt } collateralAmount debtAmount averagePrice } }',
     {
@@ -105,8 +97,8 @@ export const fetchFuturesPositions = async (
   )
 
   const results = await publicClient.multicall({
-    contracts: WHITE_LISTED_ASSETS.map((asset) => ({
-      address: FUTURES_CONTRACT_ADDRESSES[chain.id]!.FuturesMarket,
+    contracts: WHITELISTED_FUTURES_ASSETS.map((asset) => ({
+      address: CHAIN_CONFIG.EXTERNAL_CONTRACT_ADDRESSES.FuturesMarket,
       abi: _abi,
       functionName: 'getPosition',
       args: [asset, userAddress],
@@ -115,7 +107,10 @@ export const fetchFuturesPositions = async (
   return results
     .map((result, index) => {
       const asset = assets.find((asset) =>
-        isAddressEqual(asset.currency.address, WHITE_LISTED_ASSETS[index]),
+        isAddressEqual(
+          asset.currency.address,
+          WHITELISTED_FUTURES_ASSETS[index],
+        ),
       )
       if (result.error || !asset) {
         return null

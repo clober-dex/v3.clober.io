@@ -1,17 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { Pool } from 'pg'
 import { getAddress } from 'viem'
 
-const pool = new Pool({ connectionString: process.env.POSTGRES_URL })
-
-async function query(text: string, params?: any[]) {
-  const client = await pool.connect()
-  try {
-    return client.query(text, params)
-  } finally {
-    client.release()
-  }
-}
+import { query } from '../../../../../utils/query'
 
 export const dynamic = 'force-dynamic'
 

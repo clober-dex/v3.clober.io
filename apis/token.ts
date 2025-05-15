@@ -7,11 +7,11 @@ import {
 } from '@clober/v2-sdk'
 import { getCurrentTimestamp } from 'hardhat/internal/hardhat-network/provider/utils/getCurrentTimestamp'
 
-import { RPC_URL } from '../constants/rpc-url'
 import { ERC20_PERMIT_ABI } from '../abis/@openzeppelin/erc20-permit-abi'
 import { DEFAULT_TOKEN_INFO, TokenInfo } from '../model/token-info'
 import { formatUnits } from '../utils/bigint'
 import { Chain } from '../model/chain'
+import { CHAIN_CONFIG } from '../chain-configs'
 
 const buildTotalSupplyCacheKey = (
   chainId: CHAIN_IDS,
@@ -55,7 +55,7 @@ async function fetchTotalSupplyInner(
   }
   const publicClient = createPublicClient({
     chain,
-    transport: http(RPC_URL[chain.id]),
+    transport: http(CHAIN_CONFIG.RPC_URL),
   })
   return publicClient.readContract({
     address: tokenAddress,

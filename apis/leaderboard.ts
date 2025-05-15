@@ -12,9 +12,9 @@ import { CHAIN_IDS } from '@clober/v2-sdk'
 import { ANALYTICS_SUBGRAPH_ENDPOINT } from '../constants/subgraph-endpoint'
 import { Chain } from '../model/chain'
 import { Subgraph } from '../model/subgraph'
-import { RPC_URL } from '../constants/rpc-url'
 import { ERC20_PERMIT_ABI } from '../abis/@openzeppelin/erc20-permit-abi'
 import { DailyActivitySnapshot } from '../model/snapshot'
+import { CHAIN_CONFIG } from '../chain-configs'
 
 const BLACKLISTED_USER_ADDRESSES = [
   '0x5F79EE8f8fA862E98201120d83c4eC39D9468D49',
@@ -137,7 +137,7 @@ export const fetchWalletDayData = async (
     .filter((address) => !isAddressEqual(address, zeroAddress))
   const publicClient = createPublicClient({
     chain,
-    transport: http(RPC_URL[chain.id]),
+    transport: http(CHAIN_CONFIG.RPC_URL),
   })
   const results = await publicClient.multicall({
     contracts: tokenAddresses.flatMap((address) => [

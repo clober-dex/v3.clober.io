@@ -1,18 +1,11 @@
-import {
-  createPublicClient,
-  getAddress,
-  http,
-  isAddressEqual,
-  zeroAddress,
-} from 'viem'
+import { createPublicClient, http, isAddressEqual, zeroAddress } from 'viem'
 import { CHAIN_IDS } from '@clober/v2-sdk'
 
 import { ERC20_PERMIT_ABI } from '../abis/@openzeppelin/erc20-permit-abi'
 import { Currency } from '../model/currency'
-import { WETH } from '../constants/currency'
 import { Chain } from '../model/chain'
 import { fetchApi } from '../apis/utils'
-import { RPC_URL } from '../constants/rpc-url'
+import { CHAIN_CONFIG } from '../chain-configs'
 
 export const LOCAL_STORAGE_INPUT_CURRENCY_KEY = (
   context: string,
@@ -55,7 +48,7 @@ export const fetchCurrency = async (
 
   const publicClient = createPublicClient({
     chain,
-    transport: http(RPC_URL[chain.id]),
+    transport: http(CHAIN_CONFIG.RPC_URL),
   })
   const [{ result: name }, { result: symbol }, { result: decimals }] =
     await publicClient.multicall({
@@ -172,9 +165,9 @@ export const isCurrencyEqual = (a: Currency, b: Currency) => {
   )
 }
 
-export const fetchCurrenciesDone = (currencies: Currency[], chain: Chain) => {
+export const fetchCurrenciesDone = (currencies: Currency[]) => {
   return currencies.find((currency) =>
-    isAddressEqual(currency.address, getAddress(WETH[chain.id].address)),
+    isAddressEqual(currency.address, CHAIN_CONFIG.REFERENCE_CURRENCY.address),
   )
 }
 

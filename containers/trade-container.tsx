@@ -16,7 +16,7 @@ import { useLimitContractContext } from '../contexts/trade/limit-contract-contex
 import { useCurrencyContext } from '../contexts/currency-context'
 import { isAddressesEqual } from '../utils/address'
 import { fetchQuotes } from '../apis/swap/quote'
-import { AGGREGATORS } from '../constants/aggregators'
+import { aggregators } from '../chain-configs/aggregators'
 import { formatUnits } from '../utils/bigint'
 import { toPlacesString } from '../utils/bignumber'
 import { MarketInfoCard } from '../components/card/market-info-card'
@@ -28,11 +28,11 @@ import { useTradeContext } from '../contexts/trade/trade-context'
 import { SwapForm } from '../components/form/swap-form'
 import { useSwapContractContext } from '../contexts/trade/swap-contract-context'
 import { DEFAULT_TOKEN_INFO } from '../model/token-info'
-import { WETH } from '../constants/currency'
 import { fetchPrice } from '../apis/price'
 import { fetchTokenInfoFromOrderBook } from '../apis/token'
 import { SearchSvg } from '../components/svg/search-svg'
 import CheckIcon from '../components/icon/check-icon'
+import { CHAIN_CONFIG } from '../chain-configs'
 
 import { IframeChartContainer } from './chart/iframe-chart-container'
 import { NativeChartContainer } from './chart/native-chart-container'
@@ -369,7 +369,7 @@ export const TradeContainer = () => {
           amountIn,
         })
         return fetchQuotes(
-          AGGREGATORS[selectedChain.id],
+          aggregators,
           inputCurrency,
           amountIn,
           outputCurrency,
@@ -512,7 +512,7 @@ export const TradeContainer = () => {
                     setShowOrderBook={setShowOrderBook}
                     baseCurrency={
                       isAddressEqual(zeroAddress, baseCurrency.address)
-                        ? WETH[selectedChain.id]
+                        ? CHAIN_CONFIG.REFERENCE_CURRENCY
                         : baseCurrency
                     }
                     chainName={selectedChain.name.toLowerCase()}
@@ -744,7 +744,7 @@ export const TradeContainer = () => {
                         amountIn,
                         outputCurrency,
                         quotes.amountOut,
-                        AGGREGATORS[selectedChain.id].find(
+                        aggregators.find(
                           (aggregator) =>
                             aggregator.name === quotes.aggregator.name,
                         )!,
@@ -771,12 +771,13 @@ export const TradeContainer = () => {
                                       ) &&
                                       isAddressEqual(
                                         outputCurrency.address,
-                                        WETH[selectedChain.id].address,
+                                        CHAIN_CONFIG.REFERENCE_CURRENCY.address,
                                       )
                                     ? 'Wrap'
                                     : isAddressEqual(
                                           inputCurrency.address,
-                                          WETH[selectedChain.id].address,
+                                          CHAIN_CONFIG.REFERENCE_CURRENCY
+                                            .address,
                                         ) &&
                                         isAddressEqual(
                                           outputCurrency.address,
@@ -1102,7 +1103,7 @@ export const TradeContainer = () => {
                       amountIn,
                       outputCurrency,
                       quotes.amountOut,
-                      AGGREGATORS[selectedChain.id].find(
+                      aggregators.find(
                         (aggregator) =>
                           aggregator.name === quotes.aggregator.name,
                       )!,
@@ -1129,12 +1130,12 @@ export const TradeContainer = () => {
                                     ) &&
                                     isAddressEqual(
                                       outputCurrency.address,
-                                      WETH[selectedChain.id].address,
+                                      CHAIN_CONFIG.REFERENCE_CURRENCY.address,
                                     )
                                   ? 'Wrap'
                                   : isAddressEqual(
                                         inputCurrency.address,
-                                        WETH[selectedChain.id].address,
+                                        CHAIN_CONFIG.REFERENCE_CURRENCY.address,
                                       ) &&
                                       isAddressEqual(
                                         outputCurrency.address,

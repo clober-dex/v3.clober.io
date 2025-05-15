@@ -321,7 +321,7 @@ export const LeaderboardContainer = () => {
   const { data: allUserLP } = useQuery({
     queryKey: ['lp-leaderboard', selectedChain.id],
     queryFn: async () => {
-      return fetchLiquidVaultBalanceLeaderboard(selectedChain.id)
+      return fetchLiquidVaultBalanceLeaderboard()
     },
   }) as {
     data: {

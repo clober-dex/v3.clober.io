@@ -19,7 +19,7 @@ import {
 import { useChainContext } from '../chain-context'
 import { getCurrencyAddress } from '../../utils/currency'
 import { toPlacesString } from '../../utils/bignumber'
-import { RPC_URL } from '../../constants/rpc-url'
+import { CHAIN_CONFIG } from '../../chain-configs'
 
 import { useTradeContext } from './trade-context'
 
@@ -126,7 +126,7 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
           token0: getAddress(inputCurrencyAddress),
           token1: getAddress(outputCurrencyAddress),
           options: {
-            rpcUrl: RPC_URL[selectedChain.id],
+            rpcUrl: CHAIN_CONFIG.RPC_URL,
             useSubgraph: false,
           },
         })
