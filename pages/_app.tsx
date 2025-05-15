@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import '../styles/globals.css'
 import '@rainbow-me/rainbowkit/styles.css'
 import { darkTheme, RainbowKitProvider } from '@rainbow-me/rainbowkit'
@@ -17,7 +17,6 @@ import Script from 'next/script'
 import HeaderContainer from '../containers/header-container'
 import { ChainProvider } from '../contexts/chain-context'
 import { MarketProvider } from '../contexts/trade/market-context'
-import { getChain, getClientConfig } from '../constants/chain'
 import {
   TransactionProvider,
   useTransactionContext,
@@ -34,7 +33,7 @@ import { VaultProvider } from '../contexts/vault/vault-context'
 import { VaultContractProvider } from '../contexts/vault/vault-contract-context'
 import { FuturesProvider } from '../contexts/futures/futures-context'
 import { FuturesContractProvider } from '../contexts/futures/futures-contract-context'
-import { GOOGLE_ANALYTICS_TRACKING_ID } from '../chain-configs'
+import { CHAIN_CONFIG, getClientConfig } from '../chain-configs'
 
 const CacheProvider = ({ children }: React.PropsWithChildren) => {
   const queryClient = useQueryClient()
@@ -150,8 +149,6 @@ function App({ Component, pageProps }: AppProps) {
     return () => window.removeEventListener('popstate', handlePopState)
   }, [handlePopState])
 
-  const chain = useMemo(() => getChain(), [])
-
   const getBackground = (pathname: string) => {
     if (pathname.includes('/trade')) {
       return "lg:bg-[url('../public/trade-background.png')] lg:bg-top"
@@ -178,7 +175,7 @@ function App({ Component, pageProps }: AppProps) {
       const utm_campaign = urlParams.get('utm_campaign') || undefined
 
       // @ts-ignore
-      window.gtag?.('config', GOOGLE_ANALYTICS_TRACKING_ID, {
+      window.gtag?.('config', CHAIN_CONFIG.GOOGLE_ANALYTICS_TRACKING_ID, {
         page_path: pathname,
         campaign_source: utm_source,
         campaign_medium: utm_medium,
@@ -222,12 +219,12 @@ function App({ Component, pageProps }: AppProps) {
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [chain.id, router])
+  }, [router])
 
   return (
     <>
       <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_TRACKING_ID}`}
+        src={`https://www.googletagmanager.com/gtag/js?id=${CHAIN_CONFIG.GOOGLE_ANALYTICS_TRACKING_ID}`}
         strategy="afterInteractive"
       />
       <Script id="google-analytics" strategy="afterInteractive">
