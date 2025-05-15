@@ -12,9 +12,9 @@ import {
   LOCAL_STORAGE_OUTPUT_CURRENCY_KEY,
 } from '../../utils/currency'
 import { getQueryParams } from '../../utils/url'
-import { DEFAULT_INPUT_CURRENCY } from '../../constants/currency'
 import { useChainContext } from '../chain-context'
 import { useCurrencyContext } from '../currency-context'
+import { CHAIN_CONFIG } from '../../chain-configs'
 
 type TradeContext = {
   isBid: boolean
@@ -178,7 +178,7 @@ export const TradeProvider = ({ children }: React.PropsWithChildren<{}>) => {
               selectedChain,
               getAddress(inputCurrencyAddress),
             )))
-          : DEFAULT_INPUT_CURRENCY[selectedChain.id]
+          : CHAIN_CONFIG.DEFAULT_INPUT_CURRENCY
         const _outputCurrency = outputCurrencyAddress
           ? (whitelistCurrencies.find((currency) =>
               isAddressEqual(

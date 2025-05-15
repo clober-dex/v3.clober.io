@@ -3,13 +3,11 @@ import { getAddress } from 'viem'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import { fetchPricesFromPyth } from '../../../apis/price'
-import {
-  PRICE_FEED_ID_LIST,
-  WHITELISTED_CURRENCIES,
-} from '../../../constants/currency'
+import { PRICE_FEED_ID_LIST } from '../../../constants/currency'
 import { fetchPrices } from '../../../apis/swap/price'
 import { Prices } from '../../../model/prices'
 import { query } from '../../../utils/query'
+import { CHAIN_CONFIG } from '../../../chain-configs'
 
 const BLACKLISTED_TOKENS: `0x${string}`[] = [
   '0x836047a99e11f376522b447bffb6e3495dd0637c',
@@ -45,10 +43,9 @@ export default async function handler(
         ),
       )
 
-      const whitelist = WHITELISTED_CURRENCIES[chainId] || []
       const updates: { token: Buffer; price: number; decimals: number }[] = []
 
-      for (const token of whitelist) {
+      for (const token of CHAIN_CONFIG.WHITELISTED_CURRENCIES) {
         const addr = getAddress(token.address)
         const price = filteredPriceMap[addr]
         if (!price) {

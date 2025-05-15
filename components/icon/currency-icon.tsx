@@ -4,7 +4,7 @@ import Image from 'next/image'
 
 import { Currency, getLogo } from '../../model/currency'
 import { Chain } from '../../model/chain'
-import { WHITELISTED_CURRENCIES } from '../../constants/currency'
+import { CHAIN_CONFIG } from '../../chain-configs'
 
 type CurrencyIconProps = {
   chain: Chain
@@ -18,7 +18,7 @@ const CurrencyIconBase = ({
   unoptimized,
   ...props
 }: CurrencyIconProps) => {
-  const _currency = WHITELISTED_CURRENCIES[chain.id]?.find((c) =>
+  const _currency = CHAIN_CONFIG.WHITELISTED_CURRENCIES.find((c) =>
     isAddressEqual(c.address, currency.address),
   )
 

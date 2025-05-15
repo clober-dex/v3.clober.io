@@ -13,7 +13,6 @@ import { getContractAddresses } from '@clober/v2-sdk'
 import { Currency } from '../model/currency'
 import { Prices } from '../model/prices'
 import { Balances } from '../model/balances'
-import { fetchWhitelistCurrencies } from '../apis/currency'
 import { ERC20_PERMIT_ABI } from '../abis/@openzeppelin/erc20-permit-abi'
 import { fetchPrices } from '../apis/swap/price'
 import { aggregators } from '../chain-configs/aggregators'
@@ -84,7 +83,10 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { data: whitelistCurrencies } = useQuery({
     queryKey: ['currencies', selectedChain.id],
     queryFn: async () => {
-      return fetchWhitelistCurrencies(selectedChain.id)
+      return CHAIN_CONFIG.WHITELISTED_CURRENCIES.map((currency) => ({
+        ...currency,
+        isVerified: true,
+      }))
     },
     initialData: [],
   }) as {
