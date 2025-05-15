@@ -1,5 +1,6 @@
 import { CHAIN_IDS } from '@clober/v2-sdk'
 
+// todo: remove it
 export const ANALYTICS_SUBGRAPH_ENDPOINT: {
   [chainId in CHAIN_IDS]: string | undefined
 } = {

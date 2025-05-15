@@ -3,10 +3,6 @@ import BigNumber from 'bignumber.js'
 import { getAddress, isAddressEqual } from 'viem'
 
 import { Subgraph } from '../model/subgraph'
-import {
-  LIQUIDITY_VAULT_POINT_PER_SECOND,
-  LIQUIDITY_VAULT_POINT_START_AT,
-} from '../constants/point'
 import { currentTimestampInSeconds } from '../utils/date'
 import { formatUnits } from '../utils/bigint'
 import { CHAIN_CONFIG } from '../chain-configs'
@@ -15,6 +11,18 @@ const BLACKLISTED_USER_ADDRESSES = [
   '0x5F79EE8f8fA862E98201120d83c4eC39D9468D49',
   '0xCcd0964F534c4583C35e07E47AbE8984A6bB1534',
 ].map((address) => getAddress(address))
+
+const CONSTANTS: {
+  [key: string]: {
+    START_AT: number
+    POINT_PER_SECOND: number
+  }
+} = {
+  ['0xad46920833ad7a1ba8e74cc241faf9ae4fd3dc4616ad9648b13160f8453e444f']: {
+    START_AT: 1743465600,
+    POINT_PER_SECOND: 0.000001,
+  },
+}
 
 export async function fetchLiquidVaultPoint(
   chainId: CHAIN_IDS,
@@ -44,10 +52,9 @@ export async function fetchLiquidVaultPoint(
   )
   const now = currentTimestampInSeconds()
   return liquidityVaultPoint.vaultBalances.reduce((acc, vaultBalance) => {
-    const startedAt =
-      LIQUIDITY_VAULT_POINT_START_AT?.[chainId]?.[vaultBalance.pool.id] ?? 0
+    const startedAt = CONSTANTS?.[vaultBalance.pool.id].START_AT ?? 0
     const pointsPerSecond =
-      LIQUIDITY_VAULT_POINT_PER_SECOND?.[chainId]?.[vaultBalance.pool.id] ?? 0
+      CONSTANTS?.[vaultBalance.pool.id].POINT_PER_SECOND ?? 0
     if (startedAt === 0 || pointsPerSecond === 0 || startedAt > now) {
       return acc
     }
