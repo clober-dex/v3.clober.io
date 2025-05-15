@@ -2,7 +2,7 @@ import { createPublicClient, getAddress, http, isAddressEqual } from 'viem'
 
 import { FuturesPosition } from '../../model/futures/futures-position'
 import { Prices } from '../../model/prices'
-import { WHITE_LISTED_ASSETS } from '../../constants/futures/asset'
+import { WHITELISTED_FUTURES_ASSETS } from '../../constants/futures'
 import { FUTURES_CONTRACT_ADDRESSES } from '../../constants/futures/contract-addresses'
 import { Asset } from '../../model/futures/asset'
 import { calculateLiquidationPrice, calculateLtv } from '../../utils/ltv'
@@ -105,7 +105,7 @@ export const fetchFuturesPositions = async (
   )
 
   const results = await publicClient.multicall({
-    contracts: WHITE_LISTED_ASSETS.map((asset) => ({
+    contracts: WHITELISTED_FUTURES_ASSETS.map((asset) => ({
       address: FUTURES_CONTRACT_ADDRESSES[chain.id]!.FuturesMarket,
       abi: _abi,
       functionName: 'getPosition',
@@ -115,7 +115,10 @@ export const fetchFuturesPositions = async (
   return results
     .map((result, index) => {
       const asset = assets.find((asset) =>
-        isAddressEqual(asset.currency.address, WHITE_LISTED_ASSETS[index]),
+        isAddressEqual(
+          asset.currency.address,
+          WHITELISTED_FUTURES_ASSETS[index],
+        ),
       )
       if (result.error || !asset) {
         return null
