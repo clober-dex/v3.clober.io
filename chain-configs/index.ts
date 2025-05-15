@@ -30,6 +30,12 @@ export const CHAIN_CONFIG = {
       '0x58e84BAc13e19966A17F7Df370d3452bb0c23BF7',
     ),
   },
+  EXTERNAL_SUBGRAPH_ENDPOINTS: {
+    FUTURES:
+      'https://api.goldsky.com/api/public/project_clsljw95chutg01w45cio46j0/subgraphs/clober-futures-subgraph-monad-testnet/latest/gn',
+    LIQUIDITY_VAULT_POINT:
+      'https://api.goldsky.com/api/public/project_clsljw95chutg01w45cio46j0/subgraphs/liquidity-vault-point-monad-testnet/latest/gn',
+  },
   WHITELISTED_VAULT_KEYS: [
     '0xad46920833ad7a1ba8e74cc241faf9ae4fd3dc4616ad9648b13160f8453e444f', // MON-USDC
     '0xf3c347e880b6a775f4f69f6db22860636351a70f18857fab2c56dc32835a1627', // muBOND-USDC

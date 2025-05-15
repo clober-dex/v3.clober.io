@@ -29,7 +29,7 @@ export const FuturesProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { data: assets } = useQuery({
     queryKey: ['futures-assets', selectedChain.id],
     queryFn: async () => {
-      return fetchFuturesAssets(selectedChain.id)
+      return fetchFuturesAssets()
     },
     initialData: [],
   }) as {

@@ -1,9 +1,7 @@
 import { getAddress, isAddressEqual } from 'viem'
-import { CHAIN_IDS } from '@clober/v2-sdk'
 
 import { Asset } from '../../model/futures/asset'
 import { Subgraph } from '../../model/subgraph'
-import { FUTURES_SUBGRAPH_ENDPOINT } from '../../constants/subgraph-endpoint'
 import { CHAIN_CONFIG } from '../../chain-configs'
 
 type AssetDto = {
@@ -37,12 +35,7 @@ const DEFAULT_COLLATERAL = {
     '0x41f3625971ca2ed2263e78573fe5ce23e13d2558ed3f2e47ab0f84fb9e7ae722',
 }
 
-export const fetchFuturesAssets = async (
-  chainId: CHAIN_IDS,
-): Promise<Asset[]> => {
-  if (!FUTURES_SUBGRAPH_ENDPOINT[chainId]) {
-    return []
-  }
+export const fetchFuturesAssets = async (): Promise<Asset[]> => {
   const {
     data: { assets },
   } = await Subgraph.get<{
@@ -50,7 +43,7 @@ export const fetchFuturesAssets = async (
       assets: AssetDto[]
     }
   }>(
-    FUTURES_SUBGRAPH_ENDPOINT[chainId]!,
+    CHAIN_CONFIG.EXTERNAL_SUBGRAPH_ENDPOINTS.FUTURES,
     'getAssets',
     'query getAssets { assets { id assetId currency { id name symbol decimals } collateral { id name symbol decimals } expiration maxLTV liquidationThreshold minDebt settlePrice } }',
     {},

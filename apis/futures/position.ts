@@ -5,7 +5,6 @@ import { Prices } from '../../model/prices'
 import { WHITELISTED_FUTURES_ASSETS } from '../../constants/futures'
 import { Asset } from '../../model/futures/asset'
 import { calculateLiquidationPrice, calculateLtv } from '../../utils/ltv'
-import { FUTURES_SUBGRAPH_ENDPOINT } from '../../constants/subgraph-endpoint'
 import { Subgraph } from '../../model/subgraph'
 import { Chain } from '../../model/chain'
 import { CHAIN_CONFIG } from '../../chain-configs'
@@ -77,9 +76,6 @@ export const fetchFuturesPositions = async (
   prices: Prices,
   assets: Asset[],
 ): Promise<FuturesPosition[]> => {
-  if (!FUTURES_SUBGRAPH_ENDPOINT[chain.id]) {
-    return []
-  }
   const publicClient = createPublicClient({
     chain,
     transport: http(CHAIN_CONFIG.RPC_URL),
@@ -92,7 +88,7 @@ export const fetchFuturesPositions = async (
       positions: PositionDto[]
     }
   }>(
-    FUTURES_SUBGRAPH_ENDPOINT[chain.id]!,
+    CHAIN_CONFIG.EXTERNAL_SUBGRAPH_ENDPOINTS.FUTURES,
     'getPositions',
     'query getPositions($userAddress: String!) { positions (where: {user: $userAddress }) { id user asset { id assetId currency { id name symbol decimals } collateral { id name symbol decimals } expiration maxLTV settlePrice liquidationThreshold minDebt } collateralAmount debtAmount averagePrice } }',
     {

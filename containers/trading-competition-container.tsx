@@ -214,7 +214,7 @@ export const TradingCompetitionContainer = () => {
   const { data: totalRegisteredUsers } = useQuery({
     queryKey: ['total-registered-users', selectedChain.id],
     queryFn: async () => {
-      return fetchTotalRegisteredUsers(selectedChain.id)
+      return fetchTotalRegisteredUsers()
     },
   })
 
