@@ -113,7 +113,7 @@ export const OpenOrderCard = ({
         )}
 
         <div className="justify-start items-center gap-6 flex">
-          <div className="w-[160px] max-w-[160px] text-sm font-semibold flex flex-row items-center gap-1.5 text-nowrap">
+          <div className="w-[200px] max-w-[200px] text-sm font-semibold flex flex-row items-center gap-1.5 text-nowrap">
             {openOrder.inputCurrency.symbol}{' '}
             <p className="text-sm text-gray-500">&#x2192;</p>
             {'  '}
@@ -129,7 +129,7 @@ export const OpenOrderCard = ({
             </button>
           </div>
 
-          <div className="w-[100px] h-full justify-start items-center flex text-[#e6e7eb] text-sm font-medium">
+          <div className="w-[120px] h-full justify-start items-center flex text-[#e6e7eb] text-sm font-medium">
             {toShortNumber(openOrder.price)}
           </div>
 

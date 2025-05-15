@@ -842,10 +842,10 @@ export const TradeContainer = () => {
               <div className="hidden lg:flex flex-col justify-start items-center gap-4 bg-transparent mb-14">
                 <div className="w-full justify-start items-end inline-flex">
                   <div className="flex text-gray-50 text-sm font-semibold">
-                    <div className="flex w-[180px] ml-5">Market</div>
-                    <div className="flex w-[130px]">Price</div>
+                    <div className="flex w-[225px] ml-5">Market</div>
+                    <div className="flex w-[145px]">Price</div>
                     <div className="flex w-[200px]">Amount</div>
-                    <div className="flex w-[110px]">Filled</div>
+                    <div className="flex w-[100px]">Filled</div>
                     <div className="flex w-[200px]">Claimable</div>
                   </div>
                   <div className="h-full ml-auto justify-center items-center gap-3 flex">
