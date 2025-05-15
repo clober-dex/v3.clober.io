@@ -34,7 +34,6 @@ import { buildTransaction, sendTransaction } from '../../utils/transaction'
 import { currentTimestampInSeconds } from '../../utils/date'
 import { Currency } from '../../model/currency'
 import { deduplicateCurrencies } from '../../utils/currency'
-import { PYTH_HERMES_ENDPOINT } from '../../constants/pyth'
 import { toPlacesAmountString } from '../../utils/bignumber'
 import { CHAIN_CONFIG } from '../../chain-configs'
 
@@ -222,7 +221,7 @@ export const FuturesContractProvider = ({
         }
 
         const evmPriceServiceConnection = new EvmPriceServiceConnection(
-          PYTH_HERMES_ENDPOINT[selectedChain.id],
+          CHAIN_CONFIG.PYTH_HERMES_ENDPOINT,
         )
         const priceFeedUpdateData =
           await evmPriceServiceConnection.getPriceFeedsUpdateData([
@@ -367,7 +366,7 @@ export const FuturesContractProvider = ({
         setConfirmation(confirmation)
 
         const evmPriceServiceConnection = new EvmPriceServiceConnection(
-          PYTH_HERMES_ENDPOINT[selectedChain.id],
+          CHAIN_CONFIG.PYTH_HERMES_ENDPOINT,
         )
         const priceFeedUpdateData =
           await evmPriceServiceConnection.getPriceFeedsUpdateData([
@@ -625,7 +624,7 @@ export const FuturesContractProvider = ({
         setConfirmation(confirmation)
 
         const evmPriceServiceConnection = new EvmPriceServiceConnection(
-          PYTH_HERMES_ENDPOINT[selectedChain.id],
+          CHAIN_CONFIG.PYTH_HERMES_ENDPOINT,
         )
         const priceFeedUpdateData =
           await evmPriceServiceConnection.getPriceFeedsUpdateData([
@@ -748,7 +747,7 @@ export const FuturesContractProvider = ({
         setConfirmation(confirmation)
 
         const evmPriceServiceConnection = new EvmPriceServiceConnection(
-          PYTH_HERMES_ENDPOINT[selectedChain.id],
+          CHAIN_CONFIG.PYTH_HERMES_ENDPOINT,
         )
         const priceFeedUpdateData =
           await evmPriceServiceConnection.getPriceFeedsUpdateData([
@@ -1118,7 +1117,7 @@ export const FuturesContractProvider = ({
         setConfirmation(confirmation)
 
         const evmPriceServiceConnection = new EvmPriceServiceConnection(
-          PYTH_HERMES_ENDPOINT[selectedChain.id],
+          CHAIN_CONFIG.PYTH_HERMES_ENDPOINT,
         )
         const priceFeedUpdateData =
           await evmPriceServiceConnection.getPriceFeedsUpdateData([

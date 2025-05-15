@@ -22,7 +22,7 @@ export const CHAIN_CONFIG = {
   GOOGLE_ANALYTICS_TRACKING_ID: 'G-TE8CSB6JP2',
   RPC_URL:
     'https://proud-tiniest-flower.monad-testnet.quiknode.pro/a4ebe00fca2e7bf01201f3b0f7fe2f0077c52a36',
-  // vault
+  PYTH_HERMES_ENDPOINT: 'https://hermes-beta.pyth.network',
   WHITELISTED_VAULT_KEYS: [
     '0xad46920833ad7a1ba8e74cc241faf9ae4fd3dc4616ad9648b13160f8453e444f', // MON-USDC
     '0xf3c347e880b6a775f4f69f6db22860636351a70f18857fab2c56dc32835a1627', // muBOND-USDC
@@ -42,7 +42,6 @@ export const CHAIN_CONFIG = {
     '0xc72b2145027dc9a9ac57f1e3d7e6c8bd5aa07bd3c622cf65b61edbd90ffc45d4', // BRK-A-250516
     '0x41d76a57de6d5b77eae21428db3474981b1a4ef4583b4952fd137827f0e887bd', // US30Y-250516
   ] as `0x${string}`[],
-  // currency
   REFERENCE_CURRENCY: getReferenceCurrency({ chainId: CHAIN.id }),
   DEFAULT_INPUT_CURRENCY: getNativeCurrency({ chainId: CHAIN.id }),
   WHITELISTED_CURRENCIES: [
