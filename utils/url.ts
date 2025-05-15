@@ -6,10 +6,3 @@ export const getQueryParams = () => {
   })
   return params
 }
-
-export const sliceUrl = (url: string, maxLength: number) => {
-  if (url.length <= maxLength) {
-    return url
-  }
-  return `${url.slice(0, maxLength)}...`
-}
