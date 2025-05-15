@@ -9,7 +9,7 @@ import {
   WHITELISTED_CURRENCIES,
 } from '../../../constants/currency'
 import { fetchPrices } from '../../../apis/swap/price'
-import { AGGREGATORS } from '../../../constants/aggregators'
+import { aggregators } from '../../../chain-configs/aggregators'
 import { Prices } from '../../../model/prices'
 
 const BLACKLISTED_TOKENS: `0x${string}`[] = [
@@ -47,7 +47,7 @@ export default async function handler(
       const priceMap = (
         await Promise.all([
           fetchPricesFromPyth(chainId, PRICE_FEED_ID_LIST[chainId]),
-          fetchPrices(AGGREGATORS[chainId]),
+          fetchPrices(),
         ])
       ).reduce((acc, price) => ({ ...acc, ...price }), {} as Prices)
 

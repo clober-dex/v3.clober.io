@@ -16,7 +16,7 @@ import { useLimitContractContext } from '../contexts/trade/limit-contract-contex
 import { useCurrencyContext } from '../contexts/currency-context'
 import { isAddressesEqual } from '../utils/address'
 import { fetchQuotes } from '../apis/swap/quote'
-import { AGGREGATORS } from '../constants/aggregators'
+import { aggregators } from '../chain-configs/aggregators'
 import { formatUnits } from '../utils/bigint'
 import { toPlacesString } from '../utils/bignumber'
 import { MarketInfoCard } from '../components/card/market-info-card'
@@ -369,7 +369,7 @@ export const TradeContainer = () => {
           amountIn,
         })
         return fetchQuotes(
-          AGGREGATORS[selectedChain.id],
+          aggregators,
           inputCurrency,
           amountIn,
           outputCurrency,
@@ -744,7 +744,7 @@ export const TradeContainer = () => {
                         amountIn,
                         outputCurrency,
                         quotes.amountOut,
-                        AGGREGATORS[selectedChain.id].find(
+                        aggregators.find(
                           (aggregator) =>
                             aggregator.name === quotes.aggregator.name,
                         )!,
@@ -1102,7 +1102,7 @@ export const TradeContainer = () => {
                       amountIn,
                       outputCurrency,
                       quotes.amountOut,
-                      AGGREGATORS[selectedChain.id].find(
+                      aggregators.find(
                         (aggregator) =>
                           aggregator.name === quotes.aggregator.name,
                       )!,

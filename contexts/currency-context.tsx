@@ -16,7 +16,7 @@ import { Balances } from '../model/balances'
 import { fetchWhitelistCurrencies } from '../apis/currency'
 import { ERC20_PERMIT_ABI } from '../abis/@openzeppelin/erc20-permit-abi'
 import { fetchPrices } from '../apis/swap/price'
-import { AGGREGATORS } from '../constants/aggregators'
+import { aggregators } from '../chain-configs/aggregators'
 import { Allowances } from '../model/allowances'
 import { deduplicateCurrencies } from '../utils/currency'
 import { FUTURES_CONTRACT_ADDRESSES } from '../constants/futures/contract-addresses'
@@ -154,7 +154,7 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
             selectedChain.id,
             PRICE_FEED_ID_LIST[selectedChain.id],
           ),
-          fetchPrices(AGGREGATORS[selectedChain.id]),
+          fetchPrices(),
         ])
       ).reduce((acc, price) => ({ ...acc, ...price }), {} as Prices)
     },
@@ -177,9 +177,7 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
       let spenders: `0x${string}`[] = [
         getContractAddresses({ chainId: selectedChain.id }).Controller,
         getContractAddresses({ chainId: selectedChain.id }).Minter,
-        ...AGGREGATORS[selectedChain.id].map(
-          (aggregator) => aggregator.contract,
-        ),
+        ...aggregators.map((aggregator) => aggregator.contract),
       ]
       if (
         FUTURES_CONTRACT_ADDRESSES[selectedChain.id] &&
