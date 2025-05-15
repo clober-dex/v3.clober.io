@@ -1,15 +1,8 @@
-import {
-  createPublicClient,
-  getAddress,
-  http,
-  isAddressEqual,
-  zeroAddress,
-} from 'viem'
+import { createPublicClient, http, isAddressEqual, zeroAddress } from 'viem'
 import { CHAIN_IDS } from '@clober/v2-sdk'
 
 import { ERC20_PERMIT_ABI } from '../abis/@openzeppelin/erc20-permit-abi'
 import { Currency } from '../model/currency'
-import { WETH } from '../constants/currency'
 import { Chain } from '../model/chain'
 import { fetchApi } from '../apis/utils'
 import { CHAIN_CONFIG } from '../chain-configs'
@@ -172,9 +165,9 @@ export const isCurrencyEqual = (a: Currency, b: Currency) => {
   )
 }
 
-export const fetchCurrenciesDone = (currencies: Currency[], chain: Chain) => {
+export const fetchCurrenciesDone = (currencies: Currency[]) => {
   return currencies.find((currency) =>
-    isAddressEqual(currency.address, getAddress(WETH[chain.id].address)),
+    isAddressEqual(currency.address, CHAIN_CONFIG.REFERENCE_CURRENCY.address),
   )
 }
 

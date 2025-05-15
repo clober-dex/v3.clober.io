@@ -117,24 +117,6 @@ export const PRICE_FEED_ID_LIST: {
   ],
 }
 
-export const WETH: {
-  [chain in CHAIN_IDS]: Currency
-} = {
-  [CHAIN_IDS.MONAD_TESTNET]: {
-    address: '0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701',
-    name: 'Wrapped Monad Token',
-    symbol: 'WMON',
-    decimals: 18,
-  },
-  [CHAIN_IDS.RISE_SEPOLIA]: {
-    address: '0x4200000000000000000000000000000000000006',
-    name: 'Wrapped ETH',
-    symbol: 'WETH',
-    decimals: 18,
-    icon: '/asset-icon/weth.jpg',
-  },
-}
-
 export const WHITELISTED_CURRENCIES: {
   [chain in CHAIN_IDS]: Currency[]
 } = {

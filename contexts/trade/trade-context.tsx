@@ -164,7 +164,7 @@ export const TradeProvider = ({ children }: React.PropsWithChildren<{}>) => {
               console.error('disconnectAsync error', e)
             }
           }
-        } else if (!fetchCurrenciesDone(whitelistCurrencies, selectedChain)) {
+        } else if (!fetchCurrenciesDone(whitelistCurrencies)) {
           return
         }
         const _inputCurrency = inputCurrencyAddress

@@ -23,7 +23,6 @@ import {
   Transaction,
   useTransactionContext,
 } from '../transaction-context'
-import { WETH } from '../../constants/currency'
 import { maxApprove } from '../../utils/approve20'
 import { FUTURES_CONTRACT_ADDRESSES } from '../../constants/futures/contract-addresses'
 import { useChainContext } from '../chain-context'
@@ -307,7 +306,7 @@ export const FuturesContractProvider = ({
         const spender =
           FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!.FuturesMarket
         if (
-          !isAddressEqual(spender, WETH[selectedChain.id].address) &&
+          !isAddressEqual(spender, CHAIN_CONFIG.REFERENCE_CURRENCY.address) &&
           !isAddressEqual(asset.collateral.address, zeroAddress) &&
           allowances[getAddress(spender)][
             getAddress(asset.collateral.address)

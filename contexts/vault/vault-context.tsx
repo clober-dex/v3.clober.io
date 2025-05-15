@@ -119,7 +119,7 @@ export const VaultProvider = ({ children }: React.PropsWithChildren<{}>) => {
 
   useEffect(() => {
     const action = () => {
-      if (!fetchCurrenciesDone(whitelistCurrencies, selectedChain)) {
+      if (!fetchCurrenciesDone(whitelistCurrencies)) {
         return
       }
 

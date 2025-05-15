@@ -16,7 +16,6 @@ import { monadTestnet } from 'viem/chains'
 import { Currency } from '../currency'
 import { Prices } from '../prices'
 import { formatUnits } from '../../utils/bigint'
-import { WETH } from '../../constants/currency'
 import { WETH_ABI } from '../../abis/weth-abi'
 import { Chain } from '../chain'
 import { Subgraph } from '../subgraph'
@@ -36,7 +35,7 @@ export class CloberV2Aggregator implements Aggregator {
   constructor(contract: `0x${string}`, chain: Chain) {
     this.contract = contract
     this.chain = chain
-    this.weth = WETH[chain.id].address
+    this.weth = CHAIN_CONFIG.REFERENCE_CURRENCY.address
   }
 
   public async currencies(): Promise<Currency[]> {
@@ -202,7 +201,7 @@ export class CloberV2Aggregator implements Aggregator {
           }),
           gas: this.defaultGasLimit,
           value: amountIn,
-          to: WETH[this.chain.id].address,
+          to: CHAIN_CONFIG.REFERENCE_CURRENCY.address,
           gasPrice,
           from: userAddress,
         },
@@ -221,7 +220,7 @@ export class CloberV2Aggregator implements Aggregator {
           }),
           gas: this.defaultGasLimit,
           value: 0n,
-          to: WETH[this.chain.id].address,
+          to: CHAIN_CONFIG.REFERENCE_CURRENCY.address,
           gasPrice,
           from: userAddress,
         },
