@@ -11,7 +11,6 @@ import {
 } from '../../utils/currency'
 import { useChainContext } from '../chain-context'
 import { useCurrencyContext } from '../currency-context'
-import { WHITELISTED_VAULTS } from '../../constants/vault'
 import { CHAIN_CONFIG } from '../../chain-configs'
 
 type VaultContext = {
@@ -70,7 +69,7 @@ export const VaultProvider = ({ children }: React.PropsWithChildren<{}>) => {
         return {}
       }
       const results = await publicClient.multicall({
-        contracts: WHITELISTED_VAULTS[selectedChain.id].map(({ key }) => ({
+        contracts: CHAIN_CONFIG.WHITELISTED_VAULT_KEYS.map((key) => ({
           chainId: selectedChain.id,
           address: getContractAddresses({ chainId: selectedChain.id })
             .Rebalancer,
@@ -107,7 +106,7 @@ export const VaultProvider = ({ children }: React.PropsWithChildren<{}>) => {
       return results.reduce((acc: {}, { result }, index: number) => {
         return {
           ...acc,
-          [WHITELISTED_VAULTS[selectedChain.id][index].key]: result ?? 0n,
+          [CHAIN_CONFIG.WHITELISTED_VAULT_KEYS[index]]: result ?? 0n,
         }
       }, {})
     },

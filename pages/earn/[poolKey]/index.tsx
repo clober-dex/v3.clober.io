@@ -3,10 +3,10 @@ import { useRouter } from 'next/router'
 import { useQuery } from '@tanstack/react-query'
 
 import { VaultManagerContainer } from '../../../containers/vault/vault-manager-container'
-import { WHITELISTED_VAULTS } from '../../../constants/vault'
 import { useChainContext } from '../../../contexts/chain-context'
 import { useCurrencyContext } from '../../../contexts/currency-context'
 import { Loading } from '../../../components/loading'
+import { CHAIN_CONFIG } from '../../../chain-configs'
 
 export default function PoolManage() {
   const router = useRouter()
@@ -21,8 +21,8 @@ export default function PoolManage() {
       Object.keys(prices).length !== 0,
     ],
     queryFn: async () => {
-      const vaultImmutableInfo = WHITELISTED_VAULTS[selectedChain.id].find(
-        (info) => info.key === router.query.poolKey,
+      const vaultImmutableInfo = CHAIN_CONFIG.WHITELISTED_VAULT_KEYS.find(
+        (key) => key === router.query.poolKey,
       )
       if (!vaultImmutableInfo) {
         return null
