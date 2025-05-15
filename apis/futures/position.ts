@@ -3,7 +3,6 @@ import { createPublicClient, getAddress, http, isAddressEqual } from 'viem'
 import { FuturesPosition } from '../../model/futures/futures-position'
 import { Prices } from '../../model/prices'
 import { WHITELISTED_FUTURES_ASSETS } from '../../constants/futures'
-import { FUTURES_CONTRACT_ADDRESSES } from '../../constants/futures/contract-addresses'
 import { Asset } from '../../model/futures/asset'
 import { calculateLiquidationPrice, calculateLtv } from '../../utils/ltv'
 import { FUTURES_SUBGRAPH_ENDPOINT } from '../../constants/subgraph-endpoint'
@@ -78,10 +77,7 @@ export const fetchFuturesPositions = async (
   prices: Prices,
   assets: Asset[],
 ): Promise<FuturesPosition[]> => {
-  if (
-    !FUTURES_SUBGRAPH_ENDPOINT[chain.id] ||
-    !FUTURES_CONTRACT_ADDRESSES[chain.id]?.FuturesMarket
-  ) {
+  if (!FUTURES_SUBGRAPH_ENDPOINT[chain.id]) {
     return []
   }
   const publicClient = createPublicClient({
@@ -106,7 +102,7 @@ export const fetchFuturesPositions = async (
 
   const results = await publicClient.multicall({
     contracts: WHITELISTED_FUTURES_ASSETS.map((asset) => ({
-      address: FUTURES_CONTRACT_ADDRESSES[chain.id]!.FuturesMarket,
+      address: CHAIN_CONFIG.EXTERNAL_CONTRACT_ADDRESSES.FuturesMarket,
       abi: _abi,
       functionName: 'getPosition',
       args: [asset, userAddress],

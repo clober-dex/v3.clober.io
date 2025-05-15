@@ -1,6 +1,6 @@
 import { monadTestnet } from 'viem/chains'
 import { getDefaultConfig } from '@rainbow-me/rainbowkit'
-import { http, zeroAddress } from 'viem'
+import { getAddress, http, zeroAddress } from 'viem'
 import {
   backpackWallet,
   coinbaseWallet,
@@ -23,6 +23,13 @@ export const CHAIN_CONFIG = {
   RPC_URL:
     'https://proud-tiniest-flower.monad-testnet.quiknode.pro/a4ebe00fca2e7bf01201f3b0f7fe2f0077c52a36',
   PYTH_HERMES_ENDPOINT: 'https://hermes-beta.pyth.network',
+  EXTERNAL_CONTRACT_ADDRESSES: {
+    FuturesMarket: getAddress('0x56b88CFe40d592Ec4d4234043e039d7CA807f110'),
+    PythOracle: getAddress('0xad2B52D2af1a9bD5c561894Cdd84f7505e1CD0B5'),
+    TradingCompetitionRegistration: getAddress(
+      '0x58e84BAc13e19966A17F7Df370d3452bb0c23BF7',
+    ),
+  },
   WHITELISTED_VAULT_KEYS: [
     '0xad46920833ad7a1ba8e74cc241faf9ae4fd3dc4616ad9648b13160f8453e444f', // MON-USDC
     '0xf3c347e880b6a775f4f69f6db22860636351a70f18857fab2c56dc32835a1627', // muBOND-USDC

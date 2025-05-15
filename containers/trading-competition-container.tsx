@@ -11,7 +11,6 @@ import { useChainContext } from '../contexts/chain-context'
 import { buildTransaction, sendTransaction } from '../utils/transaction'
 import { useTransactionContext } from '../contexts/transaction-context'
 import { currentTimestampInSeconds } from '../utils/date'
-import { FUTURES_CONTRACT_ADDRESSES } from '../constants/futures/contract-addresses'
 import { LeaderBoard } from '../components/leader-board'
 import {
   fetchTotalRegisteredUsers,
@@ -231,7 +230,7 @@ export const TradingCompetitionContainer = () => {
       }
       return publicClient.readContract({
         address:
-          FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!
+          CHAIN_CONFIG.EXTERNAL_CONTRACT_ADDRESSES
             .TradingCompetitionRegistration,
         abi: [
           {
@@ -268,7 +267,7 @@ export const TradingCompetitionContainer = () => {
         {
           chain: selectedChain,
           address:
-            FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!
+            CHAIN_CONFIG.EXTERNAL_CONTRACT_ADDRESSES
               .TradingCompetitionRegistration,
           abi: [
             {

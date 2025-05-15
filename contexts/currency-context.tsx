@@ -18,7 +18,6 @@ import { fetchPrices } from '../apis/swap/price'
 import { aggregators } from '../chain-configs/aggregators'
 import { Allowances } from '../model/allowances'
 import { deduplicateCurrencies } from '../utils/currency'
-import { FUTURES_CONTRACT_ADDRESSES } from '../constants/futures/contract-addresses'
 import { CHAIN_CONFIG } from '../chain-configs'
 
 import { useChainContext } from './chain-context'
@@ -166,19 +165,12 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
         .join(''),
     ],
     queryFn: async () => {
-      let spenders: `0x${string}`[] = [
+      const spenders: `0x${string}`[] = [
         getContractAddresses({ chainId: selectedChain.id }).Controller,
         getContractAddresses({ chainId: selectedChain.id }).Minter,
         ...aggregators.map((aggregator) => aggregator.contract),
+        CHAIN_CONFIG.EXTERNAL_CONTRACT_ADDRESSES.FuturesMarket,
       ]
-      if (
-        FUTURES_CONTRACT_ADDRESSES[selectedChain.id] &&
-        FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!.FuturesMarket
-      ) {
-        spenders = spenders.concat(
-          FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!.FuturesMarket,
-        )
-      }
       const _currencies = currencies.filter(
         (currency) => !isAddressEqual(currency.address, zeroAddress),
       )
