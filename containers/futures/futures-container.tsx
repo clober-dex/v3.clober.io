@@ -12,7 +12,7 @@ import { useFuturesContext } from '../../contexts/futures/futures-context'
 import { FuturesRedeemCard } from '../../components/card/futures-redeem-card'
 import { formatUnits } from '../../utils/bigint'
 import { useFuturesContractContext } from '../../contexts/futures/futures-contract-context'
-import { WHITE_LISTED_ASSETS } from '../../constants/futures/asset'
+import { WHITELISTED_ASSETS } from '../../constants/futures/asset'
 import { useChainContext } from '../../contexts/chain-context'
 import { Loading } from '../../components/loading'
 
@@ -155,7 +155,7 @@ export const FuturesContainer = () => {
                 {assets
                   .filter((asset) => asset.expiration > now)
                   .filter((asset) =>
-                    WHITE_LISTED_ASSETS.includes(asset.currency.address),
+                    WHITELISTED_ASSETS.includes(asset.currency.address),
                   )
                   .sort((a, b) =>
                     a.currency.symbol.localeCompare(b.currency.symbol),
@@ -186,7 +186,7 @@ export const FuturesContainer = () => {
                     (asset) =>
                       asset.expiration < now &&
                       balances[asset.currency.address] > 0n &&
-                      WHITE_LISTED_ASSETS.includes(asset.currency.address),
+                      WHITELISTED_ASSETS.includes(asset.currency.address),
                   )
                   .map((asset, index) => (
                     <FuturesRedeemCard

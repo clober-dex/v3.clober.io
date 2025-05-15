@@ -3,7 +3,6 @@ import { CHAIN_IDS } from '@clober/v2-sdk'
 
 import { Asset } from '../../model/futures/asset'
 import { Subgraph } from '../../model/subgraph'
-import { FUTURES_COLLATERALS } from '../../constants/futures/collaterals'
 import { FUTURES_SUBGRAPH_ENDPOINT } from '../../constants/subgraph-endpoint'
 import { WHITELISTED_CURRENCIES } from '../../constants/currency'
 
@@ -29,6 +28,15 @@ type AssetDto = {
   settlePrice: string
 }
 
+const collateral = {
+  address: getAddress('0xf817257fed379853cDe0fa4F97AB987181B1E5Ea'),
+  name: 'USD Coin',
+  symbol: 'USDC',
+  decimals: 6,
+  priceFeedId:
+    '0x41f3625971ca2ed2263e78573fe5ce23e13d2558ed3f2e47ab0f84fb9e7ae722',
+}
+
 export const fetchFuturesAssets = async (
   chainId: CHAIN_IDS,
 ): Promise<Asset[]> => {
@@ -49,13 +57,13 @@ export const fetchFuturesAssets = async (
   )
   return assets
     .map((asset) => {
-      const collateral = FUTURES_COLLATERALS.find((collateral) =>
-        isAddressEqual(collateral.address, getAddress(asset.collateral.id)),
-      )
       const currency = WHITELISTED_CURRENCIES[chainId].find((currency) =>
         isAddressEqual(currency.address, getAddress(asset.currency.id)),
       )
-      if (!collateral || !currency) {
+      if (
+        !currency ||
+        !isAddressEqual(getAddress(asset.collateral.id), collateral.address)
+      ) {
         return undefined
       }
       return {

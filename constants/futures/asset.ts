@@ -1,6 +1,6 @@
 import { getAddress } from 'viem'
 
-export const WHITE_LISTED_ASSETS: `0x${string}`[] = [
+export const WHITELISTED_ASSETS: `0x${string}`[] = [
   '0x1D074e003E222905e31476A8398e36027141915b', // MON-TGE
   '0xcaeF04f305313080C2538e585089846017193033', // USOILSPOT
   '0xCAfFD292a5c578Dbd4BBff733F1553bF2cD8850c', // XAU
