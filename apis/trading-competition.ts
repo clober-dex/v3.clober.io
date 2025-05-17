@@ -143,7 +143,7 @@ export const fetchTradingCompetitionLeaderboard = async (
   }>(
     FUTURES_SUBGRAPH_ENDPOINT[chainId]!,
     'getUsersPnL',
-    '{ users( first: 1000 orderBy: pnl orderDirection: desc where: {isRegistered: true} ) { id pnl trades { token { id decimals symbol } realizedPnL estimatedHolding } } }',
+    '{ users( first: 100 orderBy: pnl orderDirection: desc where: {isRegistered: true} ) { id pnl trades { token { id decimals symbol } realizedPnL estimatedHolding } } }',
     {},
   )
   const results = users
@@ -176,16 +176,7 @@ export const fetchTradingCompetitionLeaderboard = async (
               amount: Number(amount),
             }
           }),
-          totalPnl: user.trades.reduce((acc, trade) => {
-            const token = getAddress(trade.token.id)
-            const amount = formatUnits(
-              BigInt(trade.estimatedHolding),
-              Number(trade.token.decimals),
-            )
-            return (
-              acc + Number(trade.realizedPnL) + Number(amount) * prices[token]
-            )
-          }, 0),
+          totalPnl: Number(user.pnl),
         }
         return acc
       },

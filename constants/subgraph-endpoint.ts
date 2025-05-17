@@ -4,7 +4,7 @@ export const FUTURES_SUBGRAPH_ENDPOINT: {
   [chainId in CHAIN_IDS]: string | undefined
 } = {
   [CHAIN_IDS.MONAD_TESTNET]:
-    'https://api.goldsky.com/api/public/project_clsljw95chutg01w45cio46j0/subgraphs/clober-futures-subgraph-monad-testnet/latest/gn',
+    'https://subgraph.satsuma-prod.com/f6a8c4889b7b/clober/clober-futures-subgraph-monad-testnet/api',
   [CHAIN_IDS.RISE_SEPOLIA]: undefined,
 }
 
