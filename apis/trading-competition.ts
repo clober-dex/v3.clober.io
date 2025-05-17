@@ -48,17 +48,23 @@ export const fetchUserPnL = async (
   }
 
   const {
-    data: { users },
+    data: { users, myTrades },
   } = await Subgraph.get<{
     data: {
       users: Array<{
         pnl: string
       }>
+      myTrades: Array<{
+        user: { id: string }
+        token: { id: string; decimals: string; name: string; symbol: string }
+        realizedPnL: string
+        estimatedHolding: string
+      }>
     }
   }>(
     FUTURES_SUBGRAPH_ENDPOINT[chainId]!,
     'getTrades',
-    'query getTrades($userAddress: String!) { users(where: {id: $userAddress, isRegistered: true}) { pnl } }',
+    'query getTrades($userAddress: String!) { users: users(where: {id: $userAddress, isRegistered: true}) { pnl } myTrades: trades(where: {user: $userAddress}) { user { id } token { id decimals name symbol } realizedPnL estimatedHolding } }',
     {
       userAddress: userAddress.toLowerCase(),
     },
@@ -69,25 +75,24 @@ export const fetchUserPnL = async (
 
   return {
     totalPnl: Number(users[0].pnl),
-    trades: [],
-    // trades: myTrades.map((trade) => {
-    //   const token = getAddress(trade.token.id)
-    //   const amount = formatUnits(
-    //     BigInt(trade.estimatedHolding),
-    //     Number(trade.token.decimals),
-    //   )
-    //   const pnl = Number(trade.realizedPnL) + Number(amount) * prices[token]
-    //   return {
-    //     currency: {
-    //       address: token,
-    //       symbol: trade.token.symbol,
-    //       name: trade.token.name,
-    //       decimals: Number(trade.token.decimals),
-    //     },
-    //     pnl,
-    //     amount: Number(amount),
-    //   }
-    // }),
+    trades: myTrades.map((trade) => {
+      const token = getAddress(trade.token.id)
+      const amount = formatUnits(
+        BigInt(trade.estimatedHolding),
+        Number(trade.token.decimals),
+      )
+      const pnl = Number(trade.realizedPnL) + Number(amount) * prices[token]
+      return {
+        currency: {
+          address: token,
+          symbol: trade.token.symbol,
+          name: trade.token.name,
+          decimals: Number(trade.token.decimals),
+        },
+        pnl,
+        amount: Number(amount),
+      }
+    }),
   }
 }
 
