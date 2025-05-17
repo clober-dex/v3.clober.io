@@ -742,8 +742,9 @@ export const TradingCompetitionContainer = () => {
                   <div className="justify-start text-gray-400">User</div>
                 </div>
                 <div className="flex flex-1 justify-start items-center gap-2.5">
-                  <div className="justify-start text-gray-400">
-                    PnL at Block #17028880
+                  <div className="justify-start text-gray-400 text-nowrap flex flex-row gap-1">
+                    PnL
+                    <span className="hidden sm:block">at Block #17028880</span>
                   </div>
                 </div>
               </div>
