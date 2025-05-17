@@ -771,29 +771,29 @@ export const TradingCompetitionContainer = () => {
                             tokenColorMap={tokenColorMap}
                             trades={userPnL?.trades ?? []}
                           />
-                          <button
-                            onClick={() => setShowPnLCard(true)}
-                            className="hidden sm:flex absolute -right-6 top-1/2 -translate-y-1/2 pl-2 pr-1.5 py-1 bg-blue-500/20 rounded-lg justify-start items-center gap-1"
-                          >
-                            <div className="justify-start text-blue-400 text-[12px] font-semibold">
-                              Share
-                            </div>
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="16"
-                              height="16"
-                              viewBox="0 0 16 16"
-                              fill="none"
-                            >
-                              <path
-                                d="M5.33337 6H4.66671C4.31309 6 3.97395 6.14048 3.7239 6.39052C3.47385 6.64057 3.33337 6.97971 3.33337 7.33333V12.6667C3.33337 13.0203 3.47385 13.3594 3.7239 13.6095C3.97395 13.8595 4.31309 14 4.66671 14H11.3334C11.687 14 12.0261 13.8595 12.2762 13.6095C12.5262 13.3594 12.6667 13.0203 12.6667 12.6667V7.33333C12.6667 6.97971 12.5262 6.64057 12.2762 6.39052C12.0261 6.14048 11.687 6 11.3334 6H10.6667M8.00004 9.33333V2M8.00004 2L6.00004 4M8.00004 2L10 4"
-                                stroke="#60A5FA"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          </button>
+                          {/*<button*/}
+                          {/*  onClick={() => setShowPnLCard(true)}*/}
+                          {/*  className="hidden sm:flex absolute -right-6 top-1/2 -translate-y-1/2 pl-2 pr-1.5 py-1 bg-blue-500/20 rounded-lg justify-start items-center gap-1"*/}
+                          {/*>*/}
+                          {/*  <div className="justify-start text-blue-400 text-[12px] font-semibold">*/}
+                          {/*    Share*/}
+                          {/*  </div>*/}
+                          {/*  <svg*/}
+                          {/*    xmlns="http://www.w3.org/2000/svg"*/}
+                          {/*    width="16"*/}
+                          {/*    height="16"*/}
+                          {/*    viewBox="0 0 16 16"*/}
+                          {/*    fill="none"*/}
+                          {/*  >*/}
+                          {/*    <path*/}
+                          {/*      d="M5.33337 6H4.66671C4.31309 6 3.97395 6.14048 3.7239 6.39052C3.47385 6.64057 3.33337 6.97971 3.33337 7.33333V12.6667C3.33337 13.0203 3.47385 13.3594 3.7239 13.6095C3.97395 13.8595 4.31309 14 4.66671 14H11.3334C11.687 14 12.0261 13.8595 12.2762 13.6095C12.5262 13.3594 12.6667 13.0203 12.6667 12.6667V7.33333C12.6667 6.97971 12.5262 6.64057 12.2762 6.39052C12.0261 6.14048 11.687 6 11.3334 6H10.6667M8.00004 9.33333V2M8.00004 2L6.00004 4M8.00004 2L10 4"*/}
+                          {/*      stroke="#60A5FA"*/}
+                          {/*      strokeWidth="1.5"*/}
+                          {/*      strokeLinecap="round"*/}
+                          {/*      strokeLinejoin="round"*/}
+                          {/*    />*/}
+                          {/*  </svg>*/}
+                          {/*</button>*/}
                         </div>
                       ),
                     }
