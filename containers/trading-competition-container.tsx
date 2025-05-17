@@ -743,7 +743,7 @@ export const TradingCompetitionContainer = () => {
                 </div>
                 <div className="flex flex-1 justify-start items-center gap-2.5">
                   <div className="justify-start text-gray-400">
-                    PnL At Block(17028880)
+                    PnL at Block #17028880
                   </div>
                 </div>
               </div>
