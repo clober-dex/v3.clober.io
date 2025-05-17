@@ -21,7 +21,6 @@ import {
 } from '../apis/trading-competition'
 import { useCurrencyContext } from '../contexts/currency-context'
 import { TradingCompetitionPnl } from '../model/trading-competition-pnl'
-import { Legend } from '../components/chart/legend'
 import { CurrencyIcon } from '../components/icon/currency-icon'
 import { Chain } from '../model/chain'
 import { Countdown } from '../components/countdown'
@@ -122,11 +121,11 @@ const Profit = ({
 
   return (
     <div className="flex flex-col sm:flex-row group relative gap-1 sm:gap-2 py-2">
-      {data.length > 0 && (
-        <div className="hidden group-hover:flex absolute top-8 -left-20 sm:left-2 z-[1000]">
-          <Legend data={data} />
-        </div>
-      )}
+      {/*{data.length > 0 && (*/}
+      {/*  <div className="hidden group-hover:flex absolute top-8 -left-20 sm:left-2 z-[1000]">*/}
+      {/*    <Legend data={data} />*/}
+      {/*  </div>*/}
+      {/*)}*/}
 
       <div
         className={`flex flex-1 justify-start items-center ${profit === 0 ? 'text-white' : profit > 0 ? 'text-green-500' : 'text-red-500'} font-semibold`}
