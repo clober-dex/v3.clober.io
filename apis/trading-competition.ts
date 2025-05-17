@@ -48,53 +48,46 @@ export const fetchUserPnL = async (
   }
 
   const {
-    data: { myTrades },
+    data: { users },
   } = await Subgraph.get<{
     data: {
-      myTrades: Array<{
-        user: { id: string }
-        token: { id: string; decimals: string; name: string; symbol: string }
-        realizedPnL: string
-        estimatedHolding: string
+      users: Array<{
+        pnl: string
       }>
     }
   }>(
     FUTURES_SUBGRAPH_ENDPOINT[chainId]!,
     'getTrades',
-    'query getTrades($userAddress: String!) { myTrades: trades(where: {user: $userAddress}) { user { id } token { id decimals name symbol } realizedPnL estimatedHolding } }',
+    'query getTrades($userAddress: String!) { users(where: {id: $userAddress, isRegistered: true}) { pnl } }',
     {
       userAddress: userAddress.toLowerCase(),
     },
   )
+  if (users.length === 0) {
+    return { totalPnl: 0, trades: [] }
+  }
 
   return {
-    totalPnl: myTrades.reduce((acc, trade) => {
-      const token = getAddress(trade.token.id)
-      const amount = formatUnits(
-        BigInt(trade.estimatedHolding),
-        Number(trade.token.decimals),
-      )
-      const pnl = Number(trade.realizedPnL) + Number(amount) * prices[token]
-      return acc + pnl
-    }, 0),
-    trades: myTrades.map((trade) => {
-      const token = getAddress(trade.token.id)
-      const amount = formatUnits(
-        BigInt(trade.estimatedHolding),
-        Number(trade.token.decimals),
-      )
-      const pnl = Number(trade.realizedPnL) + Number(amount) * prices[token]
-      return {
-        currency: {
-          address: token,
-          symbol: trade.token.symbol,
-          name: trade.token.name,
-          decimals: Number(trade.token.decimals),
-        },
-        pnl,
-        amount: Number(amount),
-      }
-    }),
+    totalPnl: Number(users[0].pnl),
+    trades: [],
+    // trades: myTrades.map((trade) => {
+    //   const token = getAddress(trade.token.id)
+    //   const amount = formatUnits(
+    //     BigInt(trade.estimatedHolding),
+    //     Number(trade.token.decimals),
+    //   )
+    //   const pnl = Number(trade.realizedPnL) + Number(amount) * prices[token]
+    //   return {
+    //     currency: {
+    //       address: token,
+    //       symbol: trade.token.symbol,
+    //       name: trade.token.name,
+    //       decimals: Number(trade.token.decimals),
+    //     },
+    //     pnl,
+    //     amount: Number(amount),
+    //   }
+    // }),
   }
 }
 
