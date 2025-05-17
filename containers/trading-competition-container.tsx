@@ -715,7 +715,7 @@ export const TradingCompetitionContainer = () => {
         <div className="md:w-[616px] flex w-full mt-8 px-6 sm:px-[62px] py-4 sm:py-6 bg-[#e9edff]/5 rounded-2xl sm:rounded-[20px] flex-col justify-center items-center gap-2 sm:gap-2.5">
           <div className="w-full flex flex-col justify-start items-center gap-2 sm:gap-4">
             <div className="self-stretch text-center justify-start text-gray-400 text-[13px] sm:text-base font-bold">
-              Current Participants
+              Total Participants
             </div>
             <div className="self-stretch text-center justify-start text-white/90 text-2xl sm:text-[32px] font-bold">
               <CountUp
@@ -743,7 +743,7 @@ export const TradingCompetitionContainer = () => {
                 </div>
                 <div className="flex flex-1 justify-start items-center gap-2.5">
                   <div className="justify-start text-gray-400">
-                    Total Profit
+                    PnL At Block(17028880)
                   </div>
                 </div>
               </div>
