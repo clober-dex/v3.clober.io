@@ -1,5 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { getMarket, getMarketId, Market } from '@clober/v2-sdk'
+import {
+  getMarket,
+  getMarketId,
+  getMarketSnapshot,
+  Market,
+  MarketSnapshot,
+} from '@clober/v2-sdk'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import BigNumber from 'bignumber.js'
 import { getAddress } from 'viem'
@@ -25,6 +31,7 @@ import { useTradeContext } from './trade-context'
 
 type MarketContext = {
   selectedMarket?: Market
+  selectedMarketSnapshot?: MarketSnapshot
   setSelectedMarket: (market: Market | undefined) => void
   selectedDecimalPlaces: Decimals | undefined
   setSelectedDecimalPlaces: (decimalPlaces: Decimals | undefined) => void
@@ -55,6 +62,7 @@ type MarketContext = {
 
 const Context = React.createContext<MarketContext>({
   selectedMarket: {} as Market,
+  selectedMarketSnapshot: {} as MarketSnapshot,
   setSelectedMarket: (_) => _,
   selectedDecimalPlaces: undefined,
   setSelectedDecimalPlaces: () => {},
@@ -64,8 +72,6 @@ const Context = React.createContext<MarketContext>({
   bids: [],
   asks: [],
 })
-
-const cache = new Map<string, Market>()
 
 export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { selectedChain } = useChainContext()
@@ -85,8 +91,11 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const [selectedDecimalPlaces, setSelectedDecimalPlaces] = useState<
     Decimals | undefined
   >(undefined)
-  const [selectedMarket, setSelectedMarket] = React.useState<
-    Market | undefined
+  const [selectedMarket, setSelectedMarket] = useState<Market | undefined>(
+    undefined,
+  )
+  const [selectedMarketSnapshot, setSelectedMarketSnapshot] = useState<
+    MarketSnapshot | undefined
   >(undefined)
   const [depthClickedIndex, setDepthClickedIndex] = useState<
     | {
@@ -107,7 +116,7 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
           getAddress(outputCurrencyAddress),
         ]).marketId
       : ''
-  const { data: market } = useQuery({
+  const { data } = useQuery({
     queryKey: ['market', selectedChain.id, marketId],
     queryFn: async () => {
       if (inputCurrencyAddress && outputCurrencyAddress) {
@@ -121,17 +130,23 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
             queryClient.removeQueries({ queryKey: key })
           }
         }
-        const market = await getMarket({
-          chainId: selectedChain.id,
-          token0: getAddress(inputCurrencyAddress),
-          token1: getAddress(outputCurrencyAddress),
-          options: {
-            rpcUrl: CHAIN_CONFIG.RPC_URL,
-            useSubgraph: false,
-          },
-        })
-        cache.set(marketId, market)
-        return market
+        const [market, marketSnapshot] = await Promise.all([
+          getMarket({
+            chainId: selectedChain.id,
+            token0: getAddress(inputCurrencyAddress),
+            token1: getAddress(outputCurrencyAddress),
+            options: {
+              rpcUrl: CHAIN_CONFIG.RPC_URL,
+              useSubgraph: false,
+            },
+          }),
+          getMarketSnapshot({
+            chainId: selectedChain.id,
+            token0: getAddress(inputCurrencyAddress),
+            token1: getAddress(outputCurrencyAddress),
+          }),
+        ])
+        return { market, marketSnapshot }
       } else {
         return null
       }
@@ -142,20 +157,27 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
   })
 
   useEffect(() => {
-    if (!market) {
+    if (!data?.market) {
       setSelectedMarket(undefined)
-    } else if (!isMarketEqual(selectedMarket, market)) {
-      setSelectedMarket(market)
+      setSelectedMarketSnapshot(undefined)
+    } else if (!isMarketEqual(selectedMarket, data.market)) {
+      setSelectedMarket(data.market)
+      if (data.marketSnapshot) {
+        setSelectedMarketSnapshot(data.marketSnapshot)
+      }
     } else if (
       selectedMarket &&
-      market &&
-      isMarketEqual(selectedMarket, market) &&
-      (!isOrderBookEqual(selectedMarket?.asks ?? [], market?.asks ?? []) ||
-        !isOrderBookEqual(selectedMarket?.bids ?? [], market?.bids ?? []))
+      data.market &&
+      isMarketEqual(selectedMarket, data.market) &&
+      (!isOrderBookEqual(selectedMarket?.asks ?? [], data.market?.asks ?? []) ||
+        !isOrderBookEqual(selectedMarket?.bids ?? [], data.market?.bids ?? []))
     ) {
-      setSelectedMarket(market)
+      setSelectedMarket(data.market)
+      if (data.marketSnapshot) {
+        setSelectedMarketSnapshot(data.marketSnapshot)
+      }
     }
-  }, [market, selectedMarket])
+  }, [data, selectedMarket])
 
   const availableDecimalPlacesGroups = useMemo(() => {
     return selectedMarket &&
@@ -360,6 +382,7 @@ export const MarketProvider = ({ children }: React.PropsWithChildren<{}>) => {
     <Context.Provider
       value={{
         selectedMarket,
+        selectedMarketSnapshot,
         setSelectedMarket,
         selectedDecimalPlaces,
         setSelectedDecimalPlaces,

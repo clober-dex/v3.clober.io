@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getAddress, isAddressEqual, parseUnits, zeroAddress } from 'viem'
 import { useAccount, useGasPrice, useWalletClient } from 'wagmi'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { getMarketId, getQuoteToken } from '@clober/v2-sdk'
+import { useQuery } from '@tanstack/react-query'
+import { getQuoteToken } from '@clober/v2-sdk'
 import BigNumber from 'bignumber.js'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 import { useRouter } from 'next/router'
@@ -27,9 +27,7 @@ import WarningLimitModal from '../components/modal/warning-limit-modal'
 import { useTradeContext } from '../contexts/trade/trade-context'
 import { SwapForm } from '../components/form/swap-form'
 import { useSwapContractContext } from '../contexts/trade/swap-contract-context'
-import { DEFAULT_TOKEN_INFO } from '../model/token-info'
 import { fetchPrice } from '../apis/price'
-import { fetchTokenInfoFromOrderBook } from '../apis/token'
 import { SearchSvg } from '../components/svg/search-svg'
 import CheckIcon from '../components/icon/check-icon'
 import { CHAIN_CONFIG } from '../chain-configs'
@@ -38,12 +36,12 @@ import { IframeChartContainer } from './chart/iframe-chart-container'
 import { NativeChartContainer } from './chart/native-chart-container'
 
 export const TradeContainer = () => {
-  const queryClient = useQueryClient()
   const router = useRouter()
   const { data: gasPrice } = useGasPrice()
   const { selectedChain } = useChainContext()
   const {
     selectedMarket,
+    selectedMarketSnapshot,
     availableDecimalPlacesGroups,
     selectedDecimalPlaces,
     setSelectedDecimalPlaces,
@@ -115,42 +113,10 @@ export const TradeContainer = () => {
     }
   }, [selectedChain.testnet])
 
-  const marketId = selectedMarket
-    ? getMarketId(selectedChain.id, [
-        selectedMarket.base.address,
-        selectedMarket.quote.address,
-      ]).marketId
-    : ''
   const previousValue = useRef({
     chain: selectedChain,
     inputCurrencyAddress: inputCurrency?.address,
     outputCurrencyAddress: outputCurrency?.address,
-  })
-
-  const { data: tokenInfo } = useQuery({
-    queryKey: ['token-info', selectedChain.id, marketId],
-    queryFn: async () => {
-      const queryKeys = queryClient
-        .getQueryCache()
-        .getAll()
-        .map((query) => query.queryKey)
-        .filter((key) => key[0] === 'token-info')
-      for (const key of queryKeys) {
-        if (key[2] && key[2] !== marketId) {
-          queryClient.removeQueries({ queryKey: key })
-        }
-      }
-      if (!selectedMarket) {
-        return DEFAULT_TOKEN_INFO
-      }
-      return fetchTokenInfoFromOrderBook(
-        selectedChain,
-        selectedMarket,
-        prices[selectedMarket.quote.address] ?? 0,
-      )
-    },
-    refetchInterval: 2000, // checked
-    refetchIntervalInBackground: true,
   })
 
   const [quoteCurrency, baseCurrency] = useMemo(() => {
@@ -342,8 +308,8 @@ export const TradeContainer = () => {
   const { data: quotes } = useQuery({
     queryKey: [
       'quotes',
-      inputCurrency,
-      outputCurrency,
+      inputCurrency?.address,
+      outputCurrency?.address,
       Number(inputCurrencyAmount),
       slippageInput,
       userAddress,
@@ -473,15 +439,17 @@ export const TradeContainer = () => {
                       )?.icon,
                     } as Currency
                   }
-                  price={tokenInfo?.priceNative ?? 0}
-                  dollarValue={tokenInfo?.priceUsd ?? 0}
-                  fdv={tokenInfo?.fdv ?? 0}
-                  marketCap={tokenInfo?.marketCap ?? 0}
-                  dailyVolume={tokenInfo?.volume?.h24 ?? 0}
-                  liquidityUsd={tokenInfo?.liquidity?.usd ?? 0}
-                  websiteUrl={tokenInfo?.info?.website ?? ''}
-                  twitterUrl={tokenInfo?.info?.twitter ?? ''}
-                  telegramUrl={tokenInfo?.info?.telegram ?? ''}
+                  price={selectedMarketSnapshot?.price ?? 0}
+                  dollarValue={selectedMarketSnapshot?.priceUSD ?? 0}
+                  fdv={selectedMarketSnapshot?.fdv ?? 0}
+                  marketCap={selectedMarketSnapshot?.fdv ?? 0}
+                  dailyVolume={selectedMarketSnapshot?.volume24hUSD ?? 0}
+                  liquidityUsd={
+                    selectedMarketSnapshot?.totalValueLockedUSD ?? 0
+                  }
+                  websiteUrl={''}
+                  twitterUrl={''}
+                  telegramUrl={''}
                 />
               </>
             ) : (
