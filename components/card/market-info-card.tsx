@@ -59,7 +59,7 @@ export const MarketInfoCard = ({
       </Toast>
 
       <div className="flex w-full h-full lg:h-[74px] lg:w-[740px] flex-col lg:flex-row justify-start items-start px-4 lg:px-0 lg:pl-5 lg:pr-4 lg:py-3 lg:bg-[#171b24] lg:rounded-2xl lg:justify-start lg:items-center gap-4">
-        <div className="flex flex-row w-full">
+        <div className="flex flex-row w-full lg:w-fit">
           <div className="justify-start items-center gap-2.5 flex w-full">
             <div className="justify-start items-center flex relative w-14">
               <CurrencyIcon
@@ -74,7 +74,7 @@ export const MarketInfoCard = ({
               />
             </div>
 
-            <div className="flex flex-col justify-center gap-0.5 lg:gap-1 lg:w-[200px] overflow-y-hidden">
+            <div className="flex flex-col justify-center gap-0.5 lg:gap-1 lg:w-[180px] overflow-y-hidden">
               <div className="flex flex-row gap-2 w-full h-full justify-start items-center">
                 <div className="text-white text-base lg:text-lg lg:max-w-[200px] font-semibold text-nowrap overflow-y-hidden">
                   <span>{baseCurrency.symbol} </span>
@@ -286,8 +286,8 @@ export const MarketInfoCard = ({
           </div>
         </div>
 
-        <div className="hidden lg:flex h-full ml-auto min-w-[400px] items-center gap-7">
-          <div className="flex-col justify-center items-start gap-0.5 inline-flex">
+        <div className="hidden lg:flex h-full ml-auto items-center gap-7">
+          <div className="flex-col lg:items-end gap-0.5 flex w-[100px]">
             <div className="text-[#38e69f] text-[17px] font-bold">
               {toShortNumber(price)}
             </div>
@@ -296,7 +296,7 @@ export const MarketInfoCard = ({
             </div>
           </div>
 
-          <div className="flex flex-row gap-4">
+          <div className="flex flex-row gap-4 ml-auto lg:w-[310px]">
             <div className="min-w-[60px] flex-1 flex-col justify-center items-start gap-1 flex">
               <div className="text-[#8690a5] text-xs whitespace-nowrap">
                 Liquidity
