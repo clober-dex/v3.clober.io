@@ -19,7 +19,6 @@ import {
 } from '../apis/trading-competition'
 import { useCurrencyContext } from '../contexts/currency-context'
 import { TradingCompetitionPnl } from '../model/trading-competition-pnl'
-import { Legend } from '../components/chart/legend'
 import { CurrencyIcon } from '../components/icon/currency-icon'
 import { Chain } from '../model/chain'
 import { Countdown } from '../components/countdown'
@@ -121,11 +120,11 @@ const Profit = ({
 
   return (
     <div className="flex flex-col sm:flex-row group relative gap-1 sm:gap-2 py-2">
-      {data.length > 0 && (
-        <div className="hidden group-hover:flex absolute top-8 -left-20 sm:left-2 z-[1000]">
-          <Legend data={data} />
-        </div>
-      )}
+      {/*{data.length > 0 && (*/}
+      {/*  <div className="hidden group-hover:flex absolute top-8 -left-20 sm:left-2 z-[1000]">*/}
+      {/*    <Legend data={data} />*/}
+      {/*  </div>*/}
+      {/*)}*/}
 
       <div
         className={`flex flex-1 justify-start items-center ${profit === 0 ? 'text-white' : profit > 0 ? 'text-green-500' : 'text-red-500'} font-semibold`}
@@ -715,7 +714,7 @@ export const TradingCompetitionContainer = () => {
         <div className="md:w-[616px] flex w-full mt-8 px-6 sm:px-[62px] py-4 sm:py-6 bg-[#e9edff]/5 rounded-2xl sm:rounded-[20px] flex-col justify-center items-center gap-2 sm:gap-2.5">
           <div className="w-full flex flex-col justify-start items-center gap-2 sm:gap-4">
             <div className="self-stretch text-center justify-start text-gray-400 text-[13px] sm:text-base font-bold">
-              Current Participants
+              Total Participants
             </div>
             <div className="self-stretch text-center justify-start text-white/90 text-2xl sm:text-[32px] font-bold">
               <CountUp
@@ -742,8 +741,9 @@ export const TradingCompetitionContainer = () => {
                   <div className="justify-start text-gray-400">User</div>
                 </div>
                 <div className="flex flex-1 justify-start items-center gap-2.5">
-                  <div className="justify-start text-gray-400">
-                    Total Profit
+                  <div className="justify-start text-gray-400 text-nowrap flex flex-row gap-1">
+                    PnL
+                    <span className="hidden sm:block">at Block #17028880</span>
                   </div>
                 </div>
               </div>
@@ -771,29 +771,29 @@ export const TradingCompetitionContainer = () => {
                             tokenColorMap={tokenColorMap}
                             trades={userPnL?.trades ?? []}
                           />
-                          <button
-                            onClick={() => setShowPnLCard(true)}
-                            className="hidden sm:flex absolute -right-6 top-1/2 -translate-y-1/2 pl-2 pr-1.5 py-1 bg-blue-500/20 rounded-lg justify-start items-center gap-1"
-                          >
-                            <div className="justify-start text-blue-400 text-[12px] font-semibold">
-                              Share
-                            </div>
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="16"
-                              height="16"
-                              viewBox="0 0 16 16"
-                              fill="none"
-                            >
-                              <path
-                                d="M5.33337 6H4.66671C4.31309 6 3.97395 6.14048 3.7239 6.39052C3.47385 6.64057 3.33337 6.97971 3.33337 7.33333V12.6667C3.33337 13.0203 3.47385 13.3594 3.7239 13.6095C3.97395 13.8595 4.31309 14 4.66671 14H11.3334C11.687 14 12.0261 13.8595 12.2762 13.6095C12.5262 13.3594 12.6667 13.0203 12.6667 12.6667V7.33333C12.6667 6.97971 12.5262 6.64057 12.2762 6.39052C12.0261 6.14048 11.687 6 11.3334 6H10.6667M8.00004 9.33333V2M8.00004 2L6.00004 4M8.00004 2L10 4"
-                                stroke="#60A5FA"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          </button>
+                          {/*<button*/}
+                          {/*  onClick={() => setShowPnLCard(true)}*/}
+                          {/*  className="hidden sm:flex absolute -right-6 top-1/2 -translate-y-1/2 pl-2 pr-1.5 py-1 bg-blue-500/20 rounded-lg justify-start items-center gap-1"*/}
+                          {/*>*/}
+                          {/*  <div className="justify-start text-blue-400 text-[12px] font-semibold">*/}
+                          {/*    Share*/}
+                          {/*  </div>*/}
+                          {/*  <svg*/}
+                          {/*    xmlns="http://www.w3.org/2000/svg"*/}
+                          {/*    width="16"*/}
+                          {/*    height="16"*/}
+                          {/*    viewBox="0 0 16 16"*/}
+                          {/*    fill="none"*/}
+                          {/*  >*/}
+                          {/*    <path*/}
+                          {/*      d="M5.33337 6H4.66671C4.31309 6 3.97395 6.14048 3.7239 6.39052C3.47385 6.64057 3.33337 6.97971 3.33337 7.33333V12.6667C3.33337 13.0203 3.47385 13.3594 3.7239 13.6095C3.97395 13.8595 4.31309 14 4.66671 14H11.3334C11.687 14 12.0261 13.8595 12.2762 13.6095C12.5262 13.3594 12.6667 13.0203 12.6667 12.6667V7.33333C12.6667 6.97971 12.5262 6.64057 12.2762 6.39052C12.0261 6.14048 11.687 6 11.3334 6H10.6667M8.00004 9.33333V2M8.00004 2L6.00004 4M8.00004 2L10 4"*/}
+                          {/*      stroke="#60A5FA"*/}
+                          {/*      strokeWidth="1.5"*/}
+                          {/*      strokeLinecap="round"*/}
+                          {/*      strokeLinejoin="round"*/}
+                          {/*    />*/}
+                          {/*  </svg>*/}
+                          {/*</button>*/}
                         </div>
                       ),
                     }
