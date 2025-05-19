@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { isAddressEqual } from 'viem'
 import Image from 'next/image'
 
-import { Currency, getLogo } from '../../model/currency'
+import { Currency } from '../../model/currency'
 import { Chain } from '../../model/chain'
 import { CHAIN_CONFIG } from '../../chain-configs'
 
@@ -11,6 +11,18 @@ type CurrencyIconProps = {
   currency: Currency
   unoptimized?: boolean
 } & React.HTMLAttributes<HTMLDivElement>
+
+function getLogo(chain: Chain, currency?: Currency): string {
+  if (!currency || chain.testnet) {
+    return '/unknown.svg'
+  }
+  if (currency.icon) {
+    return currency.icon
+  }
+  return `https://assets.odos.xyz/tokens/${encodeURIComponent(
+    currency.symbol,
+  )}.webp`
+}
 
 const CurrencyIconBase = ({
   chain,
