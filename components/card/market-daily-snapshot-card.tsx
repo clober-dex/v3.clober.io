@@ -11,7 +11,7 @@ import { VerifiedSvg } from '../svg/verified-svg'
 import { convertShortTimeAgo } from '../../utils/time'
 import { Chain } from '../../model/chain'
 
-export const MarketCard = ({
+export const MarketDailySnapshotCard = ({
   chain,
   baseCurrency,
   quoteCurrency,
