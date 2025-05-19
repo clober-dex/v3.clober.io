@@ -17,6 +17,7 @@ import { useTransactionContext } from '../contexts/transaction-context'
 import { Chain } from '../model/chain'
 import { Loading } from '../components/loading'
 import { CHAIN_CONFIG } from '../chain-configs'
+import { useCurrencyContext } from '../contexts/currency-context'
 
 const MOBILE_ROW_HEIGHT = 168
 
@@ -49,6 +50,7 @@ type SortOption =
 type MarketSnapshot = SdkMarketSnapshot & {
   isBidTaken: boolean
   isAskTaken: boolean
+  verified: boolean
 }
 
 const TriangleDown = ({
@@ -72,6 +74,7 @@ const LOCAL_STORAGE_MARKET_SNAPSHOTS_KEY = (chain: Chain) =>
 
 export const DiscoverContainer = () => {
   const { selectedChain } = useChainContext()
+  const { currencies } = useCurrencyContext()
   const { latestSubgraphBlockNumber } = useTransactionContext()
   const prevMarketSnapshots = useRef<MarketSnapshot[]>([])
   const prevSubgraphBlockNumber = useRef<number>(0)
@@ -104,34 +107,50 @@ export const DiscoverContainer = () => {
             rpcUrl: CHAIN_CONFIG.RPC_URL,
           },
         })
-        const newMarketSnapshots = marketSnapshots.map((marketSnapshot) => {
-          const prevMarketSnapshot = prevMarketSnapshots.current.find(
-            (snapshot) =>
-              isAddressEqual(
-                snapshot.base.address,
-                marketSnapshot.base.address,
-              ) &&
-              isAddressEqual(
-                snapshot.quote.address,
-                marketSnapshot.quote.address,
+        const newMarketSnapshots: MarketSnapshot[] = marketSnapshots.map(
+          (marketSnapshot) => {
+            const prevMarketSnapshot = prevMarketSnapshots.current.find(
+              (snapshot) =>
+                isAddressEqual(
+                  snapshot.base.address,
+                  marketSnapshot.base.address,
+                ) &&
+                isAddressEqual(
+                  snapshot.quote.address,
+                  marketSnapshot.quote.address,
+                ),
+            )
+            return {
+              ...marketSnapshot,
+              isBidTaken:
+                (prevMarketSnapshot &&
+                  prevMarketSnapshot.bidBookUpdatedAt <
+                    marketSnapshot.bidBookUpdatedAt) ||
+                false,
+              isAskTaken:
+                (prevMarketSnapshot &&
+                  prevMarketSnapshot.askBookUpdatedAt <
+                    marketSnapshot.askBookUpdatedAt) ||
+                false,
+              verified: currencies.some(
+                (currency) =>
+                  isAddressEqual(
+                    currency.address,
+                    marketSnapshot.base.address,
+                  ) &&
+                  isAddressEqual(
+                    currency.address,
+                    marketSnapshot.quote.address,
+                  ),
               ),
-          )
-          return {
-            ...marketSnapshot,
-            isBidTaken:
-              prevMarketSnapshot &&
-              prevMarketSnapshot.bidBookUpdatedAt <
-                marketSnapshot.bidBookUpdatedAt,
-            isAskTaken:
-              prevMarketSnapshot &&
-              prevMarketSnapshot.askBookUpdatedAt <
-                marketSnapshot.askBookUpdatedAt,
-          }
-        })
+            }
+          },
+        )
         prevMarketSnapshots.current = marketSnapshots.map((marketSnapshot) => ({
           ...marketSnapshot,
           isBidTaken: false,
           isAskTaken: false,
+          verified: false,
         }))
         prevSubgraphBlockNumber.current = latestSubgraphBlockNumber.blockNumber
         localStorage.setItem(
@@ -205,12 +224,11 @@ export const DiscoverContainer = () => {
           return a.priceChange24h - b.priceChange24h
         } else if (sortOption === 'daily-change-desc') {
           return b.priceChange24h - a.priceChange24h
+        } else if (sortOption === 'verified-asc') {
+          return a.verified ? -1 : 1
+        } else if (sortOption === 'verified-desc') {
+          return b.verified ? -1 : 1
         }
-        // else if (sortOption === 'verified-asc') {
-        //   return a.verified ? -1 : 1
-        // } else if (sortOption === 'verified-desc') {
-        //   return b.verified ? -1 : 1
-        // }
         return 0
       })
   }, [marketSnapshots, searchValue, sortOption])
@@ -248,7 +266,7 @@ export const DiscoverContainer = () => {
           dailyVolume={marketSnapshot.volume24hUSD}
           fdv={marketSnapshot.fdv}
           dailyChange={marketSnapshot.priceChange24h * 100}
-          verified={true}
+          verified={marketSnapshot.verified}
           isBidTaken={marketSnapshot.isBidTaken || false}
           isAskTaken={marketSnapshot.isAskTaken || false}
         />
@@ -279,7 +297,7 @@ export const DiscoverContainer = () => {
           dailyVolume={marketSnapshot.volume24hUSD}
           fdv={marketSnapshot.fdv}
           dailyChange={marketSnapshot.priceChange24h * 100}
-          verified={true}
+          verified={marketSnapshot.verified}
           isBidTaken={marketSnapshot.isBidTaken || false}
           isAskTaken={marketSnapshot.isAskTaken || false}
         />

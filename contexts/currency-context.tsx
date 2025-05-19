@@ -152,7 +152,6 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
     refetchInterval: 5 * 1000, // checked
     refetchIntervalInBackground: true,
   })
-  console.log('prices', prices)
 
   const { data } = useQuery({
     queryKey: [
