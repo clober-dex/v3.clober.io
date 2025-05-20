@@ -107,7 +107,7 @@ export const AddLiquidityForm = ({
                     formatUnits(
                       receiveLpCurrencyAmount,
                       pool.currencyLp.decimals,
-                      pool.current.lpPriceUSD,
+                      pool.lpPriceUSD,
                     ),
                   )}
                   {' LP'}
@@ -117,7 +117,7 @@ export const AddLiquidityForm = ({
                   {formatDollarValue(
                     receiveLpCurrencyAmount,
                     pool.currencyLp.decimals,
-                    pool.current.lpPriceUSD,
+                    pool.lpPriceUSD,
                   )}
                   )
                 </div>

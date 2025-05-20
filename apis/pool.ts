@@ -1,17 +1,9 @@
-import { getPool, getPoolSnapshot } from '@clober/v2-sdk'
+import { getPool, getPoolSnapshot, PoolSnapshot } from '@clober/v2-sdk'
 import { zeroHash } from 'viem'
 
 import { Chain } from '../model/chain'
 import { Prices } from '../model/prices'
-import { Pool, PoolSnapshot } from '../model/pool'
-import { CHAIN_CONFIG } from '../chain-configs'
-
-export async function fetchPoolSnapshots(
-  chain: Chain,
-  prices: Prices,
-): Promise<PoolSnapshot[]> {
-  return []
-}
+import { Pool } from '../model/pool'
 
 export async function fetchPool(
   chain: Chain,
@@ -40,19 +32,10 @@ export async function fetchPool(
   return {
     pool: {
       ...pool,
-      current: {
-        lpPriceUSD: tvl / Number(pool.totalSupply.value),
-        tvl,
-        apy: 12.34, // TODO: fix it
-      },
+      lpPriceUSD: tvl / Number(pool.totalSupply.value),
+      tvl,
+      apy: 12.34, // TODO: fix it
     },
-    poolSnapshot: {
-      ...poolSnapshot,
-      current: {
-        lpPriceUSD: tvl / Number(pool.totalSupply.value),
-        tvl,
-        apy: 12.34, // TODO: fix it
-      },
-    },
+    poolSnapshot,
   }
 }

@@ -95,7 +95,7 @@ export const PoolManagerContainer = ({
         )
       return parseUnits(
         totalInputUsdValue
-          .div(pool.current.lpPriceUSD)
+          .div(pool.lpPriceUSD)
           .toFixed(pool.currencyLp.decimals),
         pool.currencyLp.decimals,
       )
@@ -236,7 +236,7 @@ export const PoolManagerContainer = ({
         new BigNumber(pool.liquidityA.total.value)
           .times(prices[pool.currencyA.address] ?? 0)
           .div(pool.totalSupply.value)
-          .div(pool.current.lpPriceUSD)
+          .div(pool.lpPriceUSD)
           .times(100)
           .toNumber(),
       ),

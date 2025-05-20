@@ -4,7 +4,7 @@ import { TamaguiProvider } from '@tamagui/web'
 import { Chart } from '../../components/chart/chart-model'
 import tamaguiConfig from '../../tamagui.config'
 import { ChartHeader } from '../../components/chart/chart-header'
-import { VaultPerformanceChartModel } from '../../components/chart/vault-performance-chart-model'
+import { PoolPerformanceChartModel } from '../../components/chart/pool-performance-chart-model'
 
 export const PoolChartContainer = ({
   historicalPriceIndex,
@@ -45,7 +45,7 @@ export const PoolChartContainer = ({
       {(() => {
         return (
           <Chart
-            Model={VaultPerformanceChartModel}
+            Model={PoolPerformanceChartModel}
             params={params as any}
             height={368}
           >

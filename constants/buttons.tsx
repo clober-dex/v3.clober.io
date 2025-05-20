@@ -2,7 +2,7 @@ import React from 'react'
 
 import { DiscoverPageSvg } from '../components/svg/discover-page-svg'
 import { SwapPageSvg } from '../components/svg/swap-page-svg'
-import { VaultPageSvg } from '../components/svg/vault-page-svg'
+import { EarnPageSvg } from '../components/svg/earn-page-svg'
 import { LimitPageSvg } from '../components/svg/limit-page-svg'
 import { TradingCompetitionPageSvg } from '../components/svg/trading-competition-page-svg'
 
@@ -20,7 +20,7 @@ export const PAGE_BUTTONS = [
   {
     path: '/earn',
     label: 'Earn',
-    icon: <VaultPageSvg className="w-4 h-4" />,
+    icon: <EarnPageSvg className="w-4 h-4" />,
   },
   {
     path: '/trading-competition',

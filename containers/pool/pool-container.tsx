@@ -1,18 +1,17 @@
 import React from 'react'
 import { useAccount } from 'wagmi'
-import { useRouter } from 'next/router'
 import { Tooltip } from 'react-tooltip'
 import { useQuery } from '@tanstack/react-query'
+import { getPoolSnapshots } from '@clober/v2-sdk'
 
 import { usePoolContext } from '../../contexts/pool/pool-context'
 import { useChainContext } from '../../contexts/chain-context'
-import { toCommaSeparated } from '../../utils/number'
 import { QuestionMarkSvg } from '../../components/svg/question-mark-svg'
 import { useCurrencyContext } from '../../contexts/currency-context'
 import { Loading } from '../../components/loading'
+import { fetchPoolSnapshots } from '../../apis/pool'
 
 export const PoolContainer = () => {
-  const router = useRouter()
   const { address: userAddress } = useAccount()
   const { lpBalances } = usePoolContext()
   const { selectedChain } = useChainContext()
@@ -20,10 +19,14 @@ export const PoolContainer = () => {
 
   const [tab, setTab] = React.useState<'my-liquidity' | 'pool'>('pool')
 
-  const { data: pools } = useQuery({
-    queryKey: ['pools', selectedChain.id, Object.keys(prices).length !== 0],
+  const { data: poolSnapshots } = useQuery({
+    queryKey: [
+      'pool-snapshots',
+      selectedChain.id,
+      Object.keys(prices).length !== 0,
+    ],
     queryFn: async () => {
-      return []
+      return getPoolSnapshots({ chainId: selectedChain.id })
     },
     initialData: [],
   })
@@ -128,7 +131,9 @@ export const PoolContainer = () => {
                 </div>
               </div>
 
-              {pools.length === 0 && <Loading className="flex mt-8 sm:mt-0" />}
+              {poolSnapshots.length === 0 && (
+                <Loading className="flex mt-8 sm:mt-0" />
+              )}
 
               <div className="relative flex justify-center w-full h-full lg:h-[660px]">
                 <div className="lg:absolute lg:top-0 lg:overflow-x-scroll w-full h-full items-center flex flex-1 flex-col md:grid md:grid-cols-2 lg:flex gap-3">

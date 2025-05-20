@@ -3,8 +3,6 @@ import {
   PoolSnapshot as SdkPoolSnapshot,
 } from '@clober/v2-sdk'
 
-type CurrentState = { lpPriceUSD: number; apy: number; tvl: number }
+export type Pool = { lpPriceUSD: number; apy: number; tvl: number } & SdkPool
 
-export type Pool = { current: CurrentState } & SdkPool
-
-export type PoolSnapshot = { current: CurrentState } & SdkPoolSnapshot
+export type PoolSnapshot = SdkPoolSnapshot
