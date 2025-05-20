@@ -2,7 +2,6 @@ import React from 'react'
 import { useAccount } from 'wagmi'
 import { Tooltip } from 'react-tooltip'
 import { useQuery } from '@tanstack/react-query'
-import { getPoolSnapshots } from '@clober/v2-sdk'
 import { useRouter } from 'next/router'
 
 import { usePoolContext } from '../../contexts/pool/pool-context'
@@ -13,7 +12,8 @@ import { Loading } from '../../components/loading'
 import { toCommaSeparated } from '../../utils/number'
 import { LpPositionCard } from '../../components/card/lp-position-card'
 import { formatUnits } from '../../utils/bigint'
-import { CHAIN_CONFIG } from '../../chain-configs'
+import { PoolSnapshotCard } from '../../components/card/pool-snapshot-card'
+import { fetchPoolSnapshots } from '../../apis/pool'
 
 export const PoolContainer = () => {
   const router = useRouter()
@@ -31,15 +31,27 @@ export const PoolContainer = () => {
       Object.keys(prices).length !== 0,
     ],
     queryFn: async () => {
-      const poolSnapshots = await getPoolSnapshots({
-        chainId: selectedChain.id,
-      })
-      return poolSnapshots.filter(({ key }) =>
-        CHAIN_CONFIG.WHITELISTED_POOL_KEYS.includes(key),
-      )
+      return fetchPoolSnapshots(selectedChain)
     },
     initialData: [],
   })
+
+  const [totalTvl, total24hVolume] = React.useMemo(() => {
+    const totalTvl = poolSnapshots.reduce(
+      (acc, poolSnapshot) => acc + Number(poolSnapshot.totalTvlUSD),
+      0,
+    )
+    const total24hVolume = poolSnapshots.reduce(
+      (acc, { performanceHistories }) =>
+        acc +
+        Number(
+          performanceHistories.sort((a, b) => b.timestamp - a.timestamp)?.[0]
+            ?.volumeUSD ?? 0,
+        ),
+      0,
+    )
+    return [totalTvl, total24hVolume]
+  }, [poolSnapshots])
 
   return (
     <div className="w-full flex flex-col text-white mb-4">
@@ -59,16 +71,7 @@ export const PoolContainer = () => {
                 TVL
               </div>
               <div className="self-stretch text-center text-white text-lg sm:text-2xl font-bold">
-                $
-                {toCommaSeparated(
-                  poolSnapshots
-                    .reduce(
-                      (acc, poolSnapshot) =>
-                        acc + Number(poolSnapshot.totalTvlUSD),
-                      0,
-                    )
-                    .toFixed(2),
-                )}
+                ${toCommaSeparated(totalTvl.toFixed(2))}
               </div>
             </div>
             <div className="grow shrink basis-0 h-full px-6 py-4 sm:px-8 sm:py-6 bg-[rgba(96,165,250,0.10)] rounded-xl sm:rounded-2xl flex-col justify-center items-center gap-3 inline-flex bg-gray-800">
@@ -76,21 +79,7 @@ export const PoolContainer = () => {
                 24h Volume
               </div>
               <div className="self-stretch text-center text-white text-lg sm:text-2xl font-bold">
-                $
-                {toCommaSeparated(
-                  poolSnapshots
-                    .reduce(
-                      (acc, { performanceHistories }) =>
-                        acc +
-                        Number(
-                          performanceHistories.sort(
-                            (a, b) => b.timestamp - a.timestamp,
-                          )?.[0]?.volumeUSD ?? 0,
-                        ),
-                      0,
-                    )
-                    .toFixed(2),
-                )}
+                ${toCommaSeparated(total24hVolume.toFixed(2))}
               </div>
             </div>
           </div>
@@ -162,14 +151,19 @@ export const PoolContainer = () => {
 
               <div className="relative flex justify-center w-full h-full lg:h-[660px]">
                 <div className="lg:absolute lg:top-0 lg:overflow-x-scroll w-full h-full items-center flex flex-1 flex-col md:grid md:grid-cols-2 lg:flex gap-3">
-                  {/*{pools.map((vault, index) => (*/}
-                  {/*  <PoolCard*/}
-                  {/*    chain={selectedChain}*/}
-                  {/*    key={index}*/}
-                  {/*    poolKey={vault.key}*/}
-                  {/*    router={router}*/}
-                  {/*  />*/}
-                  {/*))}*/}
+                  {poolSnapshots.map((poolSnapshot) => (
+                    <PoolSnapshotCard
+                      chain={selectedChain}
+                      key={`pool-snapshot-${poolSnapshot.key}`}
+                      poolKey={poolSnapshot.key}
+                      currencyA={poolSnapshot.currencyA}
+                      currencyB={poolSnapshot.currencyB}
+                      apy={poolSnapshot.apy}
+                      tvl={Number(poolSnapshot.totalTvlUSD)}
+                      volume24h={Number(poolSnapshot.volumeUSD24h)}
+                      router={router}
+                    />
+                  ))}
                 </div>
               </div>
             </>
@@ -195,8 +189,12 @@ export const PoolContainer = () => {
                     <LpPositionCard
                       amount={amount}
                       chain={selectedChain}
-                      key={poolSnapshot.key}
-                      poolSnapshot={poolSnapshot}
+                      key={`lp-position-${poolKey}`}
+                      poolKey={poolKey as `0x${string}`}
+                      currencyA={poolSnapshot.currencyA}
+                      currencyB={poolSnapshot.currencyB}
+                      currencyLp={poolSnapshot.currencyLp}
+                      lpPriceUSD={Number(poolSnapshot.lpPriceUSD)}
                       router={router}
                     />
                   )

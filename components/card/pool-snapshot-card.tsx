@@ -9,7 +9,7 @@ import { QuestionMarkSvg } from '../svg/question-mark-svg'
 import { Chain } from '../../model/chain'
 import { Currency } from '../../model/currency'
 
-export const PoolCard = ({
+export const PoolSnapshotCard = ({
   chain,
   poolKey,
   currencyA,

@@ -1,9 +1,23 @@
-import { getPool, getPoolSnapshot, PoolSnapshot } from '@clober/v2-sdk'
+import { getPool, getPoolSnapshot, getPoolSnapshots } from '@clober/v2-sdk'
 import { zeroHash } from 'viem'
 
 import { Chain } from '../model/chain'
 import { Prices } from '../model/prices'
-import { Pool } from '../model/pool'
+import { Pool, PoolSnapshot } from '../model/pool'
+import { CHAIN_CONFIG } from '../chain-configs'
+
+export async function fetchPoolSnapshots(chain: Chain) {
+  const poolSnapshots = await getPoolSnapshots({
+    chainId: chain.id,
+  })
+  return poolSnapshots
+    .filter(({ key }) => CHAIN_CONFIG.WHITELISTED_POOL_KEYS.includes(key))
+    .sort((a, b) => Number(b.volumeUSD24h) - Number(a.volumeUSD24h))
+    .map((poolSnapshot) => ({
+      ...poolSnapshot,
+      apy: 12.34, // TODO: fix it
+    }))
+}
 
 export async function fetchPool(
   chain: Chain,
@@ -36,6 +50,9 @@ export async function fetchPool(
       tvl,
       apy: 12.34, // TODO: fix it
     },
-    poolSnapshot,
+    poolSnapshot: {
+      ...poolSnapshot,
+      apy: 12.34, // TODO: fix it
+    },
   }
 }

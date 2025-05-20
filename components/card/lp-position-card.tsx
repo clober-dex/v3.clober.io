@@ -1,20 +1,28 @@
 import React from 'react'
 import { NextRouter } from 'next/router'
-import { PoolSnapshot } from '@clober/v2-sdk'
 
 import { CurrencyIcon } from '../icon/currency-icon'
 import { formatDollarValue, formatUnits } from '../../utils/bigint'
 import { Chain } from '../../model/chain'
 import { toCommaSeparated } from '../../utils/number'
+import { Currency } from '../../model/currency'
 
 export const LpPositionCard = ({
   chain,
-  poolSnapshot,
+  poolKey,
+  currencyA,
+  currencyB,
+  currencyLp,
+  lpPriceUSD,
   amount,
   router,
 }: {
   chain: Chain
-  poolSnapshot: PoolSnapshot
+  poolKey: `0x${string}`
+  currencyA: Currency
+  currencyB: Currency
+  currencyLp: Currency
+  lpPriceUSD: number
   amount: bigint
   router: NextRouter
 }) => {
@@ -26,22 +34,22 @@ export const LpPositionCard = ({
             <div className="w-14 h-8 relative">
               <CurrencyIcon
                 chain={chain}
-                currency={poolSnapshot.currencyA}
+                currency={currencyA}
                 className="w-8 h-8 absolute left-0 top-0 z-[1] rounded-full"
               />
               <CurrencyIcon
                 chain={chain}
-                currency={poolSnapshot.currencyB}
+                currency={currencyB}
                 className="w-8 h-8 absolute left-6 top-0 rounded-full"
               />
             </div>
             <div className="flex gap-1 items-center">
               <div className="text-white text-base font-bold">
-                {poolSnapshot.currencyA.symbol}
+                {currencyA.symbol}
               </div>
               <div className="text-white text-base font-bold">-</div>
               <div className="text-white text-base font-bold">
-                {poolSnapshot.currencyB.symbol}
+                {currencyB.symbol}
               </div>
             </div>
           </div>
@@ -50,19 +58,15 @@ export const LpPositionCard = ({
             <div className="justify-center items-center gap-1 flex">
               <div className="text-right text-white text-base">
                 {toCommaSeparated(
-                  formatUnits(
-                    amount,
-                    poolSnapshot.currencyLp.decimals,
-                    Number(poolSnapshot.lpPriceUSD),
-                  ),
+                  formatUnits(amount, currencyLp.decimals, Number(lpPriceUSD)),
                 )}
               </div>
               <div className="text-center text-gray-400 text-sm font-semibold">
                 (
                 {formatDollarValue(
                   amount,
-                  poolSnapshot.currencyLp.decimals,
-                  Number(poolSnapshot.lpPriceUSD),
+                  currencyLp.decimals,
+                  Number(lpPriceUSD),
                 )}
                 )
               </div>
@@ -71,7 +75,7 @@ export const LpPositionCard = ({
         </div>
         <div className="flex self-stretch h-8 px-3 py-2 rounded-lg border-2 border-blue-500 border-solid justify-center items-center gap-1">
           <button
-            onClick={() => router.push(`/earn/${poolSnapshot.key}`)}
+            onClick={() => router.push(`/earn/${poolKey}`)}
             className="grow shrink basis-0 opacity-90 text-center text-blue-500 text-sm font-bold"
           >
             Manage Position
@@ -83,22 +87,22 @@ export const LpPositionCard = ({
           <div className="w-10 h-6 relative">
             <CurrencyIcon
               chain={chain}
-              currency={poolSnapshot.currencyA}
+              currency={currencyA}
               className="w-6 h-6 absolute left-0 top-0 z-[1]"
             />
             <CurrencyIcon
               chain={chain}
-              currency={poolSnapshot.currencyB}
+              currency={currencyB}
               className="w-6 h-6 absolute left-[16px] top-0"
             />
           </div>
           <div className="flex gap-1 items-center">
             <div className="text-white text-base font-bold">
-              {poolSnapshot.currencyA.symbol}
+              {currencyA.symbol}
             </div>
             <div className="text-white text-base font-bold">-</div>
             <div className="text-white text-base font-bold">
-              {poolSnapshot.currencyB.symbol}
+              {currencyB.symbol}
             </div>
           </div>
         </div>
@@ -109,19 +113,15 @@ export const LpPositionCard = ({
           <div className="justify-start items-center gap-2 flex">
             <div className="text-white text-sm font-bold">
               {toCommaSeparated(
-                formatUnits(
-                  amount,
-                  poolSnapshot.currencyLp.decimals,
-                  Number(poolSnapshot.lpPriceUSD),
-                ),
+                formatUnits(amount, currencyLp.decimals, Number(lpPriceUSD)),
               )}
             </div>
             <div className="text-gray-400 text-xs font-semibold">
               (
               {formatDollarValue(
                 amount,
-                poolSnapshot.currencyLp.decimals,
-                Number(poolSnapshot.lpPriceUSD),
+                currencyLp.decimals,
+                Number(lpPriceUSD),
               )}
               )
             </div>
@@ -129,7 +129,7 @@ export const LpPositionCard = ({
         </div>
         <div className="flex self-stretch h-8 px-3 py-2 rounded-lg border border-solid border-blue-500 justify-center items-center gap-1">
           <button
-            onClick={() => router.push(`/earn/${poolSnapshot.key}`)}
+            onClick={() => router.push(`/earn/${poolKey}`)}
             className="grow shrink basis-0 opacity-90 text-center text-blue-500 text-sm font-bold"
           >
             Manage Position
