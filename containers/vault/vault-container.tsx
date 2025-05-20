@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { Tooltip } from 'react-tooltip'
 import { useQuery } from '@tanstack/react-query'
 
-import { useVaultContext } from '../../contexts/vault/vault-context'
+import { usePoolContext } from '../../contexts/vault/pool-context'
 import { useChainContext } from '../../contexts/chain-context'
 import { toCommaSeparated } from '../../utils/number'
 import { QuestionMarkSvg } from '../../components/svg/question-mark-svg'
@@ -18,7 +18,7 @@ import { Loading } from '../../components/loading'
 export const VaultContainer = () => {
   const router = useRouter()
   const { address: userAddress } = useAccount()
-  const { vaultLpBalances } = useVaultContext()
+  const { lpBalances } = usePoolContext()
   const { selectedChain } = useChainContext()
   const { prices } = useCurrencyContext()
 
@@ -85,9 +85,8 @@ export const VaultContainer = () => {
               <button
                 onClick={() =>
                   userAddress &&
-                  Object.entries(vaultLpBalances).filter(
-                    ([, amount]) => amount > 0n,
-                  ).length > 0 &&
+                  Object.entries(lpBalances).filter(([, amount]) => amount > 0n)
+                    .length > 0 &&
                   setTab('my-liquidity')
                 }
                 disabled={tab === 'my-liquidity'}
@@ -150,7 +149,7 @@ export const VaultContainer = () => {
             </>
           ) : tab === 'my-liquidity' ? (
             <div className="w-full h-full items-center flex flex-1 flex-col md:grid md:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-[18px]">
-              {Object.entries(vaultLpBalances)
+              {Object.entries(lpBalances)
                 .filter(([, amount]) => amount > 0n)
                 .map(([vaultKey, amount]) => {
                   const vault = vaults.find((vault) => vault.key === vaultKey)

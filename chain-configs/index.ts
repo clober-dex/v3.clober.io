@@ -36,7 +36,7 @@ export const CHAIN_CONFIG: ChainConfig = {
     LIQUIDITY_VAULT_POINT:
       'https://api.goldsky.com/api/public/project_clsljw95chutg01w45cio46j0/subgraphs/liquidity-vault-point-monad-testnet/latest/gn',
   },
-  WHITELISTED_VAULT_KEYS: [
+  WHITELISTED_POOL_KEYS: [
     '0xad46920833ad7a1ba8e74cc241faf9ae4fd3dc4616ad9648b13160f8453e444f', // MON-USDC
     '0xf3c347e880b6a775f4f69f6db22860636351a70f18857fab2c56dc32835a1627', // muBOND-USDC
     '0xebadcf03683413b3fc72a0d16a0a02902db04ee7a3b439de5033e825c1d79380', // aprMON-MON

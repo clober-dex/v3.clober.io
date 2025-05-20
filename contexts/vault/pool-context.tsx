@@ -13,7 +13,7 @@ import { useChainContext } from '../chain-context'
 import { useCurrencyContext } from '../currency-context'
 import { CHAIN_CONFIG } from '../../chain-configs'
 
-type VaultContext = {
+type PoolContext = {
   lpCurrencyAmount: string
   setLpCurrencyAmount: (inputCurrencyAmount: string) => void
   currency0Amount: string
@@ -24,10 +24,10 @@ type VaultContext = {
   setDisableSwap: (value: boolean) => void
   slippageInput: string
   setSlippageInput: (slippageInput: string) => void
-  vaultLpBalances: Balances
+  lpBalances: Balances
 }
 
-const Context = React.createContext<VaultContext>({
+const Context = React.createContext<PoolContext>({
   lpCurrencyAmount: '',
   setLpCurrencyAmount: () => {},
   currency0Amount: '',
@@ -38,10 +38,10 @@ const Context = React.createContext<VaultContext>({
   setDisableSwap: () => {},
   slippageInput: '1',
   setSlippageInput: () => {},
-  vaultLpBalances: {},
+  lpBalances: {},
 })
 
-export const VaultProvider = ({ children }: React.PropsWithChildren<{}>) => {
+export const PoolProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { selectedChain } = useChainContext()
   const { address: userAddress } = useAccount()
   const { prices, setCurrencies, whitelistCurrencies } = useCurrencyContext()
@@ -57,9 +57,9 @@ export const VaultProvider = ({ children }: React.PropsWithChildren<{}>) => {
     })
   }, [selectedChain])
 
-  const { data: vaultLpBalances } = useQuery({
+  const { data: lpBalances } = useQuery({
     queryKey: [
-      'vault-lp-balances',
+      'lp-balances',
       userAddress,
       selectedChain.id,
       Object.values(prices).reduce((acc, price) => acc + price, 0) !== 0,
@@ -69,7 +69,7 @@ export const VaultProvider = ({ children }: React.PropsWithChildren<{}>) => {
         return {}
       }
       const results = await publicClient.multicall({
-        contracts: CHAIN_CONFIG.WHITELISTED_VAULT_KEYS.map((key) => ({
+        contracts: CHAIN_CONFIG.WHITELISTED_POOL_KEYS.map((key) => ({
           chainId: selectedChain.id,
           address: getContractAddresses({ chainId: selectedChain.id })
             .Rebalancer,
@@ -106,7 +106,7 @@ export const VaultProvider = ({ children }: React.PropsWithChildren<{}>) => {
       return results.reduce((acc: {}, { result }, index: number) => {
         return {
           ...acc,
-          [CHAIN_CONFIG.WHITELISTED_VAULT_KEYS[index]]: result ?? 0n,
+          [CHAIN_CONFIG.WHITELISTED_POOL_KEYS[index]]: result ?? 0n,
         }
       }, {})
     },
@@ -142,7 +142,7 @@ export const VaultProvider = ({ children }: React.PropsWithChildren<{}>) => {
         setDisableSwap,
         slippageInput,
         setSlippageInput,
-        vaultLpBalances: vaultLpBalances ?? {},
+        lpBalances: lpBalances ?? {},
       }}
     >
       {children}
@@ -150,4 +150,4 @@ export const VaultProvider = ({ children }: React.PropsWithChildren<{}>) => {
   )
 }
 
-export const useVaultContext = () => React.useContext(Context) as VaultContext
+export const usePoolContext = () => React.useContext(Context) as PoolContext

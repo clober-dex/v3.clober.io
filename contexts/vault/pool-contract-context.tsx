@@ -26,7 +26,7 @@ import { sendTransaction } from '../../utils/transaction'
 import { currentTimestampInSeconds } from '../../utils/date'
 import { CHAIN_CONFIG } from '../../chain-configs'
 
-type VaultContractContext = {
+type PoolContractContext = {
   mint: (
     currency0: Currency,
     currency1: Currency,
@@ -43,12 +43,12 @@ type VaultContractContext = {
   ) => Promise<void>
 }
 
-const Context = React.createContext<VaultContractContext>({
+const Context = React.createContext<PoolContractContext>({
   mint: () => Promise.resolve(),
   burn: () => Promise.resolve(),
 })
 
-export const VaultContractProvider = ({
+export const PoolContractProvider = ({
   children,
 }: React.PropsWithChildren<{}>) => {
   const queryClient = useQueryClient()
@@ -272,8 +272,8 @@ export const VaultContractProvider = ({
           isAllowanceChanged
             ? queryClient.invalidateQueries({ queryKey: ['allowances'] })
             : undefined,
-          queryClient.invalidateQueries({ queryKey: ['vault'] }),
-          queryClient.invalidateQueries({ queryKey: ['vault-lp-balances'] }),
+          queryClient.invalidateQueries({ queryKey: ['pool'] }),
+          queryClient.invalidateQueries({ queryKey: ['lp-balances'] }),
         ])
         setConfirmation(undefined)
       }
@@ -406,8 +406,8 @@ export const VaultContractProvider = ({
       } finally {
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: ['balances'] }),
-          queryClient.invalidateQueries({ queryKey: ['vault'] }),
-          queryClient.invalidateQueries({ queryKey: ['vault-lp-balances'] }),
+          queryClient.invalidateQueries({ queryKey: ['pool'] }),
+          queryClient.invalidateQueries({ queryKey: ['lp-balances'] }),
         ])
         setConfirmation(undefined)
       }
@@ -435,5 +435,5 @@ export const VaultContractProvider = ({
   )
 }
 
-export const useVaultContractContext = () =>
-  React.useContext(Context) as VaultContractContext
+export const usePoolContractContext = () =>
+  React.useContext(Context) as PoolContractContext

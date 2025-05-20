@@ -25,7 +25,7 @@ export default function PoolManage() {
     ],
     queryFn: async () => {
       if (
-        !CHAIN_CONFIG.WHITELISTED_VAULT_KEYS.find(
+        !CHAIN_CONFIG.WHITELISTED_POOL_KEYS.find(
           (key) => key === router.query.poolKey,
         )
       ) {

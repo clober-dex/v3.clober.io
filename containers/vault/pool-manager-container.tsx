@@ -9,8 +9,8 @@ import { Tooltip } from 'react-tooltip'
 
 import { useChainContext } from '../../contexts/chain-context'
 import { useCurrencyContext } from '../../contexts/currency-context'
-import { useVaultContractContext } from '../../contexts/vault/vault-contract-context'
-import { useVaultContext } from '../../contexts/vault/vault-context'
+import { usePoolContractContext } from '../../contexts/vault/pool-contract-context'
+import { usePoolContext } from '../../contexts/vault/pool-context'
 import { CurrencyIcon } from '../../components/icon/currency-icon'
 import { toPlacesAmountString } from '../../utils/bignumber'
 import { QuestionMarkSvg } from '../../components/svg/question-mark-svg'
@@ -57,9 +57,9 @@ export const PoolManagerContainer = ({
     setSlippageInput,
     lpCurrencyAmount,
     setLpCurrencyAmount,
-    vaultLpBalances,
-  } = useVaultContext()
-  const { mint, burn } = useVaultContractContext()
+    lpBalances,
+  } = usePoolContext()
+  const { mint, burn } = usePoolContractContext()
   const [showRPI, setShowRPI] = useState(true)
   const previousValues = useRef({
     currency0Amount,
@@ -601,7 +601,7 @@ export const PoolManagerContainer = ({
                   }}
                   lpCurrencyAmount={lpCurrencyAmount}
                   setLpCurrencyAmount={setLpCurrencyAmount}
-                  availableLpCurrencyBalance={vaultLpBalances[pool.key] ?? 0n}
+                  availableLpCurrencyBalance={lpBalances[pool.key] ?? 0n}
                   receiveCurrencies={
                     receiveCurrencies.length === 2
                       ? [
@@ -641,8 +641,7 @@ export const PoolManagerContainer = ({
                     disabled:
                       !walletClient ||
                       Number(lpCurrencyAmount) === 0 ||
-                      parseUnits(lpCurrencyAmount, 18) >
-                        vaultLpBalances[pool.key],
+                      parseUnits(lpCurrencyAmount, 18) > lpBalances[pool.key],
                     onClick: async () => {
                       await burn(
                         pool.currencyA,
@@ -656,7 +655,7 @@ export const PoolManagerContainer = ({
                       : Number(lpCurrencyAmount) === 0
                         ? 'Enter amount'
                         : parseUnits(lpCurrencyAmount, 18) >
-                            vaultLpBalances[pool.key]
+                            lpBalances[pool.key]
                           ? `Insufficient ${pool.currencyLp.symbol} balance`
                           : `Remove Liquidity`,
                   }}
