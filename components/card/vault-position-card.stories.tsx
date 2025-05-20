@@ -4,22 +4,22 @@ import { Meta, StoryObj } from '@storybook/react'
 import { mainnet } from 'viem/chains'
 import { zeroHash } from 'viem'
 
-import { VaultPositionCard } from './vault-position-card'
+import { LpPositionCard } from './lp-position-card'
 
 export default {
   title: 'Card/VaultPositionCard',
-  component: VaultPositionCard,
+  component: LpPositionCard,
   parameters: {
     layout: 'centered',
   },
   render: ({ ...args }) => (
     <div className="flex w-[300px]">
-      <VaultPositionCard {...args} />
+      <LpPositionCard {...args} />
     </div>
   ),
-} as Meta<typeof VaultPositionCard>
+} as Meta<typeof LpPositionCard>
 
-type Story = StoryObj<typeof VaultPositionCard>
+type Story = StoryObj<typeof LpPositionCard>
 
 export const Default: Story = {
   args: {

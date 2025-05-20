@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useWalletClient } from 'wagmi'
 import { useQuery } from '@tanstack/react-query'
 import { parseUnits, zeroAddress, zeroHash } from 'viem'
-import { removeLiquidity } from '@clober/v2-sdk'
+import { PoolSnapshot, removeLiquidity } from '@clober/v2-sdk'
 import BigNumber from 'bignumber.js'
 import { Tooltip } from 'react-tooltip'
 
@@ -17,7 +17,7 @@ import { QuestionMarkSvg } from '../../components/svg/question-mark-svg'
 import { AddLiquidityForm } from '../../components/form/vault/add-liquidity-form'
 import { RemoveLiquidityForm } from '../../components/form/vault/remove-liquidity-form'
 import { toCommaSeparated } from '../../utils/number'
-import { Pool, PoolSnapshot } from '../../model/pool'
+import { Pool } from '../../model/pool'
 
 import { PoolChartContainer } from './pool-chart-container'
 
@@ -603,7 +603,7 @@ export const PoolManagerContainer = ({
                   pool={pool}
                   prices={{
                     ...prices,
-                    [pool.currencyLp.address]: pool.current.lpPriceUSD,
+                    [pool.currencyLp.address]: pool.lpPriceUSD,
                   }}
                   lpCurrencyAmount={lpCurrencyAmount}
                   setLpCurrencyAmount={setLpCurrencyAmount}

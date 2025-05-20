@@ -3,15 +3,20 @@ import { useAccount } from 'wagmi'
 import { Tooltip } from 'react-tooltip'
 import { useQuery } from '@tanstack/react-query'
 import { getPoolSnapshots } from '@clober/v2-sdk'
+import { useRouter } from 'next/router'
 
 import { usePoolContext } from '../../contexts/pool/pool-context'
 import { useChainContext } from '../../contexts/chain-context'
 import { QuestionMarkSvg } from '../../components/svg/question-mark-svg'
 import { useCurrencyContext } from '../../contexts/currency-context'
 import { Loading } from '../../components/loading'
-import { fetchPoolSnapshots } from '../../apis/pool'
+import { toCommaSeparated } from '../../utils/number'
+import { LpPositionCard } from '../../components/card/lp-position-card'
+import { formatUnits } from '../../utils/bigint'
+import { CHAIN_CONFIG } from '../../chain-configs'
 
 export const PoolContainer = () => {
+  const router = useRouter()
   const { address: userAddress } = useAccount()
   const { lpBalances } = usePoolContext()
   const { selectedChain } = useChainContext()
@@ -26,7 +31,12 @@ export const PoolContainer = () => {
       Object.keys(prices).length !== 0,
     ],
     queryFn: async () => {
-      return getPoolSnapshots({ chainId: selectedChain.id })
+      const poolSnapshots = await getPoolSnapshots({
+        chainId: selectedChain.id,
+      })
+      return poolSnapshots.filter(({ key }) =>
+        CHAIN_CONFIG.WHITELISTED_POOL_KEYS.includes(key),
+      )
     },
     initialData: [],
   })
@@ -49,10 +59,16 @@ export const PoolContainer = () => {
                 TVL
               </div>
               <div className="self-stretch text-center text-white text-lg sm:text-2xl font-bold">
-                {/*$*/}
-                {/*{toCommaSeparated(*/}
-                {/*  pools.reduce((acc, vault) => acc + vault.tvl, 0).toFixed(2),*/}
-                {/*)}*/}
+                $
+                {toCommaSeparated(
+                  poolSnapshots
+                    .reduce(
+                      (acc, poolSnapshot) =>
+                        acc + Number(poolSnapshot.totalTvlUSD),
+                      0,
+                    )
+                    .toFixed(2),
+                )}
               </div>
             </div>
             <div className="grow shrink basis-0 h-full px-6 py-4 sm:px-8 sm:py-6 bg-[rgba(96,165,250,0.10)] rounded-xl sm:rounded-2xl flex-col justify-center items-center gap-3 inline-flex bg-gray-800">
@@ -60,12 +76,21 @@ export const PoolContainer = () => {
                 24h Volume
               </div>
               <div className="self-stretch text-center text-white text-lg sm:text-2xl font-bold">
-                {/*$*/}
-                {/*{toCommaSeparated(*/}
-                {/*  pools*/}
-                {/*    .reduce((acc, vault) => acc + vault.volume24h, 0)*/}
-                {/*    .toFixed(2),*/}
-                {/*)}*/}
+                $
+                {toCommaSeparated(
+                  poolSnapshots
+                    .reduce(
+                      (acc, { performanceHistories }) =>
+                        acc +
+                        Number(
+                          performanceHistories.sort(
+                            (a, b) => b.timestamp - a.timestamp,
+                          )?.[0]?.volumeUSD ?? 0,
+                        ),
+                      0,
+                    )
+                    .toFixed(2),
+                )}
               </div>
             </div>
           </div>
@@ -150,49 +175,35 @@ export const PoolContainer = () => {
             </>
           ) : tab === 'my-liquidity' ? (
             <div className="w-full h-full items-center flex flex-1 flex-col md:grid md:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-[18px]">
-              {/*{Object.entries(lpBalances)*/}
-              {/*  .filter(([, amount]) => amount > 0n)*/}
-              {/*  .map(([vaultKey, amount]) => {*/}
-              {/*    const vault = pools.find((vault) => vault.key === vaultKey)*/}
-              {/*    if (!vault) {*/}
-              {/*      return <></>*/}
-              {/*    }*/}
-              {/*    return (*/}
-              {/*      <VaultPositionCard*/}
-              {/*        chain={selectedChain}*/}
-              {/*        key={vault.key}*/}
-              {/*        vaultPosition={{*/}
-              {/*          vault,*/}
-              {/*          amount,*/}
-              {/*          value:*/}
-              {/*            vault.lpUsdValue **/}
-              {/*            Number(*/}
-              {/*              formatUnits(amount, vault.lpCurrency.decimals),*/}
-              {/*            ),*/}
-              {/*        }}*/}
-              {/*        router={router}*/}
-              {/*      />*/}
-              {/*    )*/}
-              {/*  })}*/}
+              {Object.entries(lpBalances)
+                .filter(([, amount]) => amount > 0n)
+                .map(([poolKey, amount]) => {
+                  const poolSnapshot = poolSnapshots.find(
+                    ({ key }) => key === poolKey,
+                  )
+                  if (!poolSnapshot) {
+                    return <></>
+                  }
+                  const value =
+                    Number(
+                      formatUnits(amount, poolSnapshot.currencyLp.decimals),
+                    ) * Number(poolSnapshot.lpPriceUSD)
+                  if (value < 0.01) {
+                    return <></>
+                  }
+                  return (
+                    <LpPositionCard
+                      amount={amount}
+                      chain={selectedChain}
+                      key={poolSnapshot.key}
+                      poolSnapshot={poolSnapshot}
+                      router={router}
+                    />
+                  )
+                })}
             </div>
           ) : (
-            <div className="flex flex-col justify-start items-center gap-3 sm:gap-4 mb-4">
-              <div className="w-full py-3 sm:py-4 bg-[#1d1f27] sm:bg-[#1c1e27] rounded-xl inline-flex flex-col justify-start items-start gap-3">
-                <div className="self-stretch px-4 sm:px-8 inline-flex justify-start items-start gap-1.5 sm:text-sm text-xs">
-                  <div className="w-16 flex justify-start items-center gap-2.5 text-gray-400">
-                    Rank
-                  </div>
-                  <div className="flex w-full">
-                    <div className="flex flex-1 justify-start items-center gap-2.5">
-                      <div className="justify-start text-gray-400">User</div>
-                    </div>
-                    <div className="flex flex-1 justify-start items-center gap-2.5">
-                      <div className="justify-start text-gray-400">Point</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <></>
           )}
         </div>
       </div>

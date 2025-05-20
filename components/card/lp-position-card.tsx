@@ -1,19 +1,21 @@
 import React from 'react'
 import { NextRouter } from 'next/router'
+import { PoolSnapshot } from '@clober/v2-sdk'
 
 import { CurrencyIcon } from '../icon/currency-icon'
-import { formatUnits } from '../../utils/bigint'
-import { toCommaSeparated } from '../../utils/number'
-import { VaultPosition } from '../../model/vault'
+import { formatDollarValue, formatUnits } from '../../utils/bigint'
 import { Chain } from '../../model/chain'
+import { toCommaSeparated } from '../../utils/number'
 
-export const VaultPositionCard = ({
+export const LpPositionCard = ({
   chain,
-  vaultPosition,
+  poolSnapshot,
+  amount,
   router,
 }: {
   chain: Chain
-  vaultPosition: VaultPosition
+  poolSnapshot: PoolSnapshot
+  amount: bigint
   router: NextRouter
 }) => {
   return (
@@ -24,22 +26,22 @@ export const VaultPositionCard = ({
             <div className="w-14 h-8 relative">
               <CurrencyIcon
                 chain={chain}
-                currency={vaultPosition.vault.currencyA}
+                currency={poolSnapshot.currencyA}
                 className="w-8 h-8 absolute left-0 top-0 z-[1] rounded-full"
               />
               <CurrencyIcon
                 chain={chain}
-                currency={vaultPosition.vault.currencyB}
+                currency={poolSnapshot.currencyB}
                 className="w-8 h-8 absolute left-6 top-0 rounded-full"
               />
             </div>
             <div className="flex gap-1 items-center">
               <div className="text-white text-base font-bold">
-                {vaultPosition.vault.currencyA.symbol}
+                {poolSnapshot.currencyA.symbol}
               </div>
               <div className="text-white text-base font-bold">-</div>
               <div className="text-white text-base font-bold">
-                {vaultPosition.vault.currencyB.symbol}
+                {poolSnapshot.currencyB.symbol}
               </div>
             </div>
           </div>
@@ -47,21 +49,29 @@ export const VaultPositionCard = ({
             <div className="text-gray-400 text-sm">LP in wallet</div>
             <div className="justify-center items-center gap-1 flex">
               <div className="text-right text-white text-base">
-                {formatUnits(
-                  vaultPosition.amount,
-                  vaultPosition.vault.lpCurrency.decimals,
-                  vaultPosition.vault.lpUsdValue,
+                {toCommaSeparated(
+                  formatUnits(
+                    amount,
+                    poolSnapshot.currencyLp.decimals,
+                    Number(poolSnapshot.lpPriceUSD),
+                  ),
                 )}
               </div>
               <div className="text-center text-gray-400 text-sm font-semibold">
-                (${toCommaSeparated(vaultPosition.value.toFixed(2))})
+                (
+                {formatDollarValue(
+                  amount,
+                  poolSnapshot.currencyLp.decimals,
+                  Number(poolSnapshot.lpPriceUSD),
+                )}
+                )
               </div>
             </div>
           </div>
         </div>
         <div className="flex self-stretch h-8 px-3 py-2 rounded-lg border-2 border-blue-500 border-solid justify-center items-center gap-1">
           <button
-            onClick={() => router.push(`/earn/${vaultPosition.vault.key}`)}
+            onClick={() => router.push(`/earn/${poolSnapshot.key}`)}
             className="grow shrink basis-0 opacity-90 text-center text-blue-500 text-sm font-bold"
           >
             Manage Position
@@ -73,22 +83,22 @@ export const VaultPositionCard = ({
           <div className="w-10 h-6 relative">
             <CurrencyIcon
               chain={chain}
-              currency={vaultPosition.vault.currencyA}
+              currency={poolSnapshot.currencyA}
               className="w-6 h-6 absolute left-0 top-0 z-[1]"
             />
             <CurrencyIcon
               chain={chain}
-              currency={vaultPosition.vault.currencyB}
+              currency={poolSnapshot.currencyB}
               className="w-6 h-6 absolute left-[16px] top-0"
             />
           </div>
           <div className="flex gap-1 items-center">
             <div className="text-white text-base font-bold">
-              {vaultPosition.vault.currencyA.symbol}
+              {poolSnapshot.currencyA.symbol}
             </div>
             <div className="text-white text-base font-bold">-</div>
             <div className="text-white text-base font-bold">
-              {vaultPosition.vault.currencyB.symbol}
+              {poolSnapshot.currencyB.symbol}
             </div>
           </div>
         </div>
@@ -98,20 +108,28 @@ export const VaultPositionCard = ({
           </div>
           <div className="justify-start items-center gap-2 flex">
             <div className="text-white text-sm font-bold">
-              {formatUnits(
-                vaultPosition.amount,
-                vaultPosition.vault.lpCurrency.decimals,
-                vaultPosition.vault.lpUsdValue,
+              {toCommaSeparated(
+                formatUnits(
+                  amount,
+                  poolSnapshot.currencyLp.decimals,
+                  Number(poolSnapshot.lpPriceUSD),
+                ),
               )}
             </div>
             <div className="text-gray-400 text-xs font-semibold">
-              (${toCommaSeparated(vaultPosition.value.toFixed(2))})
+              (
+              {formatDollarValue(
+                amount,
+                poolSnapshot.currencyLp.decimals,
+                Number(poolSnapshot.lpPriceUSD),
+              )}
+              )
             </div>
           </div>
         </div>
         <div className="flex self-stretch h-8 px-3 py-2 rounded-lg border border-solid border-blue-500 justify-center items-center gap-1">
           <button
-            onClick={() => router.push(`/earn/${vaultPosition.vault.key}`)}
+            onClick={() => router.push(`/earn/${poolSnapshot.key}`)}
             className="grow shrink basis-0 opacity-90 text-center text-blue-500 text-sm font-bold"
           >
             Manage Position
