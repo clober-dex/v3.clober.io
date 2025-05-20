@@ -1,6 +1,5 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 
-import { Vault } from '../../../model/vault'
 import { Prices } from '../../../model/prices'
 import { ActionButton, ActionButtonProps } from '../../button/action-button'
 import CurrencyAmountInput from '../../input/currency-amount-input'
@@ -8,10 +7,11 @@ import { toPlacesString } from '../../../utils/bignumber'
 import { formatDollarValue, formatUnits } from '../../../utils/bigint'
 import { SlippageToggle } from '../../toggle/slippage-toggle'
 import { Chain } from '../../../model/chain'
+import { Pool } from '../../../model/pool'
 
 export const AddLiquidityForm = ({
   chain,
-  vault,
+  pool,
   prices,
   currency0Amount,
   setCurrency0Amount,
@@ -29,7 +29,7 @@ export const AddLiquidityForm = ({
   actionButtonProps,
 }: {
   chain: Chain
-  vault: Vault
+  pool: Pool
   prices: Prices
   currency0Amount: string
   setCurrency0Amount: (inputCurrencyAmount: string) => void
@@ -46,6 +46,12 @@ export const AddLiquidityForm = ({
   isCalculatingReceiveLpAmount: boolean
   actionButtonProps: ActionButtonProps
 }) => {
+  const isNoLiquidity = useMemo(
+    () =>
+      pool.liquidityA.total.value === '0' &&
+      pool.liquidityB.total.value === '0',
+    [pool],
+  )
   return (
     <>
       <div className="flex flex-col relative gap-4 self-stretch">
@@ -55,19 +61,19 @@ export const AddLiquidityForm = ({
         <div className="flex flex-col relative gap-4 self-stretch">
           <CurrencyAmountInput
             chain={chain}
-            currency={vault.currencyA}
+            currency={pool.currencyA}
             value={currency0Amount}
             onValueChange={setCurrency0Amount}
             availableAmount={availableCurrency0Balance}
-            price={prices[vault.currencyA.address] ?? 0}
+            price={prices[pool.currencyA.address] ?? 0}
           />
           <CurrencyAmountInput
             chain={chain}
-            currency={vault.currencyB}
+            currency={pool.currencyB}
             value={currency1Amount}
             onValueChange={setCurrency1Amount}
             availableAmount={availableCurrency1Balance}
-            price={prices[vault.currencyB.address] ?? 0}
+            price={prices[pool.currencyB.address] ?? 0}
           />
         </div>
         <div className="flex items-center gap-3 ml-auto">
@@ -79,9 +85,7 @@ export const AddLiquidityForm = ({
               type="checkbox"
               className="sr-only peer"
               disabled={disableDisableSwap}
-              defaultChecked={
-                vault.reserveA + vault.reserveB > 0 && !chain.testnet
-              }
+              defaultChecked={!isNoLiquidity && !chain.testnet}
               onChange={() => {
                 setDisableSwap(!disableSwap)
               }}
@@ -102,8 +106,8 @@ export const AddLiquidityForm = ({
                   {toPlacesString(
                     formatUnits(
                       receiveLpCurrencyAmount,
-                      vault.lpCurrency.decimals,
-                      vault.lpUsdValue,
+                      pool.currencyLp.decimals,
+                      pool.lpPriceUSD,
                     ),
                   )}
                   {' LP'}
@@ -112,8 +116,8 @@ export const AddLiquidityForm = ({
                   (
                   {formatDollarValue(
                     receiveLpCurrencyAmount,
-                    vault.lpCurrency.decimals,
-                    vault.lpUsdValue,
+                    pool.currencyLp.decimals,
+                    pool.lpPriceUSD,
                   )}
                   )
                 </div>

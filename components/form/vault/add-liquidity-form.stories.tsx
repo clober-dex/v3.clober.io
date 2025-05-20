@@ -2,7 +2,6 @@ import React from 'react'
 import '../../../styles/globals.css'
 import { Meta, StoryObj } from '@storybook/react'
 import { mainnet } from 'viem/chains'
-import { zeroHash } from 'viem'
 
 import { AddLiquidityForm } from './add-liquidity-form'
 
@@ -24,17 +23,88 @@ type Story = StoryObj<typeof AddLiquidityForm>
 export const Default: Story = {
   args: {
     chain: mainnet,
-    vault: {
-      totalSupply: 10000,
-      historicalPriceIndex: [],
+    pool: {
+      chainId: 1,
       key: '0x',
-      salt: zeroHash,
-      hasDashboard: false,
-      hasPoint: false,
-      reserveA: 0,
-      reserveB: 0,
-      lpUsdValue: 12344.3241,
-      lpCurrency: {
+      liquidityA: {
+        total: {
+          currency: {
+            address: '0xf817257fed379853cDe0fa4F97AB987181B1E5Ea',
+            name: 'USD Coin',
+            symbol: 'USDC',
+            decimals: 6,
+          },
+          value: '74472.065381',
+        },
+        reserve: {
+          currency: {
+            address: '0xf817257fed379853cDe0fa4F97AB987181B1E5Ea',
+            name: 'USD Coin',
+            symbol: 'USDC',
+            decimals: 6,
+          },
+          value: '20852.178307',
+        },
+        cancelable: {
+          currency: {
+            address: '0xf817257fed379853cDe0fa4F97AB987181B1E5Ea',
+            name: 'USD Coin',
+            symbol: 'USDC',
+            decimals: 6,
+          },
+          value: '53619.887074',
+        },
+        claimable: {
+          currency: {
+            address: '0xf817257fed379853cDe0fa4F97AB987181B1E5Ea',
+            name: 'USD Coin',
+            symbol: 'USDC',
+            decimals: 6,
+          },
+          value: '0',
+        },
+      },
+      liquidityB: {
+        total: {
+          currency: {
+            address: '0xf817257fed379853cDe0fa4F97AB987181B1E5Ea',
+            name: 'USD Coin',
+            symbol: 'USDC',
+            decimals: 6,
+          },
+          value: '74472.065381',
+        },
+        reserve: {
+          currency: {
+            address: '0xf817257fed379853cDe0fa4F97AB987181B1E5Ea',
+            name: 'USD Coin',
+            symbol: 'USDC',
+            decimals: 6,
+          },
+          value: '20852.178307',
+        },
+        cancelable: {
+          currency: {
+            address: '0xf817257fed379853cDe0fa4F97AB987181B1E5Ea',
+            name: 'USD Coin',
+            symbol: 'USDC',
+            decimals: 6,
+          },
+          value: '53619.887074',
+        },
+        claimable: {
+          currency: {
+            address: '0xf817257fed379853cDe0fa4F97AB987181B1E5Ea',
+            name: 'USD Coin',
+            symbol: 'USDC',
+            decimals: 6,
+          },
+          value: '0',
+        },
+      },
+      lpPriceUSD: 12344.3241,
+      currencyLp: {
+        id: '0x',
         address: '0x0000000000000000000000000000000000000001',
         name: 'ETH-USDC-LP',
         symbol: 'ETH-USDC-LP',
@@ -54,7 +124,8 @@ export const Default: Story = {
       },
       apy: 120.5434,
       tvl: 43123123.0123455,
-      volume24h: 123123.123411,
+      // @ts-ignore
+      market: {},
     },
     prices: {
       '0x0000000000000000000000000000000000000001': 50000,

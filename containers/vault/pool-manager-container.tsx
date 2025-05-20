@@ -1,13 +1,12 @@
 import { useRouter } from 'next/router'
-import React, { useEffect, useMemo, useRef } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useWalletClient } from 'wagmi'
 import { useQuery } from '@tanstack/react-query'
 import { parseUnits, zeroAddress, zeroHash } from 'viem'
-import { removeLiquidity } from '@clober/v2-sdk'
+import { PoolSnapshot, removeLiquidity } from '@clober/v2-sdk'
 import BigNumber from 'bignumber.js'
 import { Tooltip } from 'react-tooltip'
 
-import { Vault } from '../../model/vault'
 import { useChainContext } from '../../contexts/chain-context'
 import { useCurrencyContext } from '../../contexts/currency-context'
 import { useVaultContractContext } from '../../contexts/vault/vault-contract-context'
@@ -18,20 +17,27 @@ import { QuestionMarkSvg } from '../../components/svg/question-mark-svg'
 import { AddLiquidityForm } from '../../components/form/vault/add-liquidity-form'
 import { RemoveLiquidityForm } from '../../components/form/vault/remove-liquidity-form'
 import { toCommaSeparated } from '../../utils/number'
+import { Pool } from '../../model/pool'
 
 import { VaultChartContainer } from './vault-chart-container'
+
+type PerformanceHistory = {
+  timestamp: number
+  pi: number
+  rpi: number
+}
 
 const isInvalidAmount = (amount: string) => {
   const parsedAmount = new BigNumber(amount)
   return parsedAmount.isNaN() || !parsedAmount.isFinite()
 }
 
-export const VaultManagerContainer = ({
-  vault,
-  showDashboard,
+export const PoolManagerContainer = ({
+  pool,
+  poolSnapshot,
 }: {
-  vault: Vault
-  showDashboard: boolean
+  pool: Pool
+  poolSnapshot: PoolSnapshot
 }) => {
   const [tab, setTab] = React.useState<'add-liquidity' | 'remove-liquidity'>(
     'add-liquidity',
@@ -54,7 +60,7 @@ export const VaultManagerContainer = ({
     vaultLpBalances,
   } = useVaultContext()
   const { mint, burn } = useVaultContractContext()
-  const [showPnL, setShowPnL] = React.useState(true)
+  const [showRPI, setShowRPI] = useState(true)
   const previousValues = useRef({
     currency0Amount,
     currency1Amount,
@@ -64,7 +70,7 @@ export const VaultManagerContainer = ({
     queryKey: [
       'calculate-receive-lp-amount',
       selectedChain.id,
-      vault.key,
+      pool.key,
       currency0Amount,
       currency1Amount,
       disableSwap,
@@ -81,17 +87,17 @@ export const VaultManagerContainer = ({
       const totalInputUsdValue = new BigNumber(
         isInvalidAmount(currency0Amount) ? 0 : currency0Amount,
       )
-        .times(prices[vault.currencyA.address] ?? 0)
+        .times(prices[pool.currencyA.address] ?? 0)
         .plus(
           new BigNumber(
             isInvalidAmount(currency1Amount) ? 0 : currency1Amount,
-          ).times(prices[vault.currencyB.address] ?? 0),
+          ).times(prices[pool.currencyB.address] ?? 0),
         )
       return parseUnits(
         totalInputUsdValue
-          .div(vault.lpUsdValue)
-          .toFixed(vault.lpCurrency.decimals),
-        vault.lpCurrency.decimals,
+          .div(pool.lpPriceUSD)
+          .toFixed(pool.currencyLp.decimals),
+        pool.currencyLp.decimals,
       )
     },
     initialData: 0n,
@@ -101,7 +107,7 @@ export const VaultManagerContainer = ({
     queryKey: [
       'calculate-receive-currencies',
       selectedChain.id,
-      vault,
+      pool.key,
       lpCurrencyAmount,
       slippageInput,
       prices,
@@ -114,8 +120,8 @@ export const VaultManagerContainer = ({
       const { result } = await removeLiquidity({
         chainId: selectedChain.id,
         userAddress: zeroAddress,
-        token0: vault.currencyA.address,
-        token1: vault.currencyB.address,
+        token0: pool.currencyA.address,
+        token1: pool.currencyB.address,
         salt: zeroHash,
         amount: lpCurrencyAmount,
         options: {
@@ -129,9 +135,44 @@ export const VaultManagerContainer = ({
     initialData: [],
   })
 
+  const isNoLiquidity = useMemo(
+    () =>
+      pool.liquidityA.total.value === '0' &&
+      pool.liquidityB.total.value === '0',
+    [pool],
+  )
+
+  const performanceHistories = useMemo(() => {
+    return poolSnapshot.performanceHistories
+      .sort((a, b) => a.timestamp - b.timestamp)
+      .map(({ timestamp, priceAUSD, priceBUSD, lpPriceUSD }) => {
+        const onHoldUSDValuePerLp =
+          (Number(poolSnapshot.initialLPInfo.tokenA.value) * priceAUSD +
+            Number(poolSnapshot.initialLPInfo.tokenB.value) * priceBUSD) /
+          Number(poolSnapshot.initialLPInfo.lpToken.value)
+
+        if (onHoldUSDValuePerLp === 0) {
+          return null
+        }
+        return {
+          timestamp,
+          pi:
+            Number(lpPriceUSD) / Number(poolSnapshot.initialLPInfo.lpPriceUSD),
+          rpi: Number(lpPriceUSD) / onHoldUSDValuePerLp,
+        }
+      })
+      .filter((item) => item !== null) as PerformanceHistory[]
+  }, [
+    poolSnapshot.initialLPInfo.lpPriceUSD,
+    poolSnapshot.initialLPInfo.lpToken.value,
+    poolSnapshot.initialLPInfo.tokenA.value,
+    poolSnapshot.initialLPInfo.tokenB.value,
+    poolSnapshot.performanceHistories,
+  ])
+
   useEffect(() => {
-    setDisableSwap(vault.reserveA + vault.reserveB === 0)
-  }, [vault.reserveA, vault.reserveB, setDisableSwap])
+    setDisableSwap(isNoLiquidity)
+  }, [isNoLiquidity, setDisableSwap])
 
   useEffect(() => {
     if (selectedChain.testnet) {
@@ -146,12 +187,12 @@ export const VaultManagerContainer = ({
 
   useEffect(
     () => {
-      if (disableSwap && vault.reserveA + vault.reserveB > 0) {
+      if (disableSwap && !isNoLiquidity) {
         // when change currency0Amount
         if (previousValues.current.currency0Amount !== currency0Amount) {
           const _currency1Amount = new BigNumber(currency0Amount)
-            .div(vault.reserveA)
-            .times(vault.reserveB)
+            .div(pool.liquidityA.total.value)
+            .times(pool.liquidityB.total.value)
             .toFixed()
           setCurrency1Amount(
             isInvalidAmount(_currency1Amount) ? '0' : _currency1Amount,
@@ -166,8 +207,8 @@ export const VaultManagerContainer = ({
         // when change currency1Amount
         else if (previousValues.current.currency1Amount !== currency1Amount) {
           const _currency0Amount = new BigNumber(currency1Amount)
-            .div(vault.reserveB)
-            .times(vault.reserveA)
+            .div(pool.liquidityB.total.value)
+            .times(pool.liquidityA.total.value)
             .toFixed()
           setCurrency0Amount(
             isInvalidAmount(_currency0Amount) ? '0' : _currency0Amount,
@@ -185,22 +226,17 @@ export const VaultManagerContainer = ({
     [currency0Amount, currency1Amount],
   )
 
-  const latestValue = useMemo(
-    () =>
-      vault.historicalPriceIndex.length > 0
-        ? vault.historicalPriceIndex[vault.historicalPriceIndex.length - 1]
-            .values[1]
-        : 0,
-    [vault.historicalPriceIndex],
-  )
-
-  const ratio0 = useMemo(
+  const ratioA = useMemo(
     () =>
       Math.floor(
-        (100 * vault.reserveA * prices[vault.currencyA.address]) /
-          (vault.totalSupply * vault.lpUsdValue),
+        new BigNumber(pool.liquidityA.total.value)
+          .times(prices[pool.currencyA.address] ?? 0)
+          .div(pool.totalSupply.value)
+          .div(pool.lpPriceUSD)
+          .times(100)
+          .toNumber(),
       ),
-    [prices, vault],
+    [prices, pool],
   )
 
   return (
@@ -231,42 +267,27 @@ export const VaultManagerContainer = ({
               <div className="w-10 h-6 md:w-14 md:h-8 shrink-0 relative">
                 <CurrencyIcon
                   chain={selectedChain}
-                  currency={vault.currencyB}
+                  currency={pool.currencyB}
                   className="w-6 h-6 md:w-8 md:h-8 absolute left-0 top-0 z-[1] rounded-full"
                 />
                 <CurrencyIcon
                   chain={selectedChain}
-                  currency={vault.currencyA}
+                  currency={pool.currencyA}
                   className="w-6 h-6 md:w-8 md:h-8 absolute left-4 md:left-6 top-0 rounded-full"
                 />
               </div>
 
               <div className="flex justify-center items-start gap-1 md:gap-2">
                 <div className="text-center text-white md:text-3xl font-bold">
-                  {vault.currencyB.symbol}
+                  {pool.currencyB.symbol}
                 </div>
                 <div className="text-center text-white md:text-3xl font-bold">
                   -
                 </div>
                 <div className="text-center text-white md:text-3xl font-bold">
-                  {vault.currencyA.symbol}
+                  {pool.currencyA.symbol}
                 </div>
               </div>
-
-              {vault.hasDashboard && (
-                <button
-                  onClick={() =>
-                    showDashboard
-                      ? router.push(`/earn/${vault.key}`)
-                      : router.push(`/earn/${vault.key}/dashboard`)
-                  }
-                  className="hidden lg:flex w-fit h-8 px-3 py-2 bg-blue-500 rounded-lg justify-center items-center gap-1"
-                >
-                  <div className="grow shrink basis-0 opacity-90 text-center text-white text-sm font-bold">
-                    {showDashboard ? 'Add Liquidity' : 'Dashboard'}
-                  </div>
-                </button>
-              )}
             </div>
           </div>
         </div>
@@ -281,13 +302,13 @@ export const VaultManagerContainer = ({
                 <div className="self-stretch w-full h-full inline-flex justify-start items-center gap-1">
                   <div
                     style={{
-                      width: `${ratio0}%`,
+                      width: `${ratioA}%`,
                     }}
                     className="h-1.5 bg-blue-500 rounded-tl rounded-bl"
                   />
                   <div
                     style={{
-                      width: `${100 - ratio0}%`,
+                      width: `${100 - ratioA}%`,
                     }}
                     className="h-1.5 bg-cyan-400 rounded-tr rounded-br"
                   />
@@ -298,24 +319,23 @@ export const VaultManagerContainer = ({
                     <div className="flex items-center gap-1 md:gap-2">
                       <CurrencyIcon
                         chain={selectedChain}
-                        currency={vault.currencyA}
+                        currency={pool.currencyA}
                         className="w-5 h-5 md:w-6 md:h-6 rounded-full"
                       />
                     </div>
                     <div className="text-blue-500 text-sm md:text-lg font-bold flex flex-col text-left items-center h-full">
                       {toCommaSeparated(
                         toPlacesAmountString(
-                          vault.reserveA.toString(),
-                          prices[vault.currencyA.address] ?? 0,
+                          pool.liquidityA.total.value.toString(),
+                          prices[pool.currencyA.address] ?? 0,
                         ),
                       )}
                       <span className="text-gray-400 font-medium text-sm">
                         ($
                         {toCommaSeparated(
-                          new BigNumber(
-                            vault.reserveA *
-                              (prices[vault.currencyA.address] ?? 0),
-                          ).toFixed(2),
+                          new BigNumber(pool.liquidityA.total.value)
+                            .times(prices[pool.currencyA.address] ?? 0)
+                            .toFixed(2),
                         )}
                         )
                       </span>
@@ -325,24 +345,23 @@ export const VaultManagerContainer = ({
                     <div className="flex items-center gap-1 md:gap-2">
                       <CurrencyIcon
                         chain={selectedChain}
-                        currency={vault.currencyB}
+                        currency={pool.currencyB}
                         className="w-5 h-5 md:w-6 md:h-6 rounded-full"
                       />
                     </div>
                     <div className="text-cyan-400 text-sm md:text-lg font-bold flex flex-col text-left items-center h-full">
                       {toCommaSeparated(
                         toPlacesAmountString(
-                          vault.reserveB.toString(),
-                          prices[vault.currencyB.address] ?? 0,
+                          pool.liquidityB.total.value.toString(),
+                          prices[pool.currencyB.address] ?? 0,
                         ),
                       )}
                       <span className="text-gray-400 font-medium text-sm">
                         ($
                         {toCommaSeparated(
-                          new BigNumber(
-                            vault.reserveB *
-                              (prices[vault.currencyB.address] ?? 0),
-                          ).toFixed(2),
+                          new BigNumber(pool.liquidityB.total.value)
+                            .times(prices[pool.currencyB.address] ?? 0)
+                            .toFixed(2),
                         )}
                         )
                       </span>
@@ -373,13 +392,16 @@ export const VaultManagerContainer = ({
                 </div>
               </div>
               <div className="text-sm font-semibold flex h-14 px-8 py-4 bg-gray-800 rounded-xl justify-center items-center gap-8 md:gap-12">
-                {selectedChain.testnet ? '-' : latestValue.toFixed(4)}
+                {(showRPI
+                  ? performanceHistories[performanceHistories.length - 1].rpi
+                  : performanceHistories[performanceHistories.length - 1].pi
+                ).toFixed(4)}
               </div>
             </div>
             <div className="flex-col items-start gap-3 md:gap-4 self-stretch hidden sm:flex">
               <div className="flex flex-col gap-0.5">
                 <div className="text-white text-sm md:text-base font-bold flex flex-row gap-1 items-center justify-center">
-                  <button onClick={() => setShowPnL(!showPnL)}>
+                  <button onClick={() => setShowRPI(!showRPI)}>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="13"
@@ -412,7 +434,7 @@ export const VaultManagerContainer = ({
                 </div>
                 <div className="flex flex-row gap-2">
                   <div className="flex text-gray-500 text-xs md:text-sm">
-                    {showPnL
+                    {showRPI
                       ? 'Relative Price Index(RPI)'
                       : 'Performance Index (PI)'}
                   </div>
@@ -421,7 +443,7 @@ export const VaultManagerContainer = ({
                       data-tooltip-id="index-info"
                       data-tooltip-place="bottom-end"
                       data-tooltip-html={
-                        showPnL
+                        showRPI
                           ? 'Relative Price Index (RPI) measures the historical performance of the Clober Liquidity Vault compared to a reference portfolio. The reference portfolio represents the value of assets if they had been held without any active management from the initial point. RPI effectively indicates how well the vault has performed relative to a passive “just hold” strategy.'
                           : 'Performance Index (PI) shows the relative value of your portfolio over time, starting at 1. A value above 1 indicates growth, while a value below 1 indicates a decrease. PI provides a snapshot of how the assets have performed since the initial measurement.'
                       }
@@ -436,10 +458,10 @@ export const VaultManagerContainer = ({
                 </div>
               </div>
               <VaultChartContainer
-                historicalPriceIndex={
-                  selectedChain.testnet ? [] : vault.historicalPriceIndex
-                }
-                showPnL={showPnL}
+                historicalPriceIndex={performanceHistories.sort(
+                  (a, b) => a.timestamp - b.timestamp,
+                )}
+                showRPI={showRPI}
               />
             </div>
           </div>
@@ -498,23 +520,22 @@ export const VaultManagerContainer = ({
               {tab === 'add-liquidity' ? (
                 <AddLiquidityForm
                   chain={selectedChain}
-                  vault={vault}
+                  pool={pool}
                   prices={prices}
                   currency0Amount={currency0Amount}
                   setCurrency0Amount={setCurrency0Amount}
                   availableCurrency0Balance={
-                    balances[vault.currencyA.address] ?? 0n
+                    balances[pool.currencyA.address] ?? 0n
                   }
                   currency1Amount={currency1Amount}
                   setCurrency1Amount={setCurrency1Amount}
                   availableCurrency1Balance={
-                    balances[vault.currencyB.address] ?? 0n
+                    balances[pool.currencyB.address] ?? 0n
                   }
                   disableSwap={disableSwap}
                   setDisableSwap={setDisableSwap}
                   disableDisableSwap={
-                    vault.reserveA + vault.reserveB === 0 ||
-                    selectedChain.testnet === true
+                    isNoLiquidity || selectedChain.testnet === true
                   }
                   slippageInput={slippageInput}
                   setSlippageInput={setSlippageInput}
@@ -533,22 +554,20 @@ export const VaultManagerContainer = ({
                       !walletClient ||
                       (Number(currency0Amount) === 0 &&
                         Number(currency1Amount) === 0) ||
-                      parseUnits(currency0Amount, vault.currencyA.decimals) >
-                        balances[vault.currencyA.address] ||
-                      parseUnits(currency1Amount, vault.currencyB.decimals) >
-                        balances[vault.currencyB.address] ||
+                      parseUnits(currency0Amount, pool.currencyA.decimals) >
+                        balances[pool.currencyA.address] ||
+                      parseUnits(currency1Amount, pool.currencyB.decimals) >
+                        balances[pool.currencyB.address] ||
                       (disableSwap &&
                         (Number(currency0Amount) === 0 ||
                           Number(currency1Amount) === 0)),
                     onClick: async () => {
                       await mint(
-                        vault.currencyA,
-                        vault.currencyB,
+                        pool.currencyA,
+                        pool.currencyB,
                         currency0Amount,
                         currency1Amount,
-                        vault.reserveA + vault.reserveB > 0
-                          ? disableSwap
-                          : true,
+                        !isNoLiquidity ? disableSwap : true,
                         Number(slippageInput),
                       )
                     },
@@ -557,16 +576,14 @@ export const VaultManagerContainer = ({
                       : Number(currency0Amount) === 0 &&
                           Number(currency1Amount) === 0
                         ? 'Enter amount'
-                        : parseUnits(
-                              currency0Amount,
-                              vault.currencyA.decimals,
-                            ) > balances[vault.currencyA.address]
-                          ? `Insufficient ${vault.currencyA.symbol} balance`
+                        : parseUnits(currency0Amount, pool.currencyA.decimals) >
+                            balances[pool.currencyA.address]
+                          ? `Insufficient ${pool.currencyA.symbol} balance`
                           : parseUnits(
                                 currency1Amount,
-                                vault.currencyB.decimals,
-                              ) > balances[vault.currencyB.address]
-                            ? `Insufficient ${vault.currencyB.symbol} balance`
+                                pool.currencyB.decimals,
+                              ) > balances[pool.currencyB.address]
+                            ? `Insufficient ${pool.currencyB.symbol} balance`
                             : disableSwap &&
                                 (Number(currency0Amount) === 0 ||
                                   Number(currency1Amount) === 0)
@@ -577,14 +594,14 @@ export const VaultManagerContainer = ({
               ) : (
                 <RemoveLiquidityForm
                   chain={selectedChain}
-                  vault={vault}
+                  pool={pool}
                   prices={{
                     ...prices,
-                    [vault.lpCurrency.address]: vault.lpUsdValue,
+                    [pool.currencyLp.address]: pool.lpPriceUSD,
                   }}
                   lpCurrencyAmount={lpCurrencyAmount}
                   setLpCurrencyAmount={setLpCurrencyAmount}
-                  availableLpCurrencyBalance={vaultLpBalances[vault.key] ?? 0n}
+                  availableLpCurrencyBalance={vaultLpBalances[pool.key] ?? 0n}
                   receiveCurrencies={
                     receiveCurrencies.length === 2
                       ? [
@@ -605,11 +622,11 @@ export const VaultManagerContainer = ({
                         ]
                       : [
                           {
-                            currency: vault.currencyA,
+                            currency: pool.currencyA,
                             amount: 0n,
                           },
                           {
-                            currency: vault.currencyB,
+                            currency: pool.currencyB,
                             amount: 0n,
                           },
                         ]
@@ -625,11 +642,11 @@ export const VaultManagerContainer = ({
                       !walletClient ||
                       Number(lpCurrencyAmount) === 0 ||
                       parseUnits(lpCurrencyAmount, 18) >
-                        vaultLpBalances[vault.key],
+                        vaultLpBalances[pool.key],
                     onClick: async () => {
                       await burn(
-                        vault.currencyA,
-                        vault.currencyB,
+                        pool.currencyA,
+                        pool.currencyB,
                         lpCurrencyAmount,
                         slippageInput,
                       )
@@ -639,8 +656,8 @@ export const VaultManagerContainer = ({
                       : Number(lpCurrencyAmount) === 0
                         ? 'Enter amount'
                         : parseUnits(lpCurrencyAmount, 18) >
-                            vaultLpBalances[vault.key]
-                          ? `Insufficient ${vault.lpCurrency.symbol} balance`
+                            vaultLpBalances[pool.key]
+                          ? `Insufficient ${pool.currencyLp.symbol} balance`
                           : `Remove Liquidity`,
                   }}
                 />

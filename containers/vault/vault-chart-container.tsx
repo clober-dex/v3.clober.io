@@ -4,27 +4,24 @@ import { TamaguiProvider } from '@tamagui/web'
 import { Chart } from '../../components/chart/chart-model'
 import tamaguiConfig from '../../tamagui.config'
 import { ChartHeader } from '../../components/chart/chart-header'
-import {
-  StackedLineData,
-  VaultPerformanceChartModel,
-} from '../../components/chart/vault-performance-chart-model'
+import { VaultPerformanceChartModel } from '../../components/chart/vault-performance-chart-model'
 
 export const VaultChartContainer = ({
   historicalPriceIndex,
-  showPnL,
+  showRPI,
 }: {
-  historicalPriceIndex: StackedLineData[]
-  showPnL: boolean
+  historicalPriceIndex: { timestamp: number; pi: number; rpi: number }[]
+  showRPI: boolean
 }) => {
   const lastEntry = historicalPriceIndex[historicalPriceIndex.length - 1]
   const params = useMemo(
     () => ({
-      data: historicalPriceIndex.map((entry) => ({
-        time: entry.time,
-        values: showPnL ? [entry.values[1], 0] : [entry.values[0], 0],
+      data: historicalPriceIndex.map(({ timestamp, rpi, pi }) => ({
+        time: timestamp,
+        values: showRPI ? [rpi, 0] : [pi, 0],
       })),
       colors: ['#4C82FB', '#FC72FF'],
-      yMultiplier: 1000,
+      yMultiplier: 1,
       gradients: [
         {
           start: 'rgba(96, 123, 238, 0.20)',
@@ -36,7 +33,7 @@ export const VaultChartContainer = ({
         },
       ],
     }),
-    [showPnL, historicalPriceIndex],
+    [showRPI, historicalPriceIndex],
   )
 
   return (
@@ -55,13 +52,15 @@ export const VaultChartContainer = ({
             {(crosshairData) => {
               const value = crosshairData
                 ? crosshairData.values[0]
-                : (lastEntry?.values[showPnL ? 1 : 0] ?? 0)
+                : showRPI
+                  ? lastEntry.rpi
+                  : lastEntry.pi
               return (
                 <ChartHeader
                   value={`${value.toFixed(4)}`}
                   time={crosshairData?.time as any}
                   detailData={
-                    showPnL
+                    showRPI
                       ? [
                           {
                             label: 'RPI',

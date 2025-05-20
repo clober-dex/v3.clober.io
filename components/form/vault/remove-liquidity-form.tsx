@@ -1,6 +1,5 @@
 import React from 'react'
 
-import { Vault } from '../../../model/vault'
 import { Prices } from '../../../model/prices'
 import { Currency } from '../../../model/currency'
 import { ActionButton, ActionButtonProps } from '../../button/action-button'
@@ -8,10 +7,11 @@ import LpCurrencyAmountInput from '../../input/lp-currency-amount-input'
 import { formatDollarValue, formatUnits } from '../../../utils/bigint'
 import { SlippageToggle } from '../../toggle/slippage-toggle'
 import { Chain } from '../../../model/chain'
+import { Pool } from '../../../model/pool'
 
 export const RemoveLiquidityForm = ({
   chain,
-  vault,
+  pool,
   prices,
   lpCurrencyAmount,
   setLpCurrencyAmount,
@@ -23,7 +23,7 @@ export const RemoveLiquidityForm = ({
   actionButtonProps,
 }: {
   chain: Chain
-  vault: Vault
+  pool: Pool
   prices: Prices
   lpCurrencyAmount: string
   setLpCurrencyAmount: (inputCurrencyAmount: string) => void
@@ -42,13 +42,13 @@ export const RemoveLiquidityForm = ({
         </div>
         <LpCurrencyAmountInput
           chain={chain}
-          currency={vault.lpCurrency}
-          currency0={vault.currencyA}
-          currency1={vault.currencyB}
+          currency={pool.currencyLp}
+          currency0={pool.currencyA}
+          currency1={pool.currencyB}
           value={lpCurrencyAmount}
           onValueChange={setLpCurrencyAmount}
           availableAmount={availableLpCurrencyBalance}
-          price={prices[vault.lpCurrency.address] ?? 0}
+          price={prices[pool.currencyLp.address] ?? 0}
         />
       </div>
       <div className="flex flex-col items-start gap-3 md:gap-4 self-stretch">
