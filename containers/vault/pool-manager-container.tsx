@@ -3,23 +3,23 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useWalletClient } from 'wagmi'
 import { useQuery } from '@tanstack/react-query'
 import { parseUnits, zeroAddress, zeroHash } from 'viem'
-import { PoolSnapshot, removeLiquidity } from '@clober/v2-sdk'
+import { removeLiquidity } from '@clober/v2-sdk'
 import BigNumber from 'bignumber.js'
 import { Tooltip } from 'react-tooltip'
 
 import { useChainContext } from '../../contexts/chain-context'
 import { useCurrencyContext } from '../../contexts/currency-context'
-import { usePoolContractContext } from '../../contexts/vault/pool-contract-context'
-import { usePoolContext } from '../../contexts/vault/pool-context'
+import { usePoolContractContext } from '../../contexts/pool/pool-contract-context'
+import { usePoolContext } from '../../contexts/pool/pool-context'
 import { CurrencyIcon } from '../../components/icon/currency-icon'
 import { toPlacesAmountString } from '../../utils/bignumber'
 import { QuestionMarkSvg } from '../../components/svg/question-mark-svg'
 import { AddLiquidityForm } from '../../components/form/vault/add-liquidity-form'
 import { RemoveLiquidityForm } from '../../components/form/vault/remove-liquidity-form'
 import { toCommaSeparated } from '../../utils/number'
-import { Pool } from '../../model/pool'
+import { Pool, PoolSnapshot } from '../../model/pool'
 
-import { VaultChartContainer } from './vault-chart-container'
+import { PoolChartContainer } from './pool-chart-container'
 
 type PerformanceHistory = {
   timestamp: number
@@ -95,7 +95,7 @@ export const PoolManagerContainer = ({
         )
       return parseUnits(
         totalInputUsdValue
-          .div(pool.lpPriceUSD)
+          .div(pool.current.lpPriceUSD)
           .toFixed(pool.currencyLp.decimals),
         pool.currencyLp.decimals,
       )
@@ -143,31 +143,35 @@ export const PoolManagerContainer = ({
   )
 
   const performanceHistories = useMemo(() => {
-    return poolSnapshot.performanceHistories
-      .sort((a, b) => a.timestamp - b.timestamp)
-      .map(({ timestamp, priceAUSD, priceBUSD, lpPriceUSD }) => {
-        const onHoldUSDValuePerLp =
-          (Number(poolSnapshot.initialLPInfo.tokenA.value) * priceAUSD +
-            Number(poolSnapshot.initialLPInfo.tokenB.value) * priceBUSD) /
-          Number(poolSnapshot.initialLPInfo.lpToken.value)
+    return selectedChain.testnet
+      ? []
+      : (poolSnapshot.performanceHistories
+          .sort((a, b) => a.timestamp - b.timestamp)
+          .map(({ timestamp, priceAUSD, priceBUSD, lpPriceUSD }) => {
+            const onHoldUSDValuePerLp =
+              (Number(poolSnapshot.initialLPInfo.tokenA.value) * priceAUSD +
+                Number(poolSnapshot.initialLPInfo.tokenB.value) * priceBUSD) /
+              Number(poolSnapshot.initialLPInfo.lpToken.value)
 
-        if (onHoldUSDValuePerLp === 0) {
-          return null
-        }
-        return {
-          timestamp,
-          pi:
-            Number(lpPriceUSD) / Number(poolSnapshot.initialLPInfo.lpPriceUSD),
-          rpi: Number(lpPriceUSD) / onHoldUSDValuePerLp,
-        }
-      })
-      .filter((item) => item !== null) as PerformanceHistory[]
+            if (onHoldUSDValuePerLp === 0) {
+              return null
+            }
+            return {
+              timestamp,
+              pi:
+                Number(lpPriceUSD) /
+                Number(poolSnapshot.initialLPInfo.lpPriceUSD),
+              rpi: Number(lpPriceUSD) / onHoldUSDValuePerLp,
+            }
+          })
+          .filter((item) => item !== null) as PerformanceHistory[])
   }, [
     poolSnapshot.initialLPInfo.lpPriceUSD,
     poolSnapshot.initialLPInfo.lpToken.value,
     poolSnapshot.initialLPInfo.tokenA.value,
     poolSnapshot.initialLPInfo.tokenB.value,
     poolSnapshot.performanceHistories,
+    selectedChain.testnet,
   ])
 
   useEffect(() => {
@@ -232,7 +236,7 @@ export const PoolManagerContainer = ({
         new BigNumber(pool.liquidityA.total.value)
           .times(prices[pool.currencyA.address] ?? 0)
           .div(pool.totalSupply.value)
-          .div(pool.lpPriceUSD)
+          .div(pool.current.lpPriceUSD)
           .times(100)
           .toNumber(),
       ),
@@ -393,8 +397,10 @@ export const PoolManagerContainer = ({
               </div>
               <div className="text-sm font-semibold flex h-14 px-8 py-4 bg-gray-800 rounded-xl justify-center items-center gap-8 md:gap-12">
                 {(showRPI
-                  ? performanceHistories[performanceHistories.length - 1].rpi
-                  : performanceHistories[performanceHistories.length - 1].pi
+                  ? (performanceHistories?.[performanceHistories.length - 1]
+                      ?.rpi ?? 0)
+                  : (performanceHistories?.[performanceHistories.length - 1]
+                      ?.pi ?? 0)
                 ).toFixed(4)}
               </div>
             </div>
@@ -457,7 +463,7 @@ export const PoolManagerContainer = ({
                   </div>
                 </div>
               </div>
-              <VaultChartContainer
+              <PoolChartContainer
                 historicalPriceIndex={performanceHistories.sort(
                   (a, b) => a.timestamp - b.timestamp,
                 )}
@@ -597,7 +603,7 @@ export const PoolManagerContainer = ({
                   pool={pool}
                   prices={{
                     ...prices,
-                    [pool.currencyLp.address]: pool.lpPriceUSD,
+                    [pool.currencyLp.address]: pool.current.lpPriceUSD,
                   }}
                   lpCurrencyAmount={lpCurrencyAmount}
                   setLpCurrencyAmount={setLpCurrencyAmount}

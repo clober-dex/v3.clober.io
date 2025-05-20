@@ -3,22 +3,22 @@ import { Meta, StoryObj } from '@storybook/react'
 import { mainnet } from 'viem/chains'
 import { zeroHash } from 'viem'
 
-import { VaultCard } from './vault-card'
+import { PoolCard } from './pool-card'
 
 export default {
   title: 'Card/VaultCard',
-  component: VaultCard,
+  component: PoolCard,
   parameters: {
     layout: 'centered',
   },
-} as Meta<typeof VaultCard>
+} as Meta<typeof PoolCard>
 
-type Story = StoryObj<typeof VaultCard>
+type Story = StoryObj<typeof PoolCard>
 
 export const Default: Story = {
   args: {
     chain: mainnet,
-    vault: {
+    poolSnapshot: {
       totalSupply: 10000,
       historicalPriceIndex: [],
       key: '0x',

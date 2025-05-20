@@ -4,30 +4,26 @@ import { useRouter } from 'next/router'
 import { Tooltip } from 'react-tooltip'
 import { useQuery } from '@tanstack/react-query'
 
-import { usePoolContext } from '../../contexts/vault/pool-context'
+import { usePoolContext } from '../../contexts/pool/pool-context'
 import { useChainContext } from '../../contexts/chain-context'
 import { toCommaSeparated } from '../../utils/number'
 import { QuestionMarkSvg } from '../../components/svg/question-mark-svg'
-import { fetchVaults } from '../../apis/vault'
 import { useCurrencyContext } from '../../contexts/currency-context'
-import { VaultPositionCard } from '../../components/card/vault-position-card'
-import { formatUnits } from '../../utils/bigint'
-import { VaultCard } from '../../components/card/vault-card'
 import { Loading } from '../../components/loading'
 
-export const VaultContainer = () => {
+export const PoolContainer = () => {
   const router = useRouter()
   const { address: userAddress } = useAccount()
   const { lpBalances } = usePoolContext()
   const { selectedChain } = useChainContext()
   const { prices } = useCurrencyContext()
 
-  const [tab, setTab] = React.useState<'my-liquidity' | 'vault'>('vault')
+  const [tab, setTab] = React.useState<'my-liquidity' | 'pool'>('pool')
 
-  const { data: vaults } = useQuery({
-    queryKey: ['vaults', selectedChain.id, Object.keys(prices).length !== 0],
+  const { data: pools } = useQuery({
+    queryKey: ['pools', selectedChain.id, Object.keys(prices).length !== 0],
     queryFn: async () => {
-      return fetchVaults(selectedChain, prices)
+      return []
     },
     initialData: [],
   })
@@ -50,10 +46,10 @@ export const VaultContainer = () => {
                 TVL
               </div>
               <div className="self-stretch text-center text-white text-lg sm:text-2xl font-bold">
-                $
-                {toCommaSeparated(
-                  vaults.reduce((acc, vault) => acc + vault.tvl, 0).toFixed(2),
-                )}
+                {/*$*/}
+                {/*{toCommaSeparated(*/}
+                {/*  pools.reduce((acc, vault) => acc + vault.tvl, 0).toFixed(2),*/}
+                {/*)}*/}
               </div>
             </div>
             <div className="grow shrink basis-0 h-full px-6 py-4 sm:px-8 sm:py-6 bg-[rgba(96,165,250,0.10)] rounded-xl sm:rounded-2xl flex-col justify-center items-center gap-3 inline-flex bg-gray-800">
@@ -61,20 +57,20 @@ export const VaultContainer = () => {
                 24h Volume
               </div>
               <div className="self-stretch text-center text-white text-lg sm:text-2xl font-bold">
-                $
-                {toCommaSeparated(
-                  vaults
-                    .reduce((acc, vault) => acc + vault.volume24h, 0)
-                    .toFixed(2),
-                )}
+                {/*$*/}
+                {/*{toCommaSeparated(*/}
+                {/*  pools*/}
+                {/*    .reduce((acc, vault) => acc + vault.volume24h, 0)*/}
+                {/*    .toFixed(2),*/}
+                {/*)}*/}
               </div>
             </div>
           </div>
           <div className="flex w-full mt-8 sm:mt-0 sm:mr-auto px-4">
             <div className="w-full sm:w-[378px] h-[40px] sm:h-[56px] items-center flex">
               <button
-                onClick={() => setTab('vault')}
-                disabled={tab === 'vault'}
+                onClick={() => setTab('pool')}
+                disabled={tab === 'pool'}
                 className="flex flex-1 gap-2 items-center justify-center w-full h-full text-gray-500 disabled:text-white disabled:bg-gray-800 bg-transparent rounded-tl-2xl rounded-tr-2xl"
               >
                 <div className="text-center text-sm sm:text-base font-bold">
@@ -102,7 +98,7 @@ export const VaultContainer = () => {
       </div>
       <div className="flex w-full flex-col items-center mt-6 px-4 lg:px-0 gap-4 sm:gap-8">
         <div className={`flex flex-col w-full lg:w-[1060px] h-full gap-6`}>
-          {tab === 'vault' ? (
+          {tab === 'pool' ? (
             <>
               <div className="hidden lg:flex self-stretch px-4 justify-start items-center gap-4">
                 <div className="w-72 text-gray-400 text-sm font-semibold">
@@ -132,47 +128,47 @@ export const VaultContainer = () => {
                 </div>
               </div>
 
-              {vaults.length === 0 && <Loading className="flex mt-8 sm:mt-0" />}
+              {pools.length === 0 && <Loading className="flex mt-8 sm:mt-0" />}
 
               <div className="relative flex justify-center w-full h-full lg:h-[660px]">
                 <div className="lg:absolute lg:top-0 lg:overflow-x-scroll w-full h-full items-center flex flex-1 flex-col md:grid md:grid-cols-2 lg:flex gap-3">
-                  {vaults.map((vault, index) => (
-                    <VaultCard
-                      chain={selectedChain}
-                      key={index}
-                      vault={vault}
-                      router={router}
-                    />
-                  ))}
+                  {/*{pools.map((vault, index) => (*/}
+                  {/*  <PoolCard*/}
+                  {/*    chain={selectedChain}*/}
+                  {/*    key={index}*/}
+                  {/*    poolKey={vault.key}*/}
+                  {/*    router={router}*/}
+                  {/*  />*/}
+                  {/*))}*/}
                 </div>
               </div>
             </>
           ) : tab === 'my-liquidity' ? (
             <div className="w-full h-full items-center flex flex-1 flex-col md:grid md:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-[18px]">
-              {Object.entries(lpBalances)
-                .filter(([, amount]) => amount > 0n)
-                .map(([vaultKey, amount]) => {
-                  const vault = vaults.find((vault) => vault.key === vaultKey)
-                  if (!vault) {
-                    return <></>
-                  }
-                  return (
-                    <VaultPositionCard
-                      chain={selectedChain}
-                      key={vault.key}
-                      vaultPosition={{
-                        vault,
-                        amount,
-                        value:
-                          vault.lpUsdValue *
-                          Number(
-                            formatUnits(amount, vault.lpCurrency.decimals),
-                          ),
-                      }}
-                      router={router}
-                    />
-                  )
-                })}
+              {/*{Object.entries(lpBalances)*/}
+              {/*  .filter(([, amount]) => amount > 0n)*/}
+              {/*  .map(([vaultKey, amount]) => {*/}
+              {/*    const vault = pools.find((vault) => vault.key === vaultKey)*/}
+              {/*    if (!vault) {*/}
+              {/*      return <></>*/}
+              {/*    }*/}
+              {/*    return (*/}
+              {/*      <VaultPositionCard*/}
+              {/*        chain={selectedChain}*/}
+              {/*        key={vault.key}*/}
+              {/*        vaultPosition={{*/}
+              {/*          vault,*/}
+              {/*          amount,*/}
+              {/*          value:*/}
+              {/*            vault.lpUsdValue **/}
+              {/*            Number(*/}
+              {/*              formatUnits(amount, vault.lpCurrency.decimals),*/}
+              {/*            ),*/}
+              {/*        }}*/}
+              {/*        router={router}*/}
+              {/*      />*/}
+              {/*    )*/}
+              {/*  })}*/}
             </div>
           ) : (
             <div className="flex flex-col justify-start items-center gap-3 sm:gap-4 mb-4">

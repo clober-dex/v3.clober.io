@@ -6,7 +6,7 @@ import tamaguiConfig from '../../tamagui.config'
 import { ChartHeader } from '../../components/chart/chart-header'
 import { VaultPerformanceChartModel } from '../../components/chart/vault-performance-chart-model'
 
-export const VaultChartContainer = ({
+export const PoolChartContainer = ({
   historicalPriceIndex,
   showRPI,
 }: {
@@ -53,8 +53,8 @@ export const VaultChartContainer = ({
               const value = crosshairData
                 ? crosshairData.values[0]
                 : showRPI
-                  ? lastEntry.rpi
-                  : lastEntry.pi
+                  ? (lastEntry?.rpi ?? 0)
+                  : (lastEntry?.pi ?? 0)
               return (
                 <ChartHeader
                   value={`${value.toFixed(4)}`}

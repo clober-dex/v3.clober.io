@@ -1,7 +1,6 @@
 import React from 'react'
 import { useRouter } from 'next/router'
 import { useQuery } from '@tanstack/react-query'
-import { PoolSnapshot } from '@clober/v2-sdk'
 
 import { PoolManagerContainer } from '../../../containers/vault/pool-manager-container'
 import { useChainContext } from '../../../contexts/chain-context'
@@ -9,7 +8,7 @@ import { useCurrencyContext } from '../../../contexts/currency-context'
 import { Loading } from '../../../components/loading'
 import { CHAIN_CONFIG } from '../../../chain-configs'
 import { fetchPool } from '../../../apis/pool'
-import { Pool } from '../../../model/pool'
+import { Pool, PoolSnapshot } from '../../../model/pool'
 
 export default function PoolManage() {
   const router = useRouter()

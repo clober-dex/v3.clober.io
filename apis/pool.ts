@@ -1,10 +1,17 @@
-import { getPool, getPoolSnapshot, PoolSnapshot } from '@clober/v2-sdk'
+import { getPool, getPoolSnapshot } from '@clober/v2-sdk'
 import { zeroHash } from 'viem'
 
 import { Chain } from '../model/chain'
 import { Prices } from '../model/prices'
-import { Pool } from '../model/pool'
+import { Pool, PoolSnapshot } from '../model/pool'
 import { CHAIN_CONFIG } from '../chain-configs'
+
+export async function fetchPoolSnapshots(
+  chain: Chain,
+  prices: Prices,
+): Promise<PoolSnapshot[]> {
+  return []
+}
 
 export async function fetchPool(
   chain: Chain,
@@ -19,9 +26,9 @@ export async function fetchPool(
     chainId: chain.id,
     token0: poolSnapshot.currencyA.address,
     token1: poolSnapshot.currencyB.address,
-    salt: zeroHash, // TODO: get salt from poolSnapshot
+    salt: zeroHash,
     options: {
-      // useSubgraph: true, // doesn't matter since to get pool liquidity, we need to use on-chain call
+      useSubgraph: true, // doesn't matter since to get pool liquidity, we need to use on-chain call
       // rpcUrl: CHAIN_CONFIG.RPC_URL,
     },
   })
@@ -33,10 +40,19 @@ export async function fetchPool(
   return {
     pool: {
       ...pool,
-      lpPriceUSD: tvl / Number(pool.totalSupply.value),
-      tvl,
-      apy: 1,
+      current: {
+        lpPriceUSD: tvl / Number(pool.totalSupply.value),
+        tvl,
+        apy: 12.34, // TODO: fix it
+      },
     },
-    poolSnapshot,
+    poolSnapshot: {
+      ...poolSnapshot,
+      current: {
+        lpPriceUSD: tvl / Number(pool.totalSupply.value),
+        tvl,
+        apy: 12.34, // TODO: fix it
+      },
+    },
   }
 }

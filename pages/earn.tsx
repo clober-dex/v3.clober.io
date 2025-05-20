@@ -1,7 +1,7 @@
 import React from 'react'
 
-import { VaultContainer } from '../containers/vault/vault-container'
+import { PoolContainer } from '../containers/vault/pool-container'
 
 export default function Earn() {
-  return <VaultContainer />
+  return <PoolContainer />
 }

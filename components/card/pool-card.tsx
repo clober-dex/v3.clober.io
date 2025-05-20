@@ -3,19 +3,29 @@ import { NextRouter } from 'next/router'
 import BigNumber from 'bignumber.js'
 import { Tooltip } from 'react-tooltip'
 
-import { Vault } from '../../model/vault'
 import { CurrencyIcon } from '../icon/currency-icon'
 import { toCommaSeparated } from '../../utils/number'
 import { QuestionMarkSvg } from '../svg/question-mark-svg'
 import { Chain } from '../../model/chain'
+import { Currency } from '../../model/currency'
 
-export const VaultCard = ({
+export const PoolCard = ({
   chain,
-  vault,
+  poolKey,
+  currencyA,
+  currencyB,
+  apy,
+  tvl,
+  volume24h,
   router,
 }: {
   chain: Chain
-  vault: Vault
+  poolKey: `0x${string}`
+  currencyA: Currency
+  currencyB: Currency
+  apy: number
+  tvl: number
+  volume24h: number
   router: NextRouter
 }) => {
   return (
@@ -25,56 +35,45 @@ export const VaultCard = ({
           <div className="w-14 h-8 shrink-0 relative">
             <CurrencyIcon
               chain={chain}
-              currency={vault.currencyB}
+              currency={currencyB}
               className="w-8 h-8 absolute left-0 top-0 z-[1] rounded-full"
             />
             <CurrencyIcon
               chain={chain}
-              currency={vault.currencyA}
+              currency={currencyA}
               className="w-8 h-8 absolute left-6 top-0 rounded-full"
             />
           </div>
           <div className="flex items-center text-white text-base font-bold gap-1 text-nowrap">
-            <div>{vault.currencyB.symbol}</div>
+            <div>{currencyB.symbol}</div>
             <div>-</div>
-            <div>{vault.currencyA.symbol}</div>
+            <div>{currencyA.symbol}</div>
           </div>
         </div>
         <div className="w-[140px] text-white text-base font-bold flex flex-row gap-2">
-          {`${!BigNumber(vault.apy).isNaN() && !BigNumber(vault.apy).isZero() && BigNumber(vault.apy).lt(10000) ? `${vault.apy.toFixed(2)}%` : '-'}`}
+          {`${!BigNumber(apy).isNaN() && !BigNumber(apy).isZero() && BigNumber(apy).lt(10000) ? `${apy.toFixed(2)}%` : '-'}`}
         </div>
         <div className="w-[140px] text-white text-base font-bold">
-          ${toCommaSeparated(vault.tvl.toFixed(0))}
+          ${toCommaSeparated(tvl.toFixed(0))}
         </div>
         <div className="w-[140px] text-white text-base font-bold">
-          ${toCommaSeparated(vault.volume24h.toFixed(0))}
+          ${toCommaSeparated(volume24h.toFixed(0))}
         </div>
         <div className="flex gap-2">
-          {vault.hasDashboard ? (
-            <button
-              onClick={() => router.push(`/earn/${vault.key}/dashboard`)}
-              className="flex w-[130px] h-8 px-3 py-2 bg-blue-500 rounded-lg justify-center items-center gap-1"
-            >
-              <div className="grow shrink basis-0 opacity-90 text-center text-white text-sm font-bold">
-                Dashboard
-              </div>
-            </button>
-          ) : (
-            <button
-              onClick={() =>
-                router.push(
-                  `/trade?inputCurrency=${vault.currencyA.address}&outputCurrency=${vault.currencyB.address}`,
-                )
-              }
-              className="flex w-[130px] h-8 px-3 py-2 bg-blue-500 rounded-lg justify-center items-center gap-1"
-            >
-              <div className="grow shrink basis-0 opacity-90 text-center text-white text-sm font-bold">
-                Trade
-              </div>
-            </button>
-          )}
           <button
-            onClick={() => router.push(`/earn/${vault.key}`)}
+            onClick={() =>
+              router.push(
+                `/trade?inputCurrency=${currencyA.address}&outputCurrency=${currencyB.address}`,
+              )
+            }
+            className="flex w-[130px] h-8 px-3 py-2 bg-blue-500 rounded-lg justify-center items-center gap-1"
+          >
+            <div className="grow shrink basis-0 opacity-90 text-center text-white text-sm font-bold">
+              Trade
+            </div>
+          </button>
+          <button
+            onClick={() => router.push(`/earn/${poolKey}`)}
             className={`flex w-40 h-8 px-3 py-2 bg-blue-500 rounded-lg justify-center items-center gap-1`}
           >
             <div className="grow shrink basis-0 opacity-90 text-center text-white text-sm font-bold">
@@ -88,26 +87,26 @@ export const VaultCard = ({
           <div className="w-10 h-6 relative">
             <CurrencyIcon
               chain={chain}
-              currency={vault.currencyA}
+              currency={currencyA}
               className="w-6 h-6 absolute left-0 top-0 z-[1] rounded-full"
             />
             <CurrencyIcon
               chain={chain}
-              currency={vault.currencyB}
+              currency={currencyB}
               className="w-6 h-6 absolute left-[16px] top-0 rounded-full"
             />
           </div>
           <div className="flex gap-1 justify-start items-center">
             <div className="text-white text-base font-bold">
-              {vault.currencyA.symbol}
+              {currencyA.symbol}
             </div>
             <div className="text-white text-base font-bold">-</div>
             <div className="text-white text-base font-bold">
-              {vault.currencyB.symbol}
+              {currencyB.symbol}
             </div>
           </div>
           <button
-            onClick={() => router.push(`/earn/${vault.key}`)}
+            onClick={() => router.push(`/earn/${poolKey}`)}
             className="flex ml-auto"
           >
             <svg
@@ -146,7 +145,7 @@ export const VaultCard = ({
               </div>
             </div>
             <div className="self-stretch text-white text-sm font-bold">
-              {`${!BigNumber(vault.apy).isNaN() && !BigNumber(vault.apy).isZero() && BigNumber(vault.apy).lt(10000) ? `${vault.apy.toFixed(2)}%` : '-'}`}
+              {`${!BigNumber(apy).isNaN() && !BigNumber(apy).isZero() && BigNumber(apy).lt(10000) ? `${apy.toFixed(2)}%` : '-'}`}
             </div>
           </div>
           <div className="flex w-full flex-col justify-start items-center gap-2">
@@ -154,7 +153,7 @@ export const VaultCard = ({
               Total Liquidity
             </div>
             <div className="self-stretch text-center text-white text-sm font-bold">
-              ${toCommaSeparated(vault.tvl.toFixed(0))}
+              ${toCommaSeparated(tvl.toFixed(0))}
             </div>
           </div>
           <div className="flex w-full flex-col justify-start items-center gap-2">
@@ -162,7 +161,7 @@ export const VaultCard = ({
               24h Volume
             </div>
             <div className="self-stretch text-right text-white text-sm font-bold">
-              ${toCommaSeparated(vault.volume24h.toFixed(0))}
+              ${toCommaSeparated(volume24h.toFixed(0))}
             </div>
           </div>
         </div>
