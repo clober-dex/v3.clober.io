@@ -1,5 +1,4 @@
 import type { Config } from 'tailwindcss'
-import colors from 'tailwindcss/colors'
 
 import { CHAIN_CONFIG } from './chain-configs'
 
