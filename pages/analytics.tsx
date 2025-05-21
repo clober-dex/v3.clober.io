@@ -10,8 +10,7 @@ import RedirectIfNotMonadTestnetContainer from '../containers/redirect-if-not-mo
 import { HistogramChart } from '../components/chart/histogram-chart'
 import { Loading } from '../components/loading'
 
-const buildCurrencyLabel = (currency: Currency): string =>
-  `${currency.symbol}(${currency.address.slice(2, 6).toLowerCase()})`
+const buildCurrencyLabel = (currency: Currency): string => `${currency.symbol}`
 
 const BLACKLISTED_VOLUME_ENTRIES = [
   { timestamp: 1743638400, address: zeroAddress },
@@ -374,6 +373,8 @@ export default function Analytics() {
       )}
 
       {!analytics && <Loading />}
+
+      <div className="flex sm:mb-[400px]" />
     </RedirectIfNotMonadTestnetContainer>
   )
 }
