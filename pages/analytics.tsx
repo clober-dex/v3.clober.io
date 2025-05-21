@@ -9,8 +9,6 @@ import { useChainContext } from '../contexts/chain-context'
 import RedirectIfNotMonadTestnetContainer from '../containers/redirect-if-not-monad-testnet-container'
 import { HistogramChart } from '../components/chart/histogram-chart'
 import { Loading } from '../components/loading'
-import { fetchDailyActivitySnapshot } from '../apis/analytics'
-import { useCurrencyContext } from '../contexts/currency-context'
 
 const buildCurrencyLabel = (currency: Currency): string =>
   `${currency.symbol}(${currency.address.slice(2, 6).toLowerCase()})`
@@ -24,16 +22,7 @@ const BLACKLIST_VOLUME = [
 ]
 
 export default function Analytics() {
-  const { prices, whitelistCurrencies } = useCurrencyContext()
   const { selectedChain } = useChainContext()
-
-  const { data: analyticsbb } = useQuery({
-    queryKey: ['analytics-bb', selectedChain.id],
-    queryFn: async () => {
-      return fetchDailyActivitySnapshot(selectedChain)
-    },
-    initialData: null,
-  })
 
   const { data: analytics } = useQuery({
     queryKey: ['analytics', selectedChain.id],

@@ -1,3 +1,4 @@
+// TODO: remove it
 export type DailyActivitySnapshot = {
   timestamp: number
   walletCount: number
