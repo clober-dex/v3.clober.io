@@ -13,7 +13,7 @@ import { Loading } from '../components/loading'
 const buildCurrencyLabel = (currency: Currency): string =>
   `${currency.symbol}(${currency.address.slice(2, 6).toLowerCase()})`
 
-const BLACKLIST_VOLUME = [
+const BLACKLISTED_VOLUME_ENTRIES = [
   { timestamp: 1743638400, address: zeroAddress },
   {
     timestamp: 1743638400,
@@ -59,7 +59,7 @@ export default function Analytics() {
         [getAddress('0xf817257fed379853cDe0fa4F97AB987181B1E5Ea')]: '#4C82FB',
       },
     }
-  }, [analytics]) as Record<`0x${string}`, string>
+  }, [uniqueCurrencies]) as Record<`0x${string}`, string>
 
   const transactionTypeColorMap = useMemo(() => {
     const transactionTypes = [
@@ -83,7 +83,21 @@ export default function Analytics() {
     return (analytics?.analyticsSnapshots ?? []).reduce((acc, item) => {
       const values = Object.entries(item.volume24hUSDMap).filter(
         ([address]) =>
-          !BLACKLIST_VOLUME.some(
+          !BLACKLISTED_VOLUME_ENTRIES.some(
+            (blacklist) =>
+              blacklist.timestamp === item.timestamp &&
+              isAddressEqual(blacklist.address, getAddress(address)),
+          ),
+      )
+      return acc + values.reduce((acc, [, { usd }]) => acc + usd, 0)
+    }, 0)
+  }, [analytics])
+
+  const totalProtocolFeesUSD = useMemo(() => {
+    return (analytics?.analyticsSnapshots ?? []).reduce((acc, item) => {
+      const values = Object.entries(item.protocolFees24hUSDMap).filter(
+        ([address]) =>
+          !BLACKLISTED_VOLUME_ENTRIES.some(
             (blacklist) =>
               blacklist.timestamp === item.timestamp &&
               isAddressEqual(blacklist.address, getAddress(address)),
@@ -112,7 +126,7 @@ export default function Analytics() {
                       const values = Object.entries(item.volume24hUSDMap)
                         .filter(
                           ([address]) =>
-                            !BLACKLIST_VOLUME.some(
+                            !BLACKLISTED_VOLUME_ENTRIES.some(
                               (blacklist) =>
                                 blacklist.timestamp === item.timestamp &&
                                 isAddressEqual(
@@ -122,7 +136,7 @@ export default function Analytics() {
                             ),
                         )
                         .map(
-                          ([address, { currency, usd }]) =>
+                          ([, { currency, usd }]) =>
                             [buildCurrencyLabel(currency), usd] as [
                               string,
                               number,
@@ -209,6 +223,148 @@ export default function Analytics() {
                       color,
                     }))}
                   defaultValue={analytics?.accumulatedUniqueTransactions ?? 0}
+                  height={312}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col">
+              <div className="text-white text-sm md:text-base font-bold">
+                Daily Protocol Fees
+              </div>
+
+              <div className="flex w-[350px] sm:w-[1016px]">
+                <HistogramChart
+                  prefix={'$'}
+                  data={(analytics?.analyticsSnapshots ?? [])
+                    .map((item) => {
+                      // filter out blacklisted addresses in that timestamp
+                      const values = Object.entries(item.protocolFees24hUSDMap)
+                        .filter(
+                          ([address]) =>
+                            !BLACKLISTED_VOLUME_ENTRIES.some(
+                              (blacklist) =>
+                                blacklist.timestamp === item.timestamp &&
+                                isAddressEqual(
+                                  blacklist.address,
+                                  getAddress(address),
+                                ),
+                            ),
+                        )
+                        .map(
+                          ([, { currency, usd }]) =>
+                            [buildCurrencyLabel(currency), usd] as [
+                              string,
+                              number,
+                            ],
+                        )
+                      return {
+                        time: item.timestamp as UTCTimestamp,
+                        values: {
+                          ...Object.fromEntries(values),
+                        },
+                      }
+                    })
+                    .sort((a, b) => a.time - b.time)}
+                  colors={
+                    Object.entries(tokenColorMap)
+                      .map(([address, color]) => {
+                        const currency = uniqueCurrencies.find((currency) =>
+                          isAddressEqual(
+                            getAddress(currency.address),
+                            getAddress(address),
+                          ),
+                        )
+                        if (!currency) {
+                          return null
+                        }
+                        return {
+                          label: buildCurrencyLabel(currency),
+                          color,
+                        }
+                      })
+                      .filter(
+                        (item): item is { label: string; color: string } =>
+                          !!item,
+                      )
+                      .sort() as { label: string; color: string }[]
+                  }
+                  defaultValue={totalProtocolFeesUSD}
+                  height={312}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col">
+              <div className="text-white text-sm md:text-base font-bold">
+                Daily TVL
+              </div>
+
+              <div className="flex w-[350px] sm:w-[1016px]">
+                <HistogramChart
+                  prefix={'$'}
+                  data={(analytics?.analyticsSnapshots ?? [])
+                    .map((item) => {
+                      // filter out blacklisted addresses in that timestamp
+                      const values = Object.entries(item.totalValueLockedUSDMap)
+                        .filter(
+                          ([address]) =>
+                            !BLACKLISTED_VOLUME_ENTRIES.some(
+                              (blacklist) =>
+                                blacklist.timestamp === item.timestamp &&
+                                isAddressEqual(
+                                  blacklist.address,
+                                  getAddress(address),
+                                ),
+                            ),
+                        )
+                        .map(
+                          ([, { currency, usd }]) =>
+                            [buildCurrencyLabel(currency), usd] as [
+                              string,
+                              number,
+                            ],
+                        )
+                      return {
+                        time: item.timestamp as UTCTimestamp,
+                        values: {
+                          ...Object.fromEntries(values),
+                        },
+                      }
+                    })
+                    .sort((a, b) => a.time - b.time)}
+                  colors={
+                    Object.entries(tokenColorMap)
+                      .map(([address, color]) => {
+                        const currency = uniqueCurrencies.find((currency) =>
+                          isAddressEqual(
+                            getAddress(currency.address),
+                            getAddress(address),
+                          ),
+                        )
+                        if (!currency) {
+                          return null
+                        }
+                        return {
+                          label: buildCurrencyLabel(currency),
+                          color,
+                        }
+                      })
+                      .filter(
+                        (item): item is { label: string; color: string } =>
+                          !!item,
+                      )
+                      .sort() as { label: string; color: string }[]
+                  }
+                  defaultValue={
+                    analytics?.analyticsSnapshots.sort(
+                      (a, b) => a.timestamp - b.timestamp,
+                    )?.[0].totalValueLockedUSD ?? 0
+                  }
                   height={312}
                 />
               </div>
