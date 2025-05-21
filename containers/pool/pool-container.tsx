@@ -60,7 +60,7 @@ export const PoolContainer = () => {
         <div className="w-[960px] mt-8 sm:mt-16 flex flex-col sm:gap-12 items-center">
           <div className="flex w-full h-12 sm:h-[72px] flex-col justify-start items-center gap-2 sm:gap-3">
             <div className="self-stretch text-center text-white text-lg sm:text-4xl font-bold">
-              ${CHAIN_CONFIG.DEX_NAME} Liquidity Vault ($
+              {CHAIN_CONFIG.DEX_NAME} Liquidity Vault (
               {CHAIN_CONFIG.DEX_NAME.slice(0, 1)}LV)
             </div>
             <div className="self-stretch text-center text-gray-400 text-xs sm:text-sm font-bold">

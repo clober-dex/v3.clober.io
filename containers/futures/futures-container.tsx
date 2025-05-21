@@ -95,7 +95,7 @@ export const FuturesContainer = () => {
               Futures
             </div>
             <div className="self-stretch text-center text-gray-400 text-xs sm:text-sm font-bold">
-              Mint & Trade Synthetic Assets on ${CHAIN_CONFIG.DEX_NAME}
+              Mint & Trade Synthetic Assets on {CHAIN_CONFIG.DEX_NAME}
             </div>
           </div>
 

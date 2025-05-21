@@ -35,7 +35,7 @@ export async function fetchPool(
     salt: zeroHash,
     options: {
       useSubgraph: true, // doesn't matter since to get pool liquidity, we need to use on-chain call
-      // rpcUrl: CHAIN_CONFIG.RPC_URL,
+      rpcUrl: CHAIN_CONFIG.RPC_URL,
     },
   })
   const tvl =

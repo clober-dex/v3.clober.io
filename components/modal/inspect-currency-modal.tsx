@@ -179,10 +179,10 @@ const InspectCurrencyModal = ({
             </button>
           </div>
           <div className="flex-col p-4 items-center gap-4 bg-gray-800 rounded-lg self-stretch text-white text-sm break-all">
-            This token isn’t officially listed by ${CHAIN_CONFIG.DEX_NAME}.
+            This token isn’t officially listed by {CHAIN_CONFIG.DEX_NAME}.
             Anyone can create any token, including fake versions of the existing
             tokens. Take due care. Some tokens and their technical parameters
-            may be incompatible with ${CHAIN_CONFIG.DEX_NAME} services. Always
+            may be incompatible with {CHAIN_CONFIG.DEX_NAME} services. Always
             conduct your own research before trading. By importing this custom
             token you acknowledge and accept the risks.
           </div>

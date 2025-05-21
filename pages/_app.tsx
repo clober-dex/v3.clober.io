@@ -238,7 +238,7 @@ function App({ Component, pageProps }: AppProps) {
       <ErrorBoundary>
         <Head>
           <title>
-            `${CHAIN_CONFIG.DEX_NAME} | ${CHAIN_CONFIG.TITLE}`
+            {CHAIN_CONFIG.DEX_NAME} | {CHAIN_CONFIG.TITLE}
           </title>
           <link rel="apple-touch-icon" href="/favicon.png" />
           <link rel="icon" type="image/png" href="/favicon.png" />
