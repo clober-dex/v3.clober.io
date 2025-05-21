@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { textStyles } from '../themes/text-styles'
+import { textStyles } from '../constants/text-styles'
 export const BlockNumberWidget = ({
   latestBlockNumber,
 }: {

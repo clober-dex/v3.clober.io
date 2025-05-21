@@ -19,7 +19,7 @@ import { UserTransactionsModal } from '../components/modal/user-transactions-mod
 import { useTransactionContext } from '../contexts/transaction-context'
 import { UserPointButton } from '../components/button/user-point-button'
 import ChainIcon from '../components/icon/chain-icon'
-import { textStyles } from '../themes/text-styles'
+import { textStyles } from '../constants/text-styles'
 import { PAGE_BUTTONS } from '../constants/buttons'
 import { fetchEnsName } from '../apis/ens'
 
