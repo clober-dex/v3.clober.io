@@ -1,9 +1,9 @@
 import React from 'react'
-import '../../styles/globals.css'
+import '../../../styles/globals.css'
 import { Meta, StoryObj } from '@storybook/react'
 import { zeroAddress } from 'viem'
 
-import { dummyCurrencies } from '../../.storybook/dummy-data/currencies'
+import { dummyCurrencies } from '../../../.storybook/dummy-data/currencies'
 
 import { OpenOrderCard } from './open-order-card'
 

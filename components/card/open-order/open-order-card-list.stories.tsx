@@ -1,10 +1,10 @@
 import React from 'react'
-import '../../styles/globals.css'
+import '../../../styles/globals.css'
 import { Meta, StoryObj } from '@storybook/react'
 import { zeroAddress } from 'viem'
 import { OpenOrder } from '@clober/v2-sdk'
 
-import { dummyCurrencies } from '../../.storybook/dummy-data/currencies'
+import { dummyCurrencies } from '../../../.storybook/dummy-data/currencies'
 
 import { OpenOrderCardList } from './open-order-card-list'
 

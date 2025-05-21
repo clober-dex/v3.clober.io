@@ -1,19 +1,25 @@
-import '../../styles/globals.css'
+import React from 'react'
+import '../../../styles/globals.css'
 import { Meta, StoryObj } from '@storybook/react'
 import { zeroAddress } from 'viem'
 import { mainnet } from 'viem/chains'
 
-import { FuturesAssetCard } from './futures-asset-card'
+import { FuturesRedeemCard } from './futures-redeem-card'
 
 export default {
-  title: 'Card/FuturesAssetCard',
-  component: FuturesAssetCard,
+  title: 'Card/FuturesRedeemCard',
+  component: FuturesRedeemCard,
   parameters: {
     layout: 'centered',
   },
-} as Meta<typeof FuturesAssetCard>
+  render: ({ ...args }) => (
+    <div className="text-white">
+      <FuturesRedeemCard {...args} />
+    </div>
+  ),
+} as Meta<typeof FuturesRedeemCard>
 
-type Story = StoryObj<typeof FuturesAssetCard>
+type Story = StoryObj<typeof FuturesRedeemCard>
 
 export const Default: Story = {
   args: {
@@ -43,6 +49,17 @@ export const Default: Story = {
       ltvPrecision: 1000000n,
       minDebt: 10000000n,
       settlePrice: 254000,
+    },
+    prices: {
+      [zeroAddress]: 240.1,
+      ['0x43D614B1bA4bA469fAEAa4557AEAFdec039b8795']: 1.0001,
+    },
+    balance: 100000000000000000000n,
+    redeemableCollateral: 10000000n,
+    actionButtonProps: {
+      onClick: () => {},
+      disabled: false,
+      text: 'Redeem',
     },
   },
 }

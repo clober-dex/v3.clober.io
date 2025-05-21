@@ -1,16 +1,16 @@
 import React, { useMemo } from 'react'
 
-import { CurrencyIcon } from '../icon/currency-icon'
+import { CurrencyIcon } from '../../icon/currency-icon'
 import {
   currentTimestampInSeconds,
   formatDate,
   getExpirationDateTextColor,
-} from '../../utils/date'
-import { formatDollarValue, formatUnits } from '../../utils/bigint'
-import { FuturesPosition } from '../../model/futures/futures-position'
-import { toCommaSeparated } from '../../utils/number'
-import { EditSvg } from '../svg/edit-svg'
-import { Chain } from '../../model/chain'
+} from '../../../utils/date'
+import { formatDollarValue, formatUnits } from '../../../utils/bigint'
+import { FuturesPosition } from '../../../model/futures/futures-position'
+import { toCommaSeparated } from '../../../utils/number'
+import { EditSvg } from '../../svg/edit-svg'
+import { Chain } from '../../../model/chain'
 
 export const FuturesPositionCard = ({
   chain,

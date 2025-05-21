@@ -4,12 +4,12 @@ import BigNumber from 'bignumber.js'
 import { Tooltip } from 'react-tooltip'
 import { useRouter } from 'next/router'
 
-import { CurrencyIcon } from '../icon/currency-icon'
-import { toHumanReadableString, toShortNumber } from '../../utils/number'
-import { QuestionMarkSvg } from '../svg/question-mark-svg'
-import { VerifiedSvg } from '../svg/verified-svg'
-import { convertShortTimeAgo } from '../../utils/time'
-import { Chain } from '../../model/chain'
+import { CurrencyIcon } from '../../icon/currency-icon'
+import { toHumanReadableString, toShortNumber } from '../../../utils/number'
+import { QuestionMarkSvg } from '../../svg/question-mark-svg'
+import { VerifiedSvg } from '../../svg/verified-svg'
+import { convertShortTimeAgo } from '../../../utils/time'
+import { Chain } from '../../../model/chain'
 
 export const MarketDailySnapshotCard = ({
   chain,

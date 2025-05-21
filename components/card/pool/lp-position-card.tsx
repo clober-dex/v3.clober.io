@@ -1,11 +1,11 @@
 import React from 'react'
 import { NextRouter } from 'next/router'
 
-import { CurrencyIcon } from '../icon/currency-icon'
-import { formatDollarValue, formatUnits } from '../../utils/bigint'
-import { Chain } from '../../model/chain'
-import { toCommaSeparated } from '../../utils/number'
-import { Currency } from '../../model/currency'
+import { CurrencyIcon } from '../../icon/currency-icon'
+import { formatDollarValue, formatUnits } from '../../../utils/bigint'
+import { Chain } from '../../../model/chain'
+import { toCommaSeparated } from '../../../utils/number'
+import { Currency } from '../../../model/currency'
 
 export const LpPositionCard = ({
   chain,

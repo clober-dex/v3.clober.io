@@ -1,17 +1,17 @@
 import React, { useMemo } from 'react'
 
-import { CurrencyIcon } from '../icon/currency-icon'
+import { CurrencyIcon } from '../../icon/currency-icon'
 import {
   currentTimestampInSeconds,
   formatDate,
   getExpirationDateTextColor,
-} from '../../utils/date'
-import { formatDollarValue, formatUnits } from '../../utils/bigint'
-import { Asset } from '../../model/futures/asset'
-import { Prices } from '../../model/prices'
-import { ActionButtonProps } from '../button/action-button'
-import { toCommaSeparated } from '../../utils/number'
-import { Chain } from '../../model/chain'
+} from '../../../utils/date'
+import { formatDollarValue, formatUnits } from '../../../utils/bigint'
+import { Asset } from '../../../model/futures/asset'
+import { Prices } from '../../../model/prices'
+import { ActionButtonProps } from '../../button/action-button'
+import { toCommaSeparated } from '../../../utils/number'
+import { Chain } from '../../../model/chain'
 
 export const FuturesRedeemCard = ({
   chain,

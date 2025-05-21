@@ -3,11 +3,11 @@ import { NextRouter } from 'next/router'
 import BigNumber from 'bignumber.js'
 import { Tooltip } from 'react-tooltip'
 
-import { CurrencyIcon } from '../icon/currency-icon'
-import { toCommaSeparated } from '../../utils/number'
-import { QuestionMarkSvg } from '../svg/question-mark-svg'
-import { Chain } from '../../model/chain'
-import { Currency } from '../../model/currency'
+import { CurrencyIcon } from '../../icon/currency-icon'
+import { toCommaSeparated } from '../../../utils/number'
+import { QuestionMarkSvg } from '../../svg/question-mark-svg'
+import { Chain } from '../../../model/chain'
+import { Currency } from '../../../model/currency'
 
 export const PoolSnapshotCard = ({
   chain,

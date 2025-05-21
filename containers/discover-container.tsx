@@ -8,7 +8,7 @@ import {
 } from '@clober/v2-sdk'
 import { isAddressEqual } from 'viem'
 
-import { MarketDailySnapshotCard } from '../components/card/market-daily-snapshot-card'
+import { MarketDailySnapshotCard } from '../components/card/market/market-daily-snapshot-card'
 import { useChainContext } from '../contexts/chain-context'
 import { SearchSvg } from '../components/svg/search-svg'
 import { QuestionMarkSvg } from '../components/svg/question-mark-svg'

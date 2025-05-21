@@ -2,10 +2,10 @@ import React from 'react'
 import { OpenOrder } from '@clober/v2-sdk'
 import { NextRouter } from 'next/router'
 
-import { OutlinkSvg } from '../svg/outlink-svg'
-import { ActionButton, ActionButtonProps } from '../button/action-button'
-import { toPlacesString } from '../../utils/bignumber'
-import { toShortNumber } from '../../utils/number'
+import { OutlinkSvg } from '../../svg/outlink-svg'
+import { ActionButton, ActionButtonProps } from '../../button/action-button'
+import { toPlacesString } from '../../../utils/bignumber'
+import { toShortNumber } from '../../../utils/number'
 
 export const OpenOrderCard = ({
   openOrder,

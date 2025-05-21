@@ -2,10 +2,10 @@ import React, { useMemo } from 'react'
 import { NextRouter } from 'next/router'
 import { getAddress } from 'viem'
 
-import { CurrencyIcon } from '../icon/currency-icon'
-import { Asset } from '../../model/futures/asset'
-import { formatDate } from '../../utils/date'
-import { Chain } from '../../model/chain'
+import { CurrencyIcon } from '../../icon/currency-icon'
+import { Asset } from '../../../model/futures/asset'
+import { formatDate } from '../../../utils/date'
+import { Chain } from '../../../model/chain'
 
 export const FuturesAssetCard = ({
   chain,

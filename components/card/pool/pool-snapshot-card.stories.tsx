@@ -1,4 +1,4 @@
-import '../../styles/globals.css'
+import '../../../styles/globals.css'
 import { Meta, StoryObj } from '@storybook/react'
 import { mainnet } from 'viem/chains'
 

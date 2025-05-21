@@ -10,9 +10,9 @@ import { QuestionMarkSvg } from '../../components/svg/question-mark-svg'
 import { useCurrencyContext } from '../../contexts/currency-context'
 import { Loading } from '../../components/loading'
 import { toCommaSeparated } from '../../utils/number'
-import { LpPositionCard } from '../../components/card/lp-position-card'
+import { LpPositionCard } from '../../components/card/pool/lp-position-card'
 import { formatUnits } from '../../utils/bigint'
-import { PoolSnapshotCard } from '../../components/card/pool-snapshot-card'
+import { PoolSnapshotCard } from '../../components/card/pool/pool-snapshot-card'
 import { fetchPoolSnapshots } from '../../apis/pool'
 
 export const PoolContainer = () => {
