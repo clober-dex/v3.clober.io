@@ -169,11 +169,10 @@ export const FuturesContainer = () => {
                       router={router}
                     />
                   ))}
-
-                {assets.length === 0 && (
-                  <Loading className="flex mt-8 sm:mt-0" />
-                )}
               </div>
+              {assets.length === 0 && (
+                <Loading className="flex items-center justify-center mt-8 sm:mt-0" />
+              )}
             </div>
           </div>
         </div>
