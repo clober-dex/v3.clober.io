@@ -1,42 +1,68 @@
 import React, { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { getAddress, isAddressEqual } from 'viem'
+import { getAddress, isAddressEqual, zeroAddress } from 'viem'
 import { UTCTimestamp } from 'lightweight-charts'
+import { Currency, getProtocolAnalytics } from '@clober/v2-sdk'
+import { AnalyticsSummary } from '@clober/v2-sdk/dist/types/entities/analytics/types'
 
 import { useChainContext } from '../contexts/chain-context'
-import { useCurrencyContext } from '../contexts/currency-context'
-import { fetchDailyActivitySnapshot } from '../apis/analytics'
 import RedirectIfNotMonadTestnetContainer from '../containers/redirect-if-not-monad-testnet-container'
 import { HistogramChart } from '../components/chart/histogram-chart'
 import { Loading } from '../components/loading'
+import { fetchDailyActivitySnapshot } from '../apis/analytics'
+import { useCurrencyContext } from '../contexts/currency-context'
+
+const buildCurrencyLabel = (currency: Currency): string =>
+  `${currency.symbol}(${currency.address.slice(2, 6).toLowerCase()})`
+
+const BLACKLIST_VOLUME = [
+  { timestamp: 1743638400, address: zeroAddress },
+  {
+    timestamp: 1743638400,
+    address: getAddress('0xb2f82D0f38dc453D596Ad40A37799446Cc89274A'),
+  },
+]
 
 export default function Analytics() {
   const { prices, whitelistCurrencies } = useCurrencyContext()
   const { selectedChain } = useChainContext()
 
-  const { data: analytics } = useQuery({
-    queryKey: ['analytics', selectedChain.id],
+  const { data: analyticsbb } = useQuery({
+    queryKey: ['analytics-bb', selectedChain.id],
     queryFn: async () => {
       return fetchDailyActivitySnapshot(selectedChain)
     },
-    initialData: [],
+    initialData: null,
   })
 
-  const tokenColorMap = useMemo(() => {
-    const addresses = [
-      ...new Set(
-        analytics.flatMap((item) =>
-          item.volumeSnapshots.map(({ address }) => getAddress(address)),
-        ),
-      ),
-    ].sort()
+  const { data: analytics } = useQuery({
+    queryKey: ['analytics', selectedChain.id],
+    queryFn: async () => {
+      return getProtocolAnalytics({ chainId: selectedChain.id })
+    },
+    initialData: null,
+  }) as {
+    data: AnalyticsSummary | null
+  }
 
+  const uniqueCurrencies = useMemo(() => {
+    const currencies = (analytics?.analyticsSnapshots ?? []).flatMap((item) =>
+      Object.values(item.volume24hUSDMap).map(({ currency }) => currency),
+    )
+    return currencies.filter(
+      (currency, index, self) =>
+        index ===
+        self.findIndex((c) => isAddressEqual(c.address, currency.address)),
+    )
+  }, [analytics])
+
+  const tokenColorMap = useMemo(() => {
     return {
       ...Object.fromEntries(
-        addresses.map((address, index) => {
+        uniqueCurrencies.map((currency, index) => {
           const baseHue = (index * 47) % 360
           const hue = (baseHue + (index % 2) * 240) % 360
-          return [address, `hsl(${hue}, 70%, 50%)`]
+          return [getAddress(currency.address), `hsl(${hue}, 70%, 50%)`]
         }),
       ),
       ...{
@@ -44,13 +70,13 @@ export default function Analytics() {
         [getAddress('0xf817257fed379853cDe0fa4F97AB987181B1E5Ea')]: '#4C82FB',
       },
     }
-  }, [analytics])
+  }, [analytics]) as Record<`0x${string}`, string>
 
   const transactionTypeColorMap = useMemo(() => {
     const transactionTypes = [
       ...new Set(
-        analytics.flatMap((item) =>
-          item.transactionTypeSnapshots.map(({ type }) => type),
+        (analytics?.analyticsSnapshots ?? []).flatMap((item) =>
+          Object.keys(item.transactionTypeCounts).map((type) => type),
         ),
       ),
     ].sort()
@@ -64,9 +90,23 @@ export default function Analytics() {
     )
   }, [analytics])
 
+  const totalValueLockedUSD = useMemo(() => {
+    return (analytics?.analyticsSnapshots ?? []).reduce((acc, item) => {
+      const values = Object.entries(item.volume24hUSDMap).filter(
+        ([address]) =>
+          !BLACKLIST_VOLUME.some(
+            (blacklist) =>
+              blacklist.timestamp === item.timestamp &&
+              isAddressEqual(blacklist.address, getAddress(address)),
+          ),
+      )
+      return acc + values.reduce((acc, [, { usd }]) => acc + usd, 0)
+    }, 0)
+  }, [analytics])
+
   return (
     <RedirectIfNotMonadTestnetContainer>
-      {analytics.length > 0 && (
+      {analytics && (
         <div className="flex flex-col w-full h-full items-center justify-center gap-8 px-16 pb-16">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex flex-col">
@@ -77,51 +117,60 @@ export default function Analytics() {
               <div className="flex w-[350px] sm:w-[1016px]">
                 <HistogramChart
                   prefix={'$'}
-                  data={analytics.map((item) => {
-                    const values = item.volumeSnapshots
-                      .map(({ amount, address }) => [
-                        whitelistCurrencies.find((currency) =>
-                          isAddressEqual(
-                            getAddress(currency.address),
-                            getAddress(address),
-                          ),
-                        )?.symbol,
-                        amount * (prices[getAddress(address)] ?? 0),
-                      ])
-                      .filter(([symbol]) => symbol !== undefined)
-                      .sort()
-                    return {
-                      time: item.timestamp as UTCTimestamp,
-                      values: {
-                        ...Object.fromEntries(values),
-                      },
-                    }
-                  })}
+                  data={(analytics?.analyticsSnapshots ?? [])
+                    .map((item) => {
+                      // filter out blacklisted addresses in that timestamp
+                      const values = Object.entries(item.volume24hUSDMap)
+                        .filter(
+                          ([address]) =>
+                            !BLACKLIST_VOLUME.some(
+                              (blacklist) =>
+                                blacklist.timestamp === item.timestamp &&
+                                isAddressEqual(
+                                  blacklist.address,
+                                  getAddress(address),
+                                ),
+                            ),
+                        )
+                        .map(
+                          ([address, { currency, usd }]) =>
+                            [buildCurrencyLabel(currency), usd] as [
+                              string,
+                              number,
+                            ],
+                        )
+                      return {
+                        time: item.timestamp as UTCTimestamp,
+                        values: {
+                          ...Object.fromEntries(values),
+                        },
+                      }
+                    })
+                    .sort((a, b) => a.time - b.time)}
                   colors={
                     Object.entries(tokenColorMap)
-                      .map(([address, color]) => ({
-                        label: whitelistCurrencies.find((currency) =>
+                      .map(([address, color]) => {
+                        const currency = uniqueCurrencies.find((currency) =>
                           isAddressEqual(
                             getAddress(currency.address),
                             getAddress(address),
                           ),
-                        )?.symbol,
-                        color,
-                      }))
-                      .filter(({ label }) => label !== undefined)
-                      .sort() as any
+                        )
+                        if (!currency) {
+                          return null
+                        }
+                        return {
+                          label: buildCurrencyLabel(currency),
+                          color,
+                        }
+                      })
+                      .filter(
+                        (item): item is { label: string; color: string } =>
+                          !!item,
+                      )
+                      .sort() as { label: string; color: string }[]
                   }
-                  defaultValue={analytics.reduce(
-                    (acc, item) =>
-                      acc +
-                      item.volumeSnapshots.reduce(
-                        (acc, { amount, address }) =>
-                          acc +
-                          (amount ?? 0) * (prices[getAddress(address)] ?? 0),
-                        0,
-                      ),
-                    0,
-                  )}
+                  defaultValue={totalValueLockedUSD}
                   height={312}
                 />
               </div>
@@ -136,21 +185,18 @@ export default function Analytics() {
 
               <div className="flex w-[350px] sm:w-[500px]">
                 <HistogramChart
-                  data={analytics.map((item) => ({
+                  data={(analytics?.analyticsSnapshots ?? []).map((item) => ({
                     time: item.timestamp as UTCTimestamp,
                     values: {
-                      Returning: item.walletCount - item.newWalletCount,
-                      New: item.newWalletCount,
+                      Returning: item.activeUsers - item.firstTimeUsers,
+                      New: item.firstTimeUsers,
                     },
                   }))}
                   colors={[
                     { label: 'New', color: '#40DE7A' },
                     { label: 'Returning', color: '#3B82F6' },
                   ]}
-                  defaultValue={analytics.reduce(
-                    (acc, item) => acc + (item.newWalletCount ?? 0),
-                    0,
-                  )}
+                  defaultValue={analytics?.accumulatedUniqueTransactions ?? 0}
                   height={312}
                 />
               </div>
@@ -163,25 +209,17 @@ export default function Analytics() {
 
               <div className="flex w-[350px] sm:w-[500px]">
                 <HistogramChart
-                  data={analytics.map((item) => ({
+                  data={(analytics?.analyticsSnapshots ?? []).map((item) => ({
                     time: item.timestamp as UTCTimestamp,
-                    values: Object.fromEntries(
-                      item.transactionTypeSnapshots.map(({ type, count }) => [
-                        type,
-                        count,
-                      ]),
-                    ),
+                    values: item.transactionTypeCounts,
                   }))}
-                  colors={Object.entries(transactionTypeColorMap).map(
-                    ([type, color]) => ({
+                  colors={Object.entries(transactionTypeColorMap)
+                    .filter(([type]) => type !== 'unknown')
+                    .map(([type, color]) => ({
                       label: type,
                       color,
-                    }),
-                  )}
-                  defaultValue={analytics.reduce(
-                    (acc, item) => acc + (item.transactionCount ?? 0),
-                    0,
-                  )}
+                    }))}
+                  defaultValue={analytics?.accumulatedUniqueTransactions ?? 0}
                   height={312}
                 />
               </div>
@@ -190,7 +228,7 @@ export default function Analytics() {
         </div>
       )}
 
-      {analytics.length === 0 && <Loading />}
+      {!analytics && <Loading />}
     </RedirectIfNotMonadTestnetContainer>
   )
 }
