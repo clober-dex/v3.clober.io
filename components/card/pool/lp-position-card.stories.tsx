@@ -6,7 +6,7 @@ import { mainnet } from 'viem/chains'
 import { LpPositionCard } from './lp-position-card'
 
 export default {
-  title: 'Card/VaultPositionCard',
+  title: 'Card/LpPositionCard',
   component: LpPositionCard,
   parameters: {
     layout: 'centered',
