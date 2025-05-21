@@ -198,7 +198,7 @@ export default function Analytics() {
                     { label: 'New', color: '#40DE7A' },
                     { label: 'Returning', color: '#3B82F6' },
                   ]}
-                  defaultValue={analytics?.accumulatedUniqueTransactions ?? 0}
+                  defaultValue={analytics?.accumulatedUniqueUsers ?? 0}
                   height={312}
                 />
               </div>
@@ -360,9 +360,11 @@ export default function Analytics() {
                       .sort() as { label: string; color: string }[]
                   }
                   defaultValue={
-                    analytics?.analyticsSnapshots.sort(
-                      (a, b) => a.timestamp - b.timestamp,
-                    )?.[0].totalValueLockedUSD ?? 0
+                    analytics && analytics.analyticsSnapshots
+                      ? analytics.analyticsSnapshots[
+                          analytics.analyticsSnapshots.length - 1
+                        ].totalValueLockedUSD
+                      : 0
                   }
                   height={312}
                 />
