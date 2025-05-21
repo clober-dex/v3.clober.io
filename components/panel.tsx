@@ -4,6 +4,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline'
 import { NextRouter } from 'next/router'
 
 import { PAGE_BUTTONS } from '../constants/buttons'
+import { CHAIN_CONFIG } from '../chain-configs'
 
 import { TwitterLogoSvg } from './svg/twitter-logo-svg'
 import { DiscordLogoSvg } from './svg/discord-logo-svg'
@@ -89,7 +90,7 @@ const Panel = ({
                         <a
                           className="link"
                           target="_blank"
-                          href="https://github.com/clober-dex/"
+                          href={CHAIN_CONFIG.GITHIB_URL}
                           rel="noreferrer"
                         >
                           <div className="flex flex-row gap-2 items-center">
@@ -100,7 +101,7 @@ const Panel = ({
                         <a
                           className="link"
                           target="_blank"
-                          href="https://docs.clober.io/"
+                          href={CHAIN_CONFIG.DOCS_URL}
                           rel="noreferrer"
                         >
                           <div className="flex flex-row gap-2 items-center">
@@ -111,7 +112,7 @@ const Panel = ({
                         <a
                           className="link"
                           target="_blank"
-                          href="https://x.com/CloberDEX"
+                          href={`https://x.com/${CHAIN_CONFIG.TWITTER_HANDLE}`}
                           rel="noreferrer"
                         >
                           <div className="flex flex-row gap-2 items-center">
@@ -122,7 +123,7 @@ const Panel = ({
                         <a
                           className="link"
                           target="_blank"
-                          href="https://discord.gg/clober-dex"
+                          href={CHAIN_CONFIG.DISCORD_URL}
                           rel="noreferrer"
                         >
                           <div className="flex flex-row gap-2 items-center">

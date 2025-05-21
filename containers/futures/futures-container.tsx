@@ -15,6 +15,7 @@ import { useFuturesContractContext } from '../../contexts/futures/futures-contra
 import { WHITELISTED_FUTURES_ASSETS } from '../../constants/futures'
 import { useChainContext } from '../../contexts/chain-context'
 import { Loading } from '../../components/loading'
+import { CHAIN_CONFIG } from '../../chain-configs'
 
 import { FuturesPositionAdjustModalContainer } from './futures-position-adjust-modal-container'
 import { FuturesPositionEditCollateralModalContainer } from './futures-position-edit-collateral-modal-container'
@@ -94,7 +95,7 @@ export const FuturesContainer = () => {
               Futures
             </div>
             <div className="self-stretch text-center text-gray-400 text-xs sm:text-sm font-bold">
-              Mint & Trade Synthetic Assets on Clober
+              Mint & Trade Synthetic Assets on ${CHAIN_CONFIG.DEX_NAME}
             </div>
           </div>
 

@@ -22,6 +22,7 @@ import ChainIcon from '../components/icon/chain-icon'
 import { textStyles } from '../constants/text-styles'
 import { PAGE_BUTTONS } from '../constants/buttons'
 import { fetchEnsName } from '../apis/ens'
+import { CHAIN_CONFIG } from '../chain-configs'
 
 const WrongNetwork = ({
   openChainModal,
@@ -93,7 +94,7 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
             <a
               className="flex gap-2 items-center"
               target="_blank"
-              href="https://alpha.clober.io/futures"
+              href={`${CHAIN_CONFIG.URL}/futures`}
               rel="noopener noreferrer"
             >
               <img className="h-7 sm:h-9" src="/futures-logo.svg" alt="logo" />
@@ -103,7 +104,7 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
               <a
                 className="hidden md:flex gap-2 items-center h-7"
                 target="_blank"
-                href="https://clober.io"
+                href={CHAIN_CONFIG.LANDING_PAGE_URL}
                 rel="noopener noreferrer"
               >
                 <Image width={123} height={28} src="/logo.svg" alt="logo" />
@@ -111,7 +112,7 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
               <a
                 className="flex md:hidden gap-2 items-center h-5"
                 target="_blank"
-                href="https://clober.io"
+                href={CHAIN_CONFIG.LANDING_PAGE_URL}
                 rel="noopener noreferrer"
               >
                 <Image width={88} height={20} src="/logo.svg" alt="logo" />

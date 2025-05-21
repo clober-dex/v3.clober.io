@@ -18,6 +18,7 @@ import { AddLiquidityForm } from '../../components/form/pool/add-liquidity-form'
 import { RemoveLiquidityForm } from '../../components/form/pool/remove-liquidity-form'
 import { toCommaSeparated } from '../../utils/number'
 import { Pool, PoolSnapshot } from '../../model/pool'
+import { CHAIN_CONFIG } from '../../chain-configs'
 
 import { PoolChartContainer } from './pool-chart-container'
 
@@ -383,9 +384,7 @@ export const PoolManagerContainer = ({
                   <QuestionMarkSvg
                     data-tooltip-id="rpi-info"
                     data-tooltip-place="bottom-end"
-                    data-tooltip-html={
-                      'Relative Price Index (RPI) measures the historical performance of the Clober Liquidity Vault compared to a reference portfolio. The reference portfolio represents the value of assets if they had been held without any active management from the initial point. RPI effectively indicates how well the vault has performed relative to a passive “just hold” strategy.'
-                    }
+                    data-tooltip-html={`Relative Price Index (RPI) measures the historical performance of the ${CHAIN_CONFIG.DEX_NAME} Liquidity Vault compared to a reference portfolio. The reference portfolio represents the value of assets if they had been held without any active management from the initial point. RPI effectively indicates how well the vault has performed relative to a passive “just hold” strategy.`}
                     className="w-3 h-3"
                   />
                   <Tooltip
@@ -450,8 +449,8 @@ export const PoolManagerContainer = ({
                       data-tooltip-place="bottom-end"
                       data-tooltip-html={
                         showRPI
-                          ? 'Relative Price Index (RPI) measures the historical performance of the Clober Liquidity Vault compared to a reference portfolio. The reference portfolio represents the value of assets if they had been held without any active management from the initial point. RPI effectively indicates how well the vault has performed relative to a passive “just hold” strategy.'
-                          : 'Performance Index (PI) shows the relative value of your portfolio over time, starting at 1. A value above 1 indicates growth, while a value below 1 indicates a decrease. PI provides a snapshot of how the assets have performed since the initial measurement.'
+                          ? `Relative Price Index (RPI) measures the historical performance of the ${CHAIN_CONFIG.DEX_NAME} Liquidity Vault compared to a reference portfolio. The reference portfolio represents the value of assets if they had been held without any active management from the initial point. RPI effectively indicates how well the vault has performed relative to a passive “just hold” strategy.`
+                          : `Performance Index (PI) shows the relative value of your portfolio over time, starting at 1. A value above 1 indicates growth, while a value below 1 indicates a decrease. PI provides a snapshot of how the assets have performed since the initial measurement.`
                       }
                       className="w-3 h-3"
                     />

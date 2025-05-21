@@ -14,6 +14,7 @@ import { LpPositionCard } from '../../components/card/pool/lp-position-card'
 import { formatUnits } from '../../utils/bigint'
 import { PoolSnapshotCard } from '../../components/card/pool/pool-snapshot-card'
 import { fetchPoolSnapshots } from '../../apis/pool'
+import { CHAIN_CONFIG } from '../../chain-configs'
 
 export const PoolContainer = () => {
   const router = useRouter()
@@ -59,7 +60,8 @@ export const PoolContainer = () => {
         <div className="w-[960px] mt-8 sm:mt-16 flex flex-col sm:gap-12 items-center">
           <div className="flex w-full h-12 sm:h-[72px] flex-col justify-start items-center gap-2 sm:gap-3">
             <div className="self-stretch text-center text-white text-lg sm:text-4xl font-bold">
-              Clober Liquidity Vault (CLV)
+              ${CHAIN_CONFIG.DEX_NAME} Liquidity Vault ($
+              {CHAIN_CONFIG.DEX_NAME.slice(0, 1)}LV)
             </div>
             <div className="self-stretch text-center text-gray-400 text-xs sm:text-sm font-bold">
               Provide liquidity and earn fees!

@@ -581,7 +581,7 @@ export const TradingCompetitionContainer = () => {
             </linearGradient>
           </defs>
         </svg>
-        Clober Trading Competition
+        ${CHAIN_CONFIG.DEX_NAME} Trading Competition
         <div className="text-sm sm:text-xl">Season 1 ends in</div>
       </div>
 

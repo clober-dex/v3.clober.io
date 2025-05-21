@@ -158,7 +158,7 @@ export const SwapContractProvider = ({
             txHash: transactionReceipt.transactionHash,
             success: transactionReceipt.status === 'success',
             blockNumber: Number(transactionReceipt.blockNumber),
-            type: aggregator.name === 'CloberV2' ? 'market' : 'swap',
+            type: aggregator.name === CHAIN_CONFIG.DEX_NAME ? 'market' : 'swap',
             timestamp: currentTimestampInSeconds(),
           })
         }

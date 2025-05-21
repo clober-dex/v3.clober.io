@@ -19,6 +19,15 @@ const CHAIN = {
 }
 export const CHAIN_CONFIG: ChainConfig = {
   CHAIN,
+  TITLE: 'Fully On-chain Order Book',
+  DEX_NAME: 'Clober',
+  URL: 'https://app.clober.io',
+  LANDING_PAGE_URL: 'https://clober.io',
+  TWITTER_HANDLE: '@CloberDEX',
+  GITHIB_URL: 'https://github.com/clober-dex/',
+  DISCORD_URL: 'https://discord.gg/clober-dex',
+  DOCS_URL: 'https://docs.clober.io/',
+  RAINBOW_KIT_PROJECT_ID: '14e09398dd595b0d1dccabf414ac4531',
   GOOGLE_ANALYTICS_TRACKING_ID: 'G-TE8CSB6JP2',
   RPC_URL:
     'https://proud-tiniest-flower.monad-testnet.quiknode.pro/a4ebe00fca2e7bf01201f3b0f7fe2f0077c52a36',
@@ -266,8 +275,8 @@ export const getClientConfig = () => {
   }
 
   config = getDefaultConfig({
-    appName: 'Clober',
-    projectId: '14e09398dd595b0d1dccabf414ac4531',
+    appName: CHAIN_CONFIG.DEX_NAME,
+    projectId: CHAIN_CONFIG.RAINBOW_KIT_PROJECT_ID,
     chains: [CHAIN],
     transports: {
       [CHAIN.id]: http(CHAIN_CONFIG.RPC_URL),

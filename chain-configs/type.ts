@@ -9,7 +9,16 @@ type EXTERNAL_CONTRACT =
 type EXTERNAL_SUBGRAPH = 'FUTURES' | 'LIQUIDITY_VAULT_POINT'
 
 export type ChainConfig = {
+  TITLE: string
+  DEX_NAME: string
+  URL: string
+  LANDING_PAGE_URL: string
   CHAIN: Chain
+  TWITTER_HANDLE: string
+  GITHIB_URL: string
+  DISCORD_URL: string
+  DOCS_URL: string
+  RAINBOW_KIT_PROJECT_ID: string
   GOOGLE_ANALYTICS_TRACKING_ID: string
   RPC_URL: string
   PYTH_HERMES_ENDPOINT: string

@@ -237,7 +237,9 @@ function App({ Component, pageProps }: AppProps) {
 
       <ErrorBoundary>
         <Head>
-          <title>Clober | Fully On-chain Order Book</title>
+          <title>
+            `${CHAIN_CONFIG.DEX_NAME} | ${CHAIN_CONFIG.TITLE}`
+          </title>
           <link rel="apple-touch-icon" href="/favicon.png" />
           <link rel="icon" type="image/png" href="/favicon.png" />
         </Head>

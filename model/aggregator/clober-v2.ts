@@ -22,7 +22,7 @@ import { CHAIN_CONFIG } from '../../chain-configs'
 import { Aggregator } from './index'
 
 export class CloberV2Aggregator implements Aggregator {
-  public readonly name = 'CloberV2'
+  public readonly name = CHAIN_CONFIG.DEX_NAME
   public readonly baseUrl = ''
   public readonly contract: `0x${string}`
   private readonly nativeTokenAddress = zeroAddress
