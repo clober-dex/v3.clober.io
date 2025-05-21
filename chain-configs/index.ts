@@ -10,6 +10,7 @@ import {
   walletConnectWallet,
 } from '@rainbow-me/rainbowkit/wallets'
 import { getNativeCurrency, getReferenceCurrency } from '@clober/v2-sdk'
+import colors from 'tailwindcss/colors'
 
 import { ChainConfig } from './type'
 
@@ -21,6 +22,7 @@ export const CHAIN_CONFIG: ChainConfig = {
   CHAIN,
   TITLE: 'Fully On-chain Order Book',
   DEX_NAME: 'Clober',
+  COLOR: colors.blue,
   URL: 'https://app.clober.io',
   LANDING_PAGE_URL: 'https://clober.io',
   TWITTER_HANDLE: '@CloberDEX',

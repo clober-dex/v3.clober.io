@@ -11,6 +11,7 @@ type EXTERNAL_SUBGRAPH = 'FUTURES' | 'LIQUIDITY_VAULT_POINT'
 export type ChainConfig = {
   TITLE: string
   DEX_NAME: string
+  COLOR: any
   URL: string
   LANDING_PAGE_URL: string
   CHAIN: Chain
