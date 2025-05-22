@@ -57,15 +57,38 @@ function getStartOfLastMonth(): Date {
 }
 
 function groupSnapshotsByDay(userVolumeSnapshots: UserVolumeSnapshot[]) {
-  const grouped: Record<string, { value: number; timestamp: number }> = {}
+  const grouped: Record<
+    string,
+    {
+      dailyVolumeUSD: number
+      dailyVolumes: { label: string; usd: number; address: `0x${string}` }[]
+      timestamp: number
+    }
+  > = {}
 
   for (const entry of userVolumeSnapshots) {
     const date = new Date(entry.timestamp * 1000)
     date.setHours(0, 0, 0, 0)
     const key = date.toISOString()
 
+    const dailyVolumes = Object.values(entry.volume24hUSDMap)
+      .filter(
+        ({ currency }) =>
+          !CHAIN_CONFIG.ANALYTICS_VOLUME_BLACKLIST.some(
+            (blacklist) =>
+              blacklist.timestamp === entry.timestamp &&
+              isAddressEqual(blacklist.address, getAddress(currency.address)),
+          ),
+      )
+      .map(({ currency, usd }) => ({
+        label: currency.symbol,
+        usd,
+        address: currency.address,
+      }))
+      .filter(({ usd }) => usd > 0)
     grouped[key] = {
-      value: (grouped[key]?.value ?? 0) + entry.volume24hUSD,
+      dailyVolumeUSD: dailyVolumes.reduce((acc, { usd }) => acc + usd, 0),
+      dailyVolumes,
       timestamp: entry.timestamp,
     }
   }
@@ -101,16 +124,10 @@ function Heatmap({ userDailyVolumes, monthLabels }: HeatmapProps) {
   const heatmapData = useMemo(() => {
     const grouped = groupSnapshotsByDay(userDailyVolumes)
     const start = getStartOfLastMonth()
-    const matrix: {
-      value: number
-      timestamp: number
-    }[][] = []
+    const matrix = []
 
     for (let week = 0; week < 44; week++) {
-      const weekData: {
-        value: number
-        timestamp: number
-      }[] = []
+      const weekData = []
 
       for (let day = 0; day < 7; day++) {
         const current = new Date(start)
@@ -118,7 +135,8 @@ function Heatmap({ userDailyVolumes, monthLabels }: HeatmapProps) {
         const key = current.toISOString()
 
         weekData.push({
-          value: grouped[key]?.value ?? 0,
+          dailyVolumeUSD: grouped[key]?.dailyVolumeUSD ?? 0,
+          dailyVolumes: grouped[key]?.dailyVolumes ?? [],
           timestamp: grouped[key]?.timestamp ?? 0,
         })
       }
@@ -159,37 +177,11 @@ function Heatmap({ userDailyVolumes, monthLabels }: HeatmapProps) {
                 key={colIdx}
                 className="w-3 sm:w-4 flex flex-col gap-[3px] sm:gap-[5px]"
               >
-                {col.map(({ timestamp }, rowIdx) => {
+                {col.map(({ dailyVolumes, dailyVolumeUSD }, rowIdx) => {
                   const date = new Date(startDate)
                   date.setDate(startDate.getDate() + colIdx * 7 + rowIdx)
                   const dateStr = date.toDateString()
 
-                  const volumes = Object.values(
-                    userDailyVolumes.find(
-                      (item) => item.timestamp === timestamp,
-                    )?.volume24hUSDMap ?? {},
-                  )
-                    .filter(
-                      ({ currency }) =>
-                        !CHAIN_CONFIG.ANALYTICS_VOLUME_BLACKLIST.some(
-                          (blacklist) =>
-                            blacklist.timestamp === timestamp &&
-                            isAddressEqual(
-                              blacklist.address,
-                              getAddress(currency.address),
-                            ),
-                        ),
-                    )
-                    .map((item) => ({
-                      label: item.currency.symbol,
-                      value: item.usd,
-                      address: item.currency.address,
-                    }))
-                    .filter(({ value }) => value > 0)
-                  const dailyVolumeUSD = volumes.reduce(
-                    (acc, { value }) => acc + value,
-                    0,
-                  )
                   return (
                     <div
                       key={rowIdx}
@@ -212,7 +204,13 @@ function Heatmap({ userDailyVolumes, monthLabels }: HeatmapProps) {
                           (scrollRef.current?.scrollLeft ?? 0)
 
                         setHoverInfo({
-                          volumes,
+                          volumes: dailyVolumes.map(
+                            ({ label, usd, address }) => ({
+                              label,
+                              value: usd,
+                              address: getAddress(address),
+                            }),
+                          ),
                           date: dateStr,
                           top: offsetTop + 24,
                           left: offsetLeft + rect.width / 2,
