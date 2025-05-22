@@ -2,7 +2,7 @@ import React from 'react'
 import '../../styles/globals.css'
 import { Meta, StoryObj } from '@storybook/react'
 import { zeroAddress } from 'viem'
-import { monadTestnet } from 'viem/chains'
+import { mainnet } from 'viem/chains'
 
 import { TradingCompetitionPnlCard } from './trading-competition-pnl-card'
 
@@ -23,7 +23,7 @@ type Story = StoryObj<typeof TradingCompetitionPnlCard>
 
 export const Default: Story = {
   args: {
-    chain: monadTestnet,
+    chain: mainnet,
     userAddress: zeroAddress,
     trades: [
       {

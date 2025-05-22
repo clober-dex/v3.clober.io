@@ -6,7 +6,6 @@ import { Currency, getProtocolAnalytics } from '@clober/v2-sdk'
 import { AnalyticsSummary } from '@clober/v2-sdk/dist/types/entities/analytics/types'
 
 import { useChainContext } from '../contexts/chain-context'
-import RedirectIfNotMonadTestnetContainer from '../containers/redirect-if-not-monad-testnet-container'
 import { HistogramChart } from '../components/chart/histogram-chart'
 import { Loading } from '../components/loading'
 import { CHAIN_CONFIG } from '../chain-configs'
@@ -100,7 +99,7 @@ export default function Analytics() {
   }, [analytics])
 
   return (
-    <RedirectIfNotMonadTestnetContainer>
+    <>
       {analytics && (
         <div className="flex flex-col w-full h-full items-center justify-center gap-8 px-16 pb-16">
           <div className="flex flex-col sm:flex-row gap-4">
@@ -370,6 +369,6 @@ export default function Analytics() {
       {!analytics && <Loading />}
 
       <div className="flex sm:mb-[400px]" />
-    </RedirectIfNotMonadTestnetContainer>
+    </>
   )
 }
