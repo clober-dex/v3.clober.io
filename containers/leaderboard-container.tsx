@@ -370,7 +370,7 @@ export const LeaderboardContainer = () => {
             </div>
             <div className="self-stretch text-center text-white text-lg sm:text-2xl font-bold">
               <CountUp
-                end={myNativeVolume / 50}
+                end={myNativeVolume / 10}
                 formattingFn={countUpFormatter}
                 preserveValue
                 useEasing={false}
