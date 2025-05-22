@@ -16,7 +16,7 @@ import { ChainConfig } from './type'
 
 const CHAIN = {
   ...monadTestnet,
-  icon: '/monad.png',
+  icon: '/chain-logo-images/monad.png',
 }
 export const CHAIN_CONFIG: ChainConfig = {
   CHAIN,

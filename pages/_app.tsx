@@ -151,19 +151,19 @@ function App({ Component, pageProps }: AppProps) {
 
   const getBackground = (pathname: string) => {
     if (pathname.includes('/trade')) {
-      return "lg:bg-[url('../public/chain-configs/trade-background.png')] lg:bg-top"
+      return "lg:bg-[url('../public/chain-configs/background/trade-background.png')] lg:bg-top"
     } else if (pathname.includes('/earn')) {
-      return "bg-[url('../public/base-background.png')] bg-top"
+      return "bg-[url('../public/chain-configs/background/base-background.png')] bg-top"
     } else if (pathname.includes('/futures')) {
-      return "bg-[url('../public/base-background.png')] bg-top"
+      return "bg-[url('../public/chain-configs/background/base-background.png')] bg-top"
     } else if (pathname.includes('/discover')) {
-      return "lg:bg-[url('../public/base-background.png')] bg-top"
+      return "lg:bg-[url('../public/chain-configs/background/base-background.png')] bg-top"
     } else if (pathname.includes('/point')) {
-      return "sm:bg-[url('../public/base-background.png')] bg-top"
+      return "sm:bg-[url('../public/chain-configs/background/base-background.png')] bg-top"
     } else if (pathname.includes('/trading-competition')) {
-      return "sm:bg-[url('../public/trading-competition-background.png')] bg-top"
+      return "sm:bg-[url('../public/chain-configs/background/trading-competition-background.png')] bg-top"
     } else if (pathname.includes('/leaderboard')) {
-      return "sm:bg-[url('../public/trading-competition-background.png')] bg-top"
+      return "sm:bg-[url('../public/chain-configs/background/trading-competition-background.png')] bg-top"
     }
   }
 
