@@ -57,10 +57,7 @@ export default function Analytics() {
             ),
           )
           return {
-            timestamp: item.timestamp,
-            activeUsers: item.activeUsers,
-            firstTimeUsers: item.firstTimeUsers,
-            transactionTypeCounts: item.transactionTypeCounts,
+            ...item,
             volume24hUSD: Object.values(volume24hUSDMap).reduce(
               (acc, { usd }) => acc + usd,
               0,

@@ -3,8 +3,8 @@ import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { NextRouter } from 'next/router'
 
-import { PAGE_BUTTONS } from '../constants/buttons'
 import { CHAIN_CONFIG } from '../chain-configs'
+import { PAGE_BUTTONS } from '../chain-configs/page-button'
 
 import { TwitterLogoSvg } from './svg/twitter-logo-svg'
 import { DiscordLogoSvg } from './svg/discord-logo-svg'

@@ -13,6 +13,7 @@ import { getNativeCurrency, getReferenceCurrency } from '@clober/v2-sdk'
 import colors from 'tailwindcss/colors'
 
 import { ChainConfig } from './type'
+import { PAGE_BUTTONS } from './page-button'
 
 const CHAIN = {
   ...monadTestnet,

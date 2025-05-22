@@ -20,9 +20,9 @@ import { useTransactionContext } from '../contexts/transaction-context'
 import { UserPointButton } from '../components/button/user-point-button'
 import ChainIcon from '../components/icon/chain-icon'
 import { textStyles } from '../constants/text-styles'
-import { PAGE_BUTTONS } from '../constants/buttons'
 import { fetchEnsName } from '../apis/ens'
 import { CHAIN_CONFIG } from '../chain-configs'
+import { PAGE_BUTTONS } from '../chain-configs/page-button'
 
 const WrongNetwork = ({
   openChainModal,
