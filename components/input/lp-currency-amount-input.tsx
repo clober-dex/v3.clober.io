@@ -7,6 +7,7 @@ import { CurrencyIcon } from '../icon/currency-icon'
 import { formatDollarValue, formatUnits } from '../../utils/bigint'
 import { toPlacesString } from '../../utils/bignumber'
 import { Chain } from '../../model/chain'
+import { LpCurrencyIcon } from '../icon/lp-currency-icon'
 
 import NumberInput from './number-input'
 
@@ -67,18 +68,12 @@ const LpCurrencyAmountInput = ({
               className="flex h-7 sm:h-8 w-fit items-center rounded-full bg-gray-700 py-1 pl-2 pr-3 gap-2"
               onClick={onCurrencyClick}
             >
-              <div className="w-8 h-5 shrink-0 relative">
-                <CurrencyIcon
-                  chain={chain}
-                  currency={currency0}
-                  className="w-5 h-5 absolute left-0 top-0 z-[1] rounded-full"
-                />
-                <CurrencyIcon
-                  chain={chain}
-                  currency={currency1}
-                  className="w-5 h-5 absolute left-4 top-0 rounded-full"
-                />
-              </div>
+              <LpCurrencyIcon
+                chain={chain}
+                currencyA={currency0}
+                currencyB={currency1}
+                className="w-5 h-5 shrink-0 relative"
+              />
               <div className="text-sm sm:text-base text-white">
                 {currency.symbol}
               </div>
@@ -93,18 +88,12 @@ const LpCurrencyAmountInput = ({
           )
         ) : currency ? (
           <div className="flex w-fit items-center rounded-full bg-gray-700 py-1 pl-2 pr-3 gap-2">
-            <div className="w-8 h-5 shrink-0 relative">
-              <CurrencyIcon
-                chain={chain}
-                currency={currency0}
-                className="w-5 h-5 absolute left-0 top-0 z-[1] rounded-full"
-              />
-              <CurrencyIcon
-                chain={chain}
-                currency={currency1}
-                className="w-5 h-5 absolute left-4 top-0 rounded-full"
-              />
-            </div>
+            <LpCurrencyIcon
+              chain={chain}
+              currencyA={currency0}
+              currencyB={currency1}
+              className="w-5 h-5 shrink-0 relative"
+            />
             <div className="text-sm sm:text-base text-white">LP Token</div>
           </div>
         ) : (

@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react'
-import BigNumber from 'bignumber.js'
+import React from 'react'
 
 import NumberInput from '../input/number-input'
 

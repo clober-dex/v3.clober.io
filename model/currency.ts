@@ -6,3 +6,8 @@ export type Currency = {
   icon?: string
   isVerified?: boolean
 }
+
+export type LPCurrency = {
+  currencyA: Currency
+  currencyB: Currency
+}

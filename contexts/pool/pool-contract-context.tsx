@@ -236,7 +236,10 @@ export const PoolContractProvider = ({
               ? undefined
               : {
                   direction: result.lpCurrency.direction,
-                  currency: result.lpCurrency.currency,
+                  currency: {
+                    currencyA: result.currencyA.currency,
+                    currencyB: result.currencyB.currency,
+                  },
                   label: result.lpCurrency.currency.symbol,
                   value: toPlacesAmountString(
                     result.lpCurrency.amount,

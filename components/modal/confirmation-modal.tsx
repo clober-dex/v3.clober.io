@@ -4,6 +4,8 @@ import { createPortal } from 'react-dom'
 import { Confirmation } from '../../contexts/transaction-context'
 import { CurrencyIcon } from '../icon/currency-icon'
 import ChainIcon from '../icon/chain-icon'
+import { Currency, LPCurrency } from '../../model/currency'
+import { LpCurrencyIcon } from '../icon/lp-currency-icon'
 
 const ConfirmationModal = ({
   confirmation,
@@ -91,11 +93,23 @@ const ConfirmationModal = ({
               <div className="flex w-full items-center justify-between bg-gray-700 px-3 py-1.5 text-sm rounded-lg">
                 <div className="flex items-center gap-2 truncate">
                   {field.currency && confirmation.chain ? (
-                    <CurrencyIcon
-                      chain={confirmation.chain}
-                      currency={field.currency}
-                      className="w-5 h-5 rounded-full"
-                    />
+                    (field.currency as Currency).address ? (
+                      <CurrencyIcon
+                        chain={confirmation.chain}
+                        currency={field.currency as Currency}
+                        className="w-5 h-5 rounded-full"
+                      />
+                    ) : (field.currency as LPCurrency).currencyA &&
+                      (field.currency as LPCurrency).currencyB ? (
+                      <LpCurrencyIcon
+                        chain={confirmation.chain}
+                        currencyA={(field.currency as LPCurrency).currencyA}
+                        currencyB={(field.currency as LPCurrency).currencyB}
+                        className="w-5 h-5 rounded-full"
+                      />
+                    ) : (
+                      <></>
+                    )
                   ) : (
                     <></>
                   )}
