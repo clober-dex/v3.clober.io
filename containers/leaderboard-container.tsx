@@ -3,16 +3,14 @@ import { useQuery } from '@tanstack/react-query'
 import { useAccount } from 'wagmi'
 import { getAddress, isAddressEqual } from 'viem'
 import CountUp from 'react-countup'
+import {
+  getUserDailyVolumes,
+  UserVolumeSnapshot,
+  getTopUsersByNativeVolume,
+  getUserNativeVolume,
+} from '@clober/v2-sdk'
 
 import { useChainContext } from '../contexts/chain-context'
-import {
-  fetchUserVolume,
-  fetchVolumeLeaderboard,
-  fetchWalletDayData,
-} from '../apis/leaderboard'
-import { DailyActivitySnapshot } from '../model/snapshot'
-import { Prices } from '../model/prices'
-import { useCurrencyContext } from '../contexts/currency-context'
 import { Legend } from '../components/chart/legend'
 import { Loading } from '../components/loading'
 import { toCommaSeparated } from '../utils/number'
@@ -22,17 +20,15 @@ import {
   fetchLiquidVaultBalanceLeaderboard,
   fetchLiquidVaultPoint,
 } from '../apis/point'
+import { CHAIN_CONFIG } from '../chain-configs'
 
 type HeatmapProps = {
-  userDailyVolumes: {
-    timestamp: number
-    volumeSnapshots: DailyActivitySnapshot['volumeSnapshots']
-  }[]
-  prices: Prices
+  userDailyVolumes: UserVolumeSnapshot[]
   monthLabels?: string[]
 }
 
 const getColor = (value: number) => {
+  value = Math.log10(value)
   if (value >= 6) {
     return 'bg-blue-900'
   }
@@ -60,30 +56,16 @@ function getStartOfLastMonth(): Date {
   return lastMonth
 }
 
-function groupSnapshotsByDay(
-  data: {
-    timestamp: number
-    volumeSnapshots: DailyActivitySnapshot['volumeSnapshots']
-  }[],
-  prices: Prices,
-) {
+function groupSnapshotsByDay(userVolumeSnapshots: UserVolumeSnapshot[]) {
   const grouped: Record<string, { value: number; timestamp: number }> = {}
 
-  for (const entry of data) {
+  for (const entry of userVolumeSnapshots) {
     const date = new Date(entry.timestamp * 1000)
     date.setHours(0, 0, 0, 0)
     const key = date.toISOString()
 
-    const dailyTotal =
-      entry.volumeSnapshots?.reduce(
-        (sum: number, snapshot: any) =>
-          sum +
-          (snapshot.amount ?? 0) * (prices[getAddress(snapshot.address)] ?? 0),
-        0,
-      ) ?? 0
-
     grouped[key] = {
-      value: (grouped[key]?.value ?? 0) + dailyTotal,
+      value: (grouped[key]?.value ?? 0) + entry.volume24hUSD,
       timestamp: entry.timestamp,
     }
   }
@@ -104,7 +86,7 @@ const getMonthLabels = (): string[] => {
   return labels
 }
 
-function Heatmap({ userDailyVolumes, prices, monthLabels }: HeatmapProps) {
+function Heatmap({ userDailyVolumes, monthLabels }: HeatmapProps) {
   const width = useWindowWidth()
   const months = monthLabels ?? getMonthLabels()
   const containerRef = useRef<HTMLDivElement>(null)
@@ -117,7 +99,7 @@ function Heatmap({ userDailyVolumes, prices, monthLabels }: HeatmapProps) {
   } | null>(null)
 
   const heatmapData = useMemo(() => {
-    const grouped = groupSnapshotsByDay(userDailyVolumes, prices)
+    const grouped = groupSnapshotsByDay(userDailyVolumes)
     const start = getStartOfLastMonth()
     const matrix: {
       value: number
@@ -145,21 +127,14 @@ function Heatmap({ userDailyVolumes, prices, monthLabels }: HeatmapProps) {
     }
 
     return matrix
-  }, [userDailyVolumes, prices])
+  }, [userDailyVolumes])
+
   const startDate = useMemo(() => getStartOfLastMonth(), [])
-  const totalVolume = useMemo(() => {
-    return heatmapData.reduce(
-      (acc, week) =>
-        acc + week.reduce((weekAcc, { value }) => weekAcc + value, 0),
-      0,
-    )
-  }, [heatmapData])
+
   const tokenColorMap = useMemo(() => {
     const addresses = [
       ...new Set(
-        userDailyVolumes.flatMap((item) =>
-          item.volumeSnapshots.map(({ address }) => getAddress(address)),
-        ),
+        userDailyVolumes.flatMap((item) => Object.keys(item.volume24hUSDMap)),
       ),
     ].sort()
 
@@ -176,7 +151,6 @@ function Heatmap({ userDailyVolumes, prices, monthLabels }: HeatmapProps) {
     <div ref={containerRef} className="relative w-full">
       <div ref={scrollRef} className="overflow-x-auto overflow-y-hidden">
         <div className="min-w-[800px] sm:min-w-[964px] max-w-[964px] h-[158px] sm:h-[227px] relative bg-[#18212f] rounded-3xl p-4 sm:p-6 mx-auto">
-          {totalVolume === 0 && <Loading />}
           <div className="absolute top-0 left-0 w-full h-full rounded-3xl pointer-events-none" />
 
           <div className="flex gap-[3px] sm:gap-[5px] mt-[24px] sm:mt-[32px]">
@@ -185,18 +159,41 @@ function Heatmap({ userDailyVolumes, prices, monthLabels }: HeatmapProps) {
                 key={colIdx}
                 className="w-3 sm:w-4 flex flex-col gap-[3px] sm:gap-[5px]"
               >
-                {col.map(({ value, timestamp }, rowIdx) => {
+                {col.map(({ timestamp }, rowIdx) => {
                   const date = new Date(startDate)
                   date.setDate(startDate.getDate() + colIdx * 7 + rowIdx)
                   const dateStr = date.toDateString()
-                  const volumeSnapshots = userDailyVolumes.find(
-                    (item) => item.timestamp === timestamp,
-                  )?.volumeSnapshots
 
+                  const volumes = Object.values(
+                    userDailyVolumes.find(
+                      (item) => item.timestamp === timestamp,
+                    )?.volume24hUSDMap ?? {},
+                  )
+                    .filter(
+                      ({ currency }) =>
+                        !CHAIN_CONFIG.ANALYTICS_VOLUME_BLACKLIST.some(
+                          (blacklist) =>
+                            blacklist.timestamp === timestamp &&
+                            isAddressEqual(
+                              blacklist.address,
+                              getAddress(currency.address),
+                            ),
+                        ),
+                    )
+                    .map((item) => ({
+                      label: item.currency.symbol,
+                      value: item.usd,
+                      address: item.currency.address,
+                    }))
+                    .filter(({ value }) => value > 0)
+                  const dailyVolumeUSD = volumes.reduce(
+                    (acc, { value }) => acc + value,
+                    0,
+                  )
                   return (
                     <div
                       key={rowIdx}
-                      className={`${value > 0 ? 'cursor-pointer' : ''} w-3 h-3 sm:w-4 sm:h-4 rounded-sm ${getColor(value)}`}
+                      className={`${dailyVolumeUSD > 0 ? 'cursor-pointer' : ''} w-3 h-3 sm:w-4 sm:h-4 rounded-sm ${getColor(dailyVolumeUSD)}`}
                       onMouseEnter={(e) => {
                         const rect = e.currentTarget.getBoundingClientRect()
                         const scrollRect =
@@ -215,14 +212,7 @@ function Heatmap({ userDailyVolumes, prices, monthLabels }: HeatmapProps) {
                           (scrollRef.current?.scrollLeft ?? 0)
 
                         setHoverInfo({
-                          volumes:
-                            (volumeSnapshots ?? [])
-                              .map(({ symbol, amount, address }) => ({
-                                label: symbol,
-                                value: amount,
-                                address: getAddress(address),
-                              }))
-                              .filter(({ value }) => value > 0) ?? [],
+                          volumes,
                           date: dateStr,
                           top: offsetTop + 24,
                           left: offsetLeft + rect.width / 2,
@@ -281,7 +271,6 @@ function Heatmap({ userDailyVolumes, prices, monthLabels }: HeatmapProps) {
 export const LeaderboardContainer = () => {
   const [tab, setTab] = useState<'vault' | 'volume'>('volume')
   const { address: userAddress } = useAccount()
-  const { prices } = useCurrencyContext()
   const { selectedChain } = useChainContext()
 
   const { data: myVaultPoint } = useQuery({
@@ -295,66 +284,67 @@ export const LeaderboardContainer = () => {
     initialData: 0,
   })
 
-  const { data: userDailyVolumes } = useQuery({
-    queryKey: ['user-daily-volumes', selectedChain.id, userAddress],
+  const { data: myNativeVolume } = useQuery({
+    queryKey: ['my-native-volume', selectedChain.id, userAddress],
+    queryFn: async () => {
+      if (!userAddress) {
+        return 0
+      }
+      return getUserNativeVolume({
+        chainId: selectedChain.id,
+        userAddress,
+      })
+    },
+    initialData: 0,
+  })
+
+  const { data: myDailyVolumes } = useQuery({
+    queryKey: ['my-daily-volumes', selectedChain.id, userAddress],
     queryFn: async () => {
       if (!userAddress) {
         return []
       }
-      return fetchWalletDayData(selectedChain, userAddress)
+      return getUserDailyVolumes({
+        chainId: selectedChain.id,
+        userAddress,
+      })
     },
     initialData: [],
   })
 
-  const { data: allUserVolume } = useQuery({
-    queryKey: ['volume-leaderboard', selectedChain.id],
+  const { data: allUserNativeVolume } = useQuery({
+    queryKey: ['native-volume-leaderboard', selectedChain.id],
     queryFn: async () => {
-      return fetchVolumeLeaderboard(selectedChain.id)
+      const topUsers = await getTopUsersByNativeVolume({
+        chainId: selectedChain.id,
+      })
+      return topUsers.filter(
+        ({ address }) =>
+          !CHAIN_CONFIG.BLACKLISTED_USERS.some((blacklist) =>
+            isAddressEqual(blacklist, getAddress(address)),
+          ),
+      )
     },
-  }) as {
-    data: {
-      address: `0x${string}`
-      totalVolumeUsd: number
-    }[]
-  }
+    initialData: [],
+  })
 
   const { data: allUserLP } = useQuery({
     queryKey: ['lp-leaderboard', selectedChain.id],
     queryFn: async () => {
       return fetchLiquidVaultBalanceLeaderboard()
     },
-  }) as {
-    data: {
-      address: `0x${string}`
-      balance: number
-    }[]
-  }
-
-  const { data: userVolume } = useQuery({
-    queryKey: ['user-volume', selectedChain.id, userAddress],
-    queryFn: async () => {
-      if (!userAddress) {
-        return null
-      }
-      return fetchUserVolume(selectedChain.id, userAddress)
-    },
-  }) as {
-    data: {
-      address: `0x${string}`
-      rank: number
-      totalVolumeUsd: number
-    } | null
-  }
+    initialData: [],
+  })
 
   const myVolumeRank = useMemo(() => {
-    if (allUserVolume && userAddress && userVolume) {
-      const index = (allUserVolume ?? []).findIndex(({ address }) =>
+    if (allUserNativeVolume && userAddress) {
+      const index = allUserNativeVolume.findIndex(({ address }) =>
         isAddressEqual(getAddress(address), userAddress),
       )
-      return index === -1 ? userVolume.rank : index + 1
+      return index + 1
     }
     return 0
-  }, [allUserVolume, userAddress, userVolume])
+  }, [allUserNativeVolume, userAddress])
 
   const myLPRank = useMemo(() => {
     if (allUserLP && userAddress) {
@@ -380,7 +370,7 @@ export const LeaderboardContainer = () => {
             </div>
             <div className="self-stretch text-center text-white text-lg sm:text-2xl font-bold">
               <CountUp
-                end={userVolume ? userVolume.totalVolumeUsd / 50 : 0}
+                end={myNativeVolume / 50}
                 formattingFn={countUpFormatter}
                 preserveValue
                 useEasing={false}
@@ -406,9 +396,7 @@ export const LeaderboardContainer = () => {
         </div>
       </div>
 
-      {userAddress && (
-        <Heatmap userDailyVolumes={userDailyVolumes} prices={prices} />
-      )}
+      {userAddress && <Heatmap userDailyVolumes={myDailyVolumes} />}
 
       <div className="w-full md:flex md:justify-center relative">
         <div className="flex flex-col items-center gap-3 sm:gap-4 mt-12 mb-4 md:w-[616px]">
@@ -443,7 +431,9 @@ export const LeaderboardContainer = () => {
                 </div>
                 <div className="flex flex-1 justify-start items-center gap-2.5">
                   <div className="justify-start text-gray-400">
-                    {tab === 'volume' ? 'Total Volume' : 'Vault Balance'}
+                    {tab === 'volume'
+                      ? `Total ${CHAIN_CONFIG.CHAIN.nativeCurrency.symbol} Volume`
+                      : 'Vault Balance'}
                   </div>
                 </div>
               </div>
@@ -452,28 +442,22 @@ export const LeaderboardContainer = () => {
 
           {tab === 'volume' && (
             <>
-              {allUserVolume ? (
+              {allUserNativeVolume ? (
                 <LeaderBoard
                   explorerUrl={selectedChain.blockExplorers?.default.url ?? ''}
                   myValue={
                     userAddress
-                      ? userVolume
-                        ? {
-                            address: userAddress,
-                            rank: myVolumeRank,
-                            value: `$${toCommaSeparated(userVolume.totalVolumeUsd.toFixed(2))}`,
-                          }
-                        : {
-                            address: userAddress,
-                            rank: -1,
-                            value: `$0.00`,
-                          }
+                      ? {
+                          address: userAddress,
+                          rank: myVolumeRank,
+                          value: `${toCommaSeparated(myNativeVolume.toFixed(4))}`,
+                        }
                       : undefined
                   }
-                  values={allUserVolume.map(
-                    ({ address, totalVolumeUsd }, index) => ({
+                  values={allUserNativeVolume.map(
+                    ({ address, nativeVolume }, index) => ({
                       address: getAddress(address),
-                      value: `$${toCommaSeparated(totalVolumeUsd.toFixed(2))}`,
+                      value: `${toCommaSeparated(nativeVolume.toFixed(4))}`,
                       rank: index + 1,
                     }),
                   )}

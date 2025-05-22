@@ -23,6 +23,11 @@ export type ChainConfig = {
   GOOGLE_ANALYTICS_TRACKING_ID: string
   RPC_URL: string
   PYTH_HERMES_ENDPOINT: string
+  ANALYTICS_VOLUME_BLACKLIST: {
+    timestamp: number
+    address: `0x${string}`
+  }[]
+  BLACKLISTED_USERS: `0x${string}`[]
   EXTERNAL_CONTRACT_ADDRESSES: Record<EXTERNAL_CONTRACT, `0x${string}`>
   EXTERNAL_SUBGRAPH_ENDPOINTS: Record<EXTERNAL_SUBGRAPH, `https://${string}`>
   WHITELISTED_POOL_KEYS: `0x${string}`[]

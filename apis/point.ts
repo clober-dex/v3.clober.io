@@ -7,11 +7,6 @@ import { currentTimestampInSeconds } from '../utils/date'
 import { formatUnits } from '../utils/bigint'
 import { CHAIN_CONFIG } from '../chain-configs'
 
-const BLACKLISTED_USER_ADDRESSES = [
-  '0x5F79EE8f8fA862E98201120d83c4eC39D9468D49',
-  '0xCcd0964F534c4583C35e07E47AbE8984A6bB1534',
-].map((address) => getAddress(address))
-
 const CONSTANTS: {
   [key: string]: {
     START_AT: number
@@ -95,7 +90,7 @@ export async function fetchLiquidVaultBalanceLeaderboard(): Promise<
   return vaultBalances
     .filter(
       (vaultBalance) =>
-        !BLACKLISTED_USER_ADDRESSES.some((address) =>
+        !CHAIN_CONFIG.BLACKLISTED_USERS.some((address) =>
           isAddressEqual(getAddress(vaultBalance.user.id), address),
         ),
     )

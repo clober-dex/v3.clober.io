@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { getAddress, isAddressEqual, zeroAddress } from 'viem'
+import { getAddress, isAddressEqual } from 'viem'
 import { UTCTimestamp } from 'lightweight-charts'
 import { Currency, getProtocolAnalytics } from '@clober/v2-sdk'
 import { AnalyticsSummary } from '@clober/v2-sdk/dist/types/entities/analytics/types'
@@ -9,16 +9,9 @@ import { useChainContext } from '../contexts/chain-context'
 import RedirectIfNotMonadTestnetContainer from '../containers/redirect-if-not-monad-testnet-container'
 import { HistogramChart } from '../components/chart/histogram-chart'
 import { Loading } from '../components/loading'
+import { CHAIN_CONFIG } from '../chain-configs'
 
 const buildCurrencyLabel = (currency: Currency): string => `${currency.symbol}`
-
-const BLACKLISTED_VOLUME_ENTRIES = [
-  { timestamp: 1743638400, address: zeroAddress },
-  {
-    timestamp: 1743638400,
-    address: getAddress('0xb2f82D0f38dc453D596Ad40A37799446Cc89274A'),
-  },
-]
 
 export default function Analytics() {
   const { selectedChain } = useChainContext()
@@ -82,7 +75,7 @@ export default function Analytics() {
     return (analytics?.analyticsSnapshots ?? []).reduce((acc, item) => {
       const values = Object.entries(item.volume24hUSDMap).filter(
         ([address]) =>
-          !BLACKLISTED_VOLUME_ENTRIES.some(
+          !CHAIN_CONFIG.ANALYTICS_VOLUME_BLACKLIST.some(
             (blacklist) =>
               blacklist.timestamp === item.timestamp &&
               isAddressEqual(blacklist.address, getAddress(address)),
@@ -96,7 +89,7 @@ export default function Analytics() {
     return (analytics?.analyticsSnapshots ?? []).reduce((acc, item) => {
       const values = Object.entries(item.protocolFees24hUSDMap).filter(
         ([address]) =>
-          !BLACKLISTED_VOLUME_ENTRIES.some(
+          !CHAIN_CONFIG.ANALYTICS_VOLUME_BLACKLIST.some(
             (blacklist) =>
               blacklist.timestamp === item.timestamp &&
               isAddressEqual(blacklist.address, getAddress(address)),
@@ -125,7 +118,7 @@ export default function Analytics() {
                       const values = Object.entries(item.volume24hUSDMap)
                         .filter(
                           ([address]) =>
-                            !BLACKLISTED_VOLUME_ENTRIES.some(
+                            !CHAIN_CONFIG.ANALYTICS_VOLUME_BLACKLIST.some(
                               (blacklist) =>
                                 blacklist.timestamp === item.timestamp &&
                                 isAddressEqual(
@@ -243,7 +236,7 @@ export default function Analytics() {
                       const values = Object.entries(item.protocolFees24hUSDMap)
                         .filter(
                           ([address]) =>
-                            !BLACKLISTED_VOLUME_ENTRIES.some(
+                            !CHAIN_CONFIG.ANALYTICS_VOLUME_BLACKLIST.some(
                               (blacklist) =>
                                 blacklist.timestamp === item.timestamp &&
                                 isAddressEqual(
@@ -312,7 +305,7 @@ export default function Analytics() {
                       const values = Object.entries(item.totalValueLockedUSDMap)
                         .filter(
                           ([address]) =>
-                            !BLACKLISTED_VOLUME_ENTRIES.some(
+                            !CHAIN_CONFIG.ANALYTICS_VOLUME_BLACKLIST.some(
                               (blacklist) =>
                                 blacklist.timestamp === item.timestamp &&
                                 isAddressEqual(

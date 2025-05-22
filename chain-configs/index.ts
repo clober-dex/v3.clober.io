@@ -34,6 +34,13 @@ export const CHAIN_CONFIG: ChainConfig = {
   RPC_URL:
     'https://proud-tiniest-flower.monad-testnet.quiknode.pro/a4ebe00fca2e7bf01201f3b0f7fe2f0077c52a36',
   PYTH_HERMES_ENDPOINT: 'https://hermes-beta.pyth.network',
+  ANALYTICS_VOLUME_BLACKLIST: [
+    { timestamp: 1743638400, address: zeroAddress },
+    {
+      timestamp: 1743638400,
+      address: getAddress('0xb2f82D0f38dc453D596Ad40A37799446Cc89274A'),
+    },
+  ],
   EXTERNAL_CONTRACT_ADDRESSES: {
     FuturesMarket: getAddress('0x56b88CFe40d592Ec4d4234043e039d7CA807f110'),
     PythOracle: getAddress('0xad2B52D2af1a9bD5c561894Cdd84f7505e1CD0B5'),
@@ -41,6 +48,10 @@ export const CHAIN_CONFIG: ChainConfig = {
       '0x58e84BAc13e19966A17F7Df370d3452bb0c23BF7',
     ),
   },
+  BLACKLISTED_USERS: [
+    '0x5F79EE8f8fA862E98201120d83c4eC39D9468D49',
+    '0xCcd0964F534c4583C35e07E47AbE8984A6bB1534',
+  ],
   EXTERNAL_SUBGRAPH_ENDPOINTS: {
     FUTURES:
       'https://subgraph.satsuma-prod.com/f6a8c4889b7b/clober/clober-futures-subgraph-monad-testnet/api',
