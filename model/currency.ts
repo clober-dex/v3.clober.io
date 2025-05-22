@@ -7,7 +7,7 @@ export type Currency = {
   isVerified?: boolean
 }
 
-export type LPCurrency = {
-  currencyA: Currency
-  currencyB: Currency
+export type LpCurrency = Currency & {
+  currencyA?: Currency
+  currencyB?: Currency
 }

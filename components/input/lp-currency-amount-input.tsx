@@ -3,7 +3,6 @@ import { parseUnits } from 'viem'
 
 import { Currency } from '../../model/currency'
 import { TriangleDownSvg } from '../svg/triangle-down-svg'
-import { CurrencyIcon } from '../icon/currency-icon'
 import { formatDollarValue, formatUnits } from '../../utils/bigint'
 import { toPlacesString } from '../../utils/bignumber'
 import { Chain } from '../../model/chain'

@@ -51,7 +51,7 @@ const CurrencyIconBase = ({
 
   return (
     <div {...props}>
-      <div className="relative w-5 h-5 rounded-full overflow-hidden border border-white bg-[#13161b]">
+      <div className="relative w-full h-full rounded-full overflow-hidden border border-white bg-[#13161b]">
         <div className="absolute top-0 left-0 w-full h-full">
           <Image
             fill
