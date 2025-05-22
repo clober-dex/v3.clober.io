@@ -5,19 +5,28 @@ import { Chain } from '../model/chain'
 import { Prices } from '../model/prices'
 import { Pool, PoolSnapshot } from '../model/pool'
 import { CHAIN_CONFIG } from '../chain-configs'
+import { currentTimestampInSeconds } from '../utils/date'
+import { calculateApy } from '../utils/apy'
 
 export async function fetchPoolSnapshots(chain: Chain) {
   const poolSnapshots = await getPoolSnapshots({
     chainId: chain.id,
   })
-  console.log('poolSnapshots', poolSnapshots)
+  const now = currentTimestampInSeconds()
   return poolSnapshots
     .filter(({ key }) => CHAIN_CONFIG.WHITELISTED_POOL_KEYS.includes(key))
     .sort((a, b) => Number(b.volumeUSD24h) - Number(a.volumeUSD24h))
-    .map((poolSnapshot) => ({
-      ...poolSnapshot,
-      apy: 12.34, // TODO: fix it
-    }))
+    .map((poolSnapshot) => {
+      return {
+        ...poolSnapshot,
+        apy: calculateApy(
+          1 +
+            Number(poolSnapshot.totalSpreadProfitUSD) /
+              Number(poolSnapshot.totalTvlUSD),
+          now - Number(poolSnapshot.initialLPInfo.timestamp),
+        ),
+      }
+    })
 }
 
 export async function fetchPool(
@@ -44,16 +53,23 @@ export async function fetchPool(
       prices[pool.liquidityA.total.currency.address] +
     Number(pool.liquidityB.total.value) *
       prices[pool.liquidityB.total.currency.address]
+  const now = currentTimestampInSeconds()
+  const apy = calculateApy(
+    1 +
+      Number(poolSnapshot.totalSpreadProfitUSD) /
+        Number(poolSnapshot.totalTvlUSD),
+    now - Number(poolSnapshot.initialLPInfo.timestamp),
+  )
   return {
     pool: {
       ...pool,
       lpPriceUSD: tvl / Number(pool.totalSupply.value),
       tvl,
-      apy: 12.34, // TODO: fix it
+      apy,
     },
     poolSnapshot: {
       ...poolSnapshot,
-      apy: 12.34, // TODO: fix it
+      apy,
     },
   }
 }
