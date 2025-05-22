@@ -10,6 +10,7 @@ export async function fetchPoolSnapshots(chain: Chain) {
   const poolSnapshots = await getPoolSnapshots({
     chainId: chain.id,
   })
+  console.log('poolSnapshots', poolSnapshots)
   return poolSnapshots
     .filter(({ key }) => CHAIN_CONFIG.WHITELISTED_POOL_KEYS.includes(key))
     .sort((a, b) => Number(b.volumeUSD24h) - Number(a.volumeUSD24h))

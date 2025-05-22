@@ -25,7 +25,7 @@ export default function Document() {
         />
         <meta
           property="og:image"
-          content={`${CHAIN_CONFIG.URL}/twitter-card-v2.png`}
+          content={`${CHAIN_CONFIG.URL}/chain-configs/twitter-card-v2.png`}
         />
         {/* <!-- Twitter Meta Tags --> */}
         <meta property="twitter:card" content="summary_large_image" />
@@ -40,7 +40,7 @@ export default function Document() {
         />
         <meta
           name="twitter:image"
-          content={`${CHAIN_CONFIG.URL}/twitter-card.png`}
+          content={`${CHAIN_CONFIG.URL}/chain-configs/twitter-card.png`}
         />
       </Head>
       <body>

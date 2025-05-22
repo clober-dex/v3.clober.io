@@ -151,7 +151,7 @@ function App({ Component, pageProps }: AppProps) {
 
   const getBackground = (pathname: string) => {
     if (pathname.includes('/trade')) {
-      return "lg:bg-[url('../public/trade-background.png')] lg:bg-top"
+      return "lg:bg-[url('../public/chain-configs/trade-background.png')] lg:bg-top"
     } else if (pathname.includes('/earn')) {
       return "bg-[url('../public/base-background.png')] bg-top"
     } else if (pathname.includes('/futures')) {
@@ -240,8 +240,8 @@ function App({ Component, pageProps }: AppProps) {
           <title>
             {CHAIN_CONFIG.DEX_NAME} | {CHAIN_CONFIG.TITLE}
           </title>
-          <link rel="apple-touch-icon" href="/favicon.png" />
-          <link rel="icon" type="image/png" href="/favicon.png" />
+          <link rel="apple-touch-icon" href="/chain-configs/favicon.png" />
+          <link rel="icon" type="image/png" href="/chain-configs/favicon.png" />
         </Head>
         <WalletProvider>
           <ChainProvider>

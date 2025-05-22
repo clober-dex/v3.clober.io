@@ -107,7 +107,12 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
                 href={CHAIN_CONFIG.LANDING_PAGE_URL}
                 rel="noopener noreferrer"
               >
-                <Image width={123} height={28} src="/logo.svg" alt="logo" />
+                <Image
+                  width={123}
+                  height={28}
+                  src="/chain-configs/logo.svg"
+                  alt="logo"
+                />
               </a>
               <a
                 className="flex md:hidden gap-2 items-center h-5"
@@ -115,7 +120,12 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
                 href={CHAIN_CONFIG.LANDING_PAGE_URL}
                 rel="noopener noreferrer"
               >
-                <Image width={88} height={20} src="/logo.svg" alt="logo" />
+                <Image
+                  width={88}
+                  height={20}
+                  src="/chain-configs/logo.svg"
+                  alt="logo"
+                />
               </a>
             </>
           )}
