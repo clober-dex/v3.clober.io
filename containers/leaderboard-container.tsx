@@ -72,14 +72,6 @@ function groupSnapshotsByDay(userVolumeSnapshots: UserVolumeSnapshot[]) {
     const key = date.toISOString()
 
     const dailyVolumes = Object.values(entry.volume24hUSDMap)
-      .filter(
-        ({ currency }) =>
-          !CHAIN_CONFIG.ANALYTICS_VOLUME_BLACKLIST.some(
-            (blacklist) =>
-              blacklist.timestamp === entry.timestamp &&
-              isAddressEqual(blacklist.address, getAddress(currency.address)),
-          ),
-      )
       .map(({ currency, usd }) => ({
         label: currency.symbol,
         usd,
@@ -156,13 +148,19 @@ function Heatmap({ userDailyVolumes, monthLabels }: HeatmapProps) {
       ),
     ].sort()
 
-    return Object.fromEntries(
-      addresses.map((address, index) => {
-        const baseHue = (index * 47) % 360
-        const hue = (baseHue + (index % 2) * 180) % 360
-        return [address, `hsl(${hue}, 70%, 50%)`]
-      }),
-    )
+    return {
+      ...Object.fromEntries(
+        addresses.map((address, index) => {
+          const baseHue = (index * 47) % 360
+          const hue = (baseHue + (index % 2) * 180) % 360
+          return [address, `hsl(${hue}, 70%, 50%)`]
+        }),
+      ),
+      ...{
+        ['0x0000000000000000000000000000000000000000']: '#FC72FF',
+        [getAddress('0xf817257fed379853cDe0fa4F97AB987181B1E5Ea')]: '#4C82FB',
+      },
+    }
   }, [userDailyVolumes])
 
   return (
@@ -302,10 +300,20 @@ export const LeaderboardContainer = () => {
       if (!userAddress) {
         return []
       }
-      return getUserDailyVolumes({
+      const userDailyVolumes = await getUserDailyVolumes({
         chainId: selectedChain.id,
         userAddress,
       })
+      return userDailyVolumes.filter(
+        ({ volume24hUSDMap }) =>
+          !Object.values(volume24hUSDMap).some(({ currency }) =>
+            CHAIN_CONFIG.ANALYTICS_VOLUME_BLACKLIST.some(
+              (blacklist) =>
+                blacklist.timestamp === userDailyVolumes[0].timestamp &&
+                isAddressEqual(blacklist.address, getAddress(currency.address)),
+            ),
+          ),
+      )
     },
     initialData: [],
   })

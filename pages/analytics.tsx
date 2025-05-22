@@ -3,7 +3,10 @@ import { useQuery } from '@tanstack/react-query'
 import { getAddress, isAddressEqual } from 'viem'
 import { UTCTimestamp } from 'lightweight-charts'
 import { Currency, getProtocolAnalytics } from '@clober/v2-sdk'
-import { AnalyticsSummary } from '@clober/v2-sdk/dist/types/entities/analytics/types'
+import {
+  AnalyticsSnapshot,
+  AnalyticsSummary,
+} from '@clober/v2-sdk/dist/types/entities/analytics/types'
 
 import { useChainContext } from '../contexts/chain-context'
 import { HistogramChart } from '../components/chart/histogram-chart'
@@ -18,7 +21,77 @@ export default function Analytics() {
   const { data: analytics } = useQuery({
     queryKey: ['analytics', selectedChain.id],
     queryFn: async () => {
-      return getProtocolAnalytics({ chainId: selectedChain.id })
+      const protocolAnalytics = await getProtocolAnalytics({
+        chainId: selectedChain.id,
+      })
+      const analyticsSnapshots: AnalyticsSnapshot[] =
+        protocolAnalytics.analyticsSnapshots.map((item) => {
+          const volume24hUSDMap = Object.fromEntries(
+            Object.entries(item.volume24hUSDMap).filter(
+              ([address]) =>
+                !CHAIN_CONFIG.ANALYTICS_VOLUME_BLACKLIST.some(
+                  (blacklist) =>
+                    blacklist.timestamp === item.timestamp &&
+                    isAddressEqual(blacklist.address, getAddress(address)),
+                ),
+            ),
+          )
+          const protocolFees24hUSDMap = Object.fromEntries(
+            Object.entries(item.protocolFees24hUSDMap).filter(
+              ([address]) =>
+                !CHAIN_CONFIG.ANALYTICS_VOLUME_BLACKLIST.some(
+                  (blacklist) =>
+                    blacklist.timestamp === item.timestamp &&
+                    isAddressEqual(blacklist.address, getAddress(address)),
+                ),
+            ),
+          )
+          const totalValueLockedUSDMap = Object.fromEntries(
+            Object.entries(item.totalValueLockedUSDMap).filter(
+              ([address]) =>
+                !CHAIN_CONFIG.ANALYTICS_VOLUME_BLACKLIST.some(
+                  (blacklist) =>
+                    blacklist.timestamp === item.timestamp &&
+                    isAddressEqual(blacklist.address, getAddress(address)),
+                ),
+            ),
+          )
+          return {
+            timestamp: item.timestamp,
+            activeUsers: item.activeUsers,
+            firstTimeUsers: item.firstTimeUsers,
+            transactionTypeCounts: item.transactionTypeCounts,
+            volume24hUSD: Object.values(volume24hUSDMap).reduce(
+              (acc, { usd }) => acc + usd,
+              0,
+            ),
+            volume24hUSDMap,
+            protocolFees24hUSD: Object.values(protocolFees24hUSDMap).reduce(
+              (acc, { usd }) => acc + usd,
+              0,
+            ),
+            protocolFees24hUSDMap,
+            totalValueLockedUSD: Object.values(totalValueLockedUSDMap).reduce(
+              (acc, { usd }) => acc + usd,
+              0,
+            ),
+            totalValueLockedUSDMap,
+          }
+        })
+      return {
+        accumulatedUniqueUsers: protocolAnalytics.accumulatedUniqueUsers,
+        accumulatedUniqueTransactions:
+          protocolAnalytics.accumulatedUniqueTransactions,
+        accumulatedVolumeUSD: analyticsSnapshots.reduce(
+          (acc, item) => acc + item.volume24hUSD,
+          0,
+        ),
+        accumulatedProtocolFeesUSD: analyticsSnapshots.reduce(
+          (acc, item) => acc + item.protocolFees24hUSD,
+          0,
+        ),
+        analyticsSnapshots,
+      }
     },
     initialData: null,
   }) as {
@@ -70,34 +143,6 @@ export default function Analytics() {
     )
   }, [analytics])
 
-  const totalValueLockedUSD = useMemo(() => {
-    return (analytics?.analyticsSnapshots ?? []).reduce((acc, item) => {
-      const values = Object.entries(item.volume24hUSDMap).filter(
-        ([address]) =>
-          !CHAIN_CONFIG.ANALYTICS_VOLUME_BLACKLIST.some(
-            (blacklist) =>
-              blacklist.timestamp === item.timestamp &&
-              isAddressEqual(blacklist.address, getAddress(address)),
-          ),
-      )
-      return acc + values.reduce((acc, [, { usd }]) => acc + usd, 0)
-    }, 0)
-  }, [analytics])
-
-  const totalProtocolFeesUSD = useMemo(() => {
-    return (analytics?.analyticsSnapshots ?? []).reduce((acc, item) => {
-      const values = Object.entries(item.protocolFees24hUSDMap).filter(
-        ([address]) =>
-          !CHAIN_CONFIG.ANALYTICS_VOLUME_BLACKLIST.some(
-            (blacklist) =>
-              blacklist.timestamp === item.timestamp &&
-              isAddressEqual(blacklist.address, getAddress(address)),
-          ),
-      )
-      return acc + values.reduce((acc, [, { usd }]) => acc + usd, 0)
-    }, 0)
-  }, [analytics])
-
   return (
     <>
       {analytics && (
@@ -113,30 +158,18 @@ export default function Analytics() {
                   prefix={'$'}
                   data={(analytics?.analyticsSnapshots ?? [])
                     .map((item) => {
-                      // filter out blacklisted addresses in that timestamp
-                      const values = Object.entries(item.volume24hUSDMap)
-                        .filter(
-                          ([address]) =>
-                            !CHAIN_CONFIG.ANALYTICS_VOLUME_BLACKLIST.some(
-                              (blacklist) =>
-                                blacklist.timestamp === item.timestamp &&
-                                isAddressEqual(
-                                  blacklist.address,
-                                  getAddress(address),
-                                ),
-                            ),
-                        )
-                        .map(
-                          ([, { currency, usd }]) =>
-                            [buildCurrencyLabel(currency), usd] as [
-                              string,
-                              number,
-                            ],
-                        )
                       return {
                         time: item.timestamp as UTCTimestamp,
                         values: {
-                          ...Object.fromEntries(values),
+                          ...Object.fromEntries(
+                            Object.entries(item.volume24hUSDMap).map(
+                              ([, { currency, usd }]) =>
+                                [buildCurrencyLabel(currency), usd] as [
+                                  string,
+                                  number,
+                                ],
+                            ),
+                          ),
                         },
                       }
                     })
@@ -164,7 +197,7 @@ export default function Analytics() {
                       )
                       .sort() as { label: string; color: string }[]
                   }
-                  defaultValue={totalValueLockedUSD}
+                  defaultValue={analytics?.accumulatedVolumeUSD ?? 0}
                   height={312}
                 />
               </div>
@@ -231,30 +264,18 @@ export default function Analytics() {
                   prefix={'$'}
                   data={(analytics?.analyticsSnapshots ?? [])
                     .map((item) => {
-                      // filter out blacklisted addresses in that timestamp
-                      const values = Object.entries(item.protocolFees24hUSDMap)
-                        .filter(
-                          ([address]) =>
-                            !CHAIN_CONFIG.ANALYTICS_VOLUME_BLACKLIST.some(
-                              (blacklist) =>
-                                blacklist.timestamp === item.timestamp &&
-                                isAddressEqual(
-                                  blacklist.address,
-                                  getAddress(address),
-                                ),
-                            ),
-                        )
-                        .map(
-                          ([, { currency, usd }]) =>
-                            [buildCurrencyLabel(currency), usd] as [
-                              string,
-                              number,
-                            ],
-                        )
                       return {
                         time: item.timestamp as UTCTimestamp,
                         values: {
-                          ...Object.fromEntries(values),
+                          ...Object.fromEntries(
+                            Object.entries(item.protocolFees24hUSDMap).map(
+                              ([, { currency, usd }]) =>
+                                [buildCurrencyLabel(currency), usd] as [
+                                  string,
+                                  number,
+                                ],
+                            ),
+                          ),
                         },
                       }
                     })
@@ -282,7 +303,7 @@ export default function Analytics() {
                       )
                       .sort() as { label: string; color: string }[]
                   }
-                  defaultValue={totalProtocolFeesUSD}
+                  defaultValue={analytics?.accumulatedProtocolFeesUSD ?? 0}
                   height={312}
                 />
               </div>
@@ -300,30 +321,18 @@ export default function Analytics() {
                   prefix={'$'}
                   data={(analytics?.analyticsSnapshots ?? [])
                     .map((item) => {
-                      // filter out blacklisted addresses in that timestamp
-                      const values = Object.entries(item.totalValueLockedUSDMap)
-                        .filter(
-                          ([address]) =>
-                            !CHAIN_CONFIG.ANALYTICS_VOLUME_BLACKLIST.some(
-                              (blacklist) =>
-                                blacklist.timestamp === item.timestamp &&
-                                isAddressEqual(
-                                  blacklist.address,
-                                  getAddress(address),
-                                ),
-                            ),
-                        )
-                        .map(
-                          ([, { currency, usd }]) =>
-                            [buildCurrencyLabel(currency), usd] as [
-                              string,
-                              number,
-                            ],
-                        )
                       return {
                         time: item.timestamp as UTCTimestamp,
                         values: {
-                          ...Object.fromEntries(values),
+                          ...Object.fromEntries(
+                            Object.entries(item.totalValueLockedUSDMap).map(
+                              ([, { currency, usd }]) =>
+                                [buildCurrencyLabel(currency), usd] as [
+                                  string,
+                                  number,
+                                ],
+                            ),
+                          ),
                         },
                       }
                     })

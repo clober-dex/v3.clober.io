@@ -27,7 +27,6 @@ export const HistogramChart = ({
     colors,
     background: '#FFFFFF',
   }
-  console.log('HistogramChart', params)
 
   return (
     <TamaguiProvider
