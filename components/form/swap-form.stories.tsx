@@ -1,7 +1,7 @@
 import React from 'react'
 import '../../styles/globals.css'
 import { Meta, StoryObj } from '@storybook/react'
-import { mainnet } from 'viem/chains'
+import { berachain } from 'viem/chains'
 
 import { dummyCurrencies } from '../../.storybook/dummy-data/currencies'
 import { dummyPrices } from '../../.storybook/dummy-data/prices'
@@ -25,7 +25,7 @@ type Story = StoryObj<typeof SwapForm>
 
 export const Default: Story = {
   args: {
-    chain: mainnet,
+    chain: berachain,
     explorerUrl: 'https://etherscan.io',
     currencies: dummyCurrencies,
     setCurrencies: () => {},
@@ -57,25 +57,26 @@ export const Default: Story = {
 
 export const Selected: Story = {
   args: {
-    chain: mainnet,
+    chain: berachain,
     currencies: dummyCurrencies,
     setCurrencies: () => {},
     prices: dummyPrices,
     showInputCurrencySelect: false,
     setShowInputCurrencySelect: () => {},
-    inputCurrency: dummyCurrencies[3],
+    inputCurrency: dummyCurrencies[0],
     setInputCurrency: () => {},
     inputCurrencyAmount: '1.123',
     setInputCurrencyAmount: () => {},
     availableInputCurrencyBalance: 10000000000000000000n,
     showOutputCurrencySelect: false,
     setShowOutputCurrencySelect: () => {},
-    outputCurrency: dummyCurrencies[5],
+    outputCurrency: dummyCurrencies[4],
     setOutputCurrency: () => {},
     outputCurrencyAmount: '2000',
     slippageInput: '1.00',
     setSlippageInput: () => {},
     gasEstimateValue: 1.12,
+    aggregatorName: 'Uniswap',
     refreshQuotesAction: () => {},
     closeSwapFormAction: () => {},
     priceImpact: 0.01,

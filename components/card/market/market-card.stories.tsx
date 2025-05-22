@@ -49,6 +49,7 @@ export const Default: Story = {
 
 export const Minus: Story = {
   args: {
+    chain: mainnet,
     baseCurrency: {
       symbol: 'BTC',
       name: 'BTC',
@@ -65,7 +66,7 @@ export const Minus: Story = {
     price: 100000,
     fdv: 100000,
     dailyVolume: 100000,
-    dailyChange: 0.2,
+    dailyChange: -0.2,
     verified: true,
     isBidTaken: false,
     isAskTaken: false,
@@ -74,6 +75,7 @@ export const Minus: Story = {
 
 export const NotVerified: Story = {
   args: {
+    chain: mainnet,
     baseCurrency: {
       symbol: 'BTC',
       name: 'BTC',
