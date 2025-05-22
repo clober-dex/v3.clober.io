@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import BigNumber from 'bignumber.js'
 
 import NumberInput from '../input/number-input'
 
@@ -11,19 +12,6 @@ export const SlippageToggle = ({
 }) => {
   const [customValue, setCustomValue] = React.useState<string>('')
 
-  useEffect(() => {
-    if (
-      Number(slippageInput) !== 0.1 &&
-      Number(slippageInput) !== 0.5 &&
-      Number(slippageInput) !== 0.99 &&
-      Number(slippageInput) !== 10000.0
-    ) {
-      setCustomValue(slippageInput)
-    } else {
-      setCustomValue('')
-    }
-  }, [slippageInput])
-
   return (
     <div className="flex h-full w-full flex-col gap-2 text-xs sm:text-sm text-white">
       <div className="bg-gray-600 text-white rounded-[22px] h-7 py-0.5 w-full flex flex-row relative text-xs">
@@ -31,6 +19,7 @@ export const SlippageToggle = ({
           disabled={Number(slippageInput) === 0.1}
           onClick={() => {
             setSlippageInput('0.1')
+            setCustomValue('')
           }}
           className="flex flex-1 pr-2 pl-4 py-0 rounded-[18px] disabled:text-blue-400 disabled:bg-blue-500/25 justify-center items-center gap-1"
         >
@@ -40,6 +29,7 @@ export const SlippageToggle = ({
           disabled={Number(slippageInput) === 0.5}
           onClick={() => {
             setSlippageInput('0.5')
+            setCustomValue('')
           }}
           className="flex flex-1 px-2 py-0 rounded-[18px] disabled:text-blue-400 disabled:bg-blue-500/25 justify-center items-center gap-1"
         >
@@ -49,6 +39,7 @@ export const SlippageToggle = ({
           disabled={Number(slippageInput) === 0.99}
           onClick={() => {
             setSlippageInput('0.99')
+            setCustomValue('')
           }}
           className="flex flex-1 px-2 py-0 rounded-[18px] disabled:text-blue-400 disabled:bg-blue-500/25 justify-center items-center gap-1"
         >
@@ -58,6 +49,7 @@ export const SlippageToggle = ({
           disabled={Number(slippageInput) === 10000.0}
           onClick={() => {
             setSlippageInput('10000')
+            setCustomValue('')
           }}
           className="flex flex-1 px-2 py-0 rounded-[18px] disabled:text-blue-400 disabled:bg-blue-500/25 justify-center items-center gap-1"
         >
@@ -73,11 +65,17 @@ export const SlippageToggle = ({
           }
           value={customValue}
           onValueChange={(e) => {
-            const _e = Math.min(Number(e), 50).toString()
-            setSlippageInput(_e)
-            setCustomValue(_e)
+            const decimals = e.split('.')[1]
+            if (decimals && decimals.length > 2) {
+              return
+            }
+            if (Number(e) < 0 || Number(e) > 50) {
+              return
+            }
+            setSlippageInput(e)
+            setCustomValue(e)
           }}
-          className={`bg-gray-600 text-center ${Number(slippageInput) >= 2 ? 'text-yellow-500' : 'text-white'} w-[70px] flex flex-1 pl-2 pr-4 py-0 rounded-[18px] disabled:text-blue-400 disabled:bg-blue-500/25 justify-center items-center gap-1`}
+          className={`bg-gray-600 text-center ${Number(slippageInput) >= 2 || Number(slippageInput) <= 0.05 ? 'text-yellow-500' : 'text-white'} w-[70px] flex flex-1 pl-2 pr-4 py-0 rounded-[18px] disabled:text-blue-400 disabled:bg-blue-500/25 justify-center items-center gap-1`}
         />
       </div>
 
@@ -96,6 +94,13 @@ export const SlippageToggle = ({
             {Number(slippageInput) >= 10000 ? 'Unlimited' : `${slippageInput}%`}{' '}
             Slippage
           </div>
+        </div>
+      ) : (
+        <div className="h-4 sm:h-5 w-1"></div>
+      )}
+      {Number(slippageInput) <= 0.05 ? (
+        <div className="flex w-full text-nowrap justify-end">
+          Slippage below 0.05% may result in a failed tx.
         </div>
       ) : (
         <div className="h-4 sm:h-5 w-1"></div>
