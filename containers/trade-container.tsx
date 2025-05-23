@@ -334,7 +334,7 @@ export const TradeContainer = () => {
           outputCurrency: outputCurrency.symbol,
           amountIn,
         })
-        return fetchQuotes(
+        const { best } = await fetchQuotes(
           aggregators,
           inputCurrency,
           amountIn,
@@ -343,6 +343,7 @@ export const TradeContainer = () => {
           gasPrice,
           userAddress,
         )
+        return best
       }
       return null
     },

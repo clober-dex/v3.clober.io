@@ -28,7 +28,9 @@ export const fetchPrice = async (
     ? [currency0, currency1]
     : [currency1, currency0]
   try {
-    const { amountOut } = await fetchQuotes(
+    const {
+      best: { amountOut },
+    } = await fetchQuotes(
       aggregators,
       baseCurrency,
       parseUnits('1', baseCurrency.decimals),
