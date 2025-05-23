@@ -369,6 +369,69 @@ export default function Analytics() {
               </div>
             </div>
           </div>
+
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col">
+              <div className="text-white text-sm md:text-base font-bold">
+                Daily Vault TVL
+              </div>
+
+              <div className="flex w-[350px] sm:w-[1016px]">
+                <HistogramChart
+                  prefix={'$'}
+                  data={(analytics?.analyticsSnapshots ?? [])
+                    .map((item) => {
+                      return {
+                        time: item.timestamp as UTCTimestamp,
+                        values: {
+                          ...Object.fromEntries(
+                            Object.entries(item.poolTotalValueLockedUSDMap).map(
+                              ([, { currency, usd }]) =>
+                                [buildCurrencyLabel(currency), usd] as [
+                                  string,
+                                  number,
+                                ],
+                            ),
+                          ),
+                        },
+                      }
+                    })
+                    .sort((a, b) => a.time - b.time)}
+                  colors={
+                    Object.entries(tokenColorMap)
+                      .map(([address, color]) => {
+                        const currency = uniqueCurrencies.find((currency) =>
+                          isAddressEqual(
+                            getAddress(currency.address),
+                            getAddress(address),
+                          ),
+                        )
+                        if (!currency) {
+                          return null
+                        }
+                        return {
+                          label: buildCurrencyLabel(currency),
+                          color,
+                        }
+                      })
+                      .filter(
+                        (item): item is { label: string; color: string } =>
+                          !!item,
+                      )
+                      .sort() as { label: string; color: string }[]
+                  }
+                  defaultValue={
+                    analytics && analytics.analyticsSnapshots
+                      ? analytics.analyticsSnapshots[
+                          analytics.analyticsSnapshots.length - 1
+                        ].poolTotalValueLockedUSD
+                      : 0
+                  }
+                  height={312}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
