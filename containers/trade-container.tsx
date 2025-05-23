@@ -31,6 +31,7 @@ import { fetchPrice } from '../apis/price'
 import { SearchSvg } from '../components/svg/search-svg'
 import CheckIcon from '../components/icon/check-icon'
 import { CHAIN_CONFIG } from '../chain-configs'
+import { SwapRouteList } from '../components/swap-router-list'
 
 import { IframeChartContainer } from './chart/iframe-chart-container'
 import { NativeChartContainer } from './chart/native-chart-container'
@@ -458,67 +459,80 @@ export const TradeContainer = () => {
               <></>
             )}
 
-            <div className="flex flex-col h-full rounded-xl sm:rounded-2xl bg-[#171b24]">
-              <div className="flex lg:hidden w-full h-10">
-                <button
-                  disabled={showOrderBook}
-                  onClick={() => setShowOrderBook(true)}
-                  className="flex-1 h-full px-6 py-2.5 text-gray-500 disabled:text-blue-500 disabled:border-b-2 disabled:border-solid disabled:border-b-blue-500 justify-center items-center gap-1 inline-flex"
-                >
-                  <div className="text-[13px] font-semibold">Order Book</div>
-                </button>
-                <button
-                  disabled={!showOrderBook}
-                  onClick={() => setShowOrderBook(false)}
-                  className="flex-1 h-full px-6 py-2.5 text-gray-500 disabled:text-blue-500 disabled:border-b-2 disabled:border-solid disabled:border-b-blue-500 justify-center items-center gap-1 inline-flex"
-                >
-                  <div className="text-[13px] font-semibold">Chart</div>
-                </button>
-              </div>
+            {tab === 'limit' && (
+              <div className="flex flex-col h-full rounded-xl sm:rounded-2xl bg-[#171b24]">
+                <div className="flex lg:hidden w-full h-10">
+                  <button
+                    disabled={showOrderBook}
+                    onClick={() => setShowOrderBook(true)}
+                    className="flex-1 h-full px-6 py-2.5 text-gray-500 disabled:text-blue-500 disabled:border-b-2 disabled:border-solid disabled:border-b-blue-500 justify-center items-center gap-1 inline-flex"
+                  >
+                    <div className="text-[13px] font-semibold">Order Book</div>
+                  </button>
+                  <button
+                    disabled={!showOrderBook}
+                    onClick={() => setShowOrderBook(false)}
+                    className="flex-1 h-full px-6 py-2.5 text-gray-500 disabled:text-blue-500 disabled:border-b-2 disabled:border-solid disabled:border-b-blue-500 justify-center items-center gap-1 inline-flex"
+                  >
+                    <div className="text-[13px] font-semibold">Chart</div>
+                  </button>
+                </div>
 
-              {!showOrderBook && baseCurrency ? (
-                !selectedChain.testnet ? (
-                  <IframeChartContainer
-                    setShowOrderBook={setShowOrderBook}
-                    baseCurrency={
-                      isAddressEqual(zeroAddress, baseCurrency.address)
-                        ? CHAIN_CONFIG.REFERENCE_CURRENCY
-                        : baseCurrency
+                {!showOrderBook && baseCurrency ? (
+                  !selectedChain.testnet ? (
+                    <IframeChartContainer
+                      setShowOrderBook={setShowOrderBook}
+                      baseCurrency={
+                        isAddressEqual(zeroAddress, baseCurrency.address)
+                          ? CHAIN_CONFIG.REFERENCE_CURRENCY
+                          : baseCurrency
+                      }
+                      chainName={selectedChain.name.toLowerCase()}
+                    />
+                  ) : (
+                    <NativeChartContainer
+                      baseCurrency={baseCurrency}
+                      quoteCurrency={quoteCurrency}
+                      setShowOrderBook={setShowOrderBook}
+                    />
+                  )
+                ) : (
+                  <></>
+                )}
+
+                {showOrderBook ? (
+                  <OrderBook
+                    market={selectedMarket}
+                    bids={bids}
+                    asks={asks}
+                    availableDecimalPlacesGroups={
+                      availableDecimalPlacesGroups ?? []
                     }
-                    chainName={selectedChain.name.toLowerCase()}
+                    selectedDecimalPlaces={selectedDecimalPlaces}
+                    setSelectedDecimalPlaces={setSelectedDecimalPlaces}
+                    setDepthClickedIndex={
+                      isFetchingQuotes ? () => {} : setDepthClickedIndex
+                    }
+                    setShowOrderBook={setShowOrderBook}
+                    setTab={setTab}
+                    className="flex flex-col px-0.5 lg:px-4 pb-4 pt-2 sm:pb-6 bg-[#171b24] rounded-b-xl sm:rounded-2xl gap-[20px] h-[300px] lg:h-full w-full"
                   />
                 ) : (
-                  <NativeChartContainer
-                    baseCurrency={baseCurrency}
-                    quoteCurrency={quoteCurrency}
-                    setShowOrderBook={setShowOrderBook}
-                  />
-                )
-              ) : (
-                <></>
-              )}
+                  <></>
+                )}
+              </div>
+            )}
 
-              {showOrderBook ? (
-                <OrderBook
-                  market={selectedMarket}
-                  bids={bids}
-                  asks={asks}
-                  availableDecimalPlacesGroups={
-                    availableDecimalPlacesGroups ?? []
-                  }
-                  selectedDecimalPlaces={selectedDecimalPlaces}
-                  setSelectedDecimalPlaces={setSelectedDecimalPlaces}
-                  setDepthClickedIndex={
-                    isFetchingQuotes ? () => {} : setDepthClickedIndex
-                  }
-                  setShowOrderBook={setShowOrderBook}
-                  setTab={setTab}
-                  className="flex flex-col px-0.5 lg:px-4 pb-4 pt-2 sm:pb-6 bg-[#171b24] rounded-b-xl sm:rounded-2xl gap-[20px] h-[300px] lg:h-full w-full"
+            {tab === 'swap' && (
+              <div className="flex flex-col h-full rounded-xl sm:rounded-2xl bg-[#171b24]">
+                <SwapRouteList
+                  quotes={quotes.all}
+                  prices={prices}
+                  outputCurrency={outputCurrency}
+                  aggregatorNames={aggregators.map((a) => a.name)}
                 />
-              ) : (
-                <></>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col items-start gap-3">

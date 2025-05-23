@@ -2,14 +2,7 @@ import { Transaction } from '@clober/v2-sdk'
 
 import { Currency } from '../../model/currency'
 import { Aggregator } from '../../model/aggregator'
-
-type QuoteResponse = {
-  amountIn: bigint
-  amountOut: bigint
-  gasLimit: bigint
-  aggregator: Aggregator
-  transaction: Transaction | undefined
-}
+import { Quote } from '../../model/aggregator/quote'
 
 export async function fetchQuotes(
   aggregators: Aggregator[],
@@ -19,7 +12,7 @@ export async function fetchQuotes(
   slippageLimitPercent: number,
   gasPrice: bigint,
   userAddress?: `0x${string}`,
-): Promise<{ best: QuoteResponse; all: QuoteResponse[] }> {
+): Promise<{ best: Quote; all: Quote[] }> {
   const quotes = (
     await Promise.allSettled(
       aggregators.map((aggregator) =>
