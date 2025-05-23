@@ -51,7 +51,7 @@ export const PoolSnapshotCard = ({
           </div>
         </div>
         <div className="w-[140px] text-white text-base font-bold flex flex-row gap-2">
-          {`${!BigNumber(apy).isNaN() && !BigNumber(apy).isZero() ? `${apy.toFixed(2)}%` : '-'}`}
+          {`${!BigNumber(apy).isNaN() && !BigNumber(apy).isZero() && BigNumber(apy).lt(10000) ? `${apy.toFixed(2)}%` : '-'}`}
         </div>
         <div className="w-[140px] text-white text-base font-bold">
           ${toCommaSeparated(tvl.toFixed(0))}
@@ -145,7 +145,7 @@ export const PoolSnapshotCard = ({
               </div>
             </div>
             <div className="self-stretch text-white text-sm font-bold">
-              {`${!BigNumber(apy).isNaN() && !BigNumber(apy).isZero() ? `${apy.toFixed(2)}%` : '-'}`}
+              {`${!BigNumber(apy).isNaN() && !BigNumber(apy).isZero() && BigNumber(apy).lt(10000) ? `${apy.toFixed(2)}%` : '-'}`}
             </div>
           </div>
           <div className="flex w-full flex-col justify-start items-center gap-2">
