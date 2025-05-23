@@ -13,7 +13,8 @@ import { HistogramChart } from '../components/chart/histogram-chart'
 import { Loading } from '../components/loading'
 import { CHAIN_CONFIG } from '../chain-configs'
 
-const buildCurrencyLabel = (currency: Currency): string => `${currency.symbol}`
+const buildCurrencyLabel = (currency: Currency): string =>
+  `${currency.symbol}(${currency.address.slice(2, 6)})`
 
 export default function Analytics() {
   const { selectedChain } = useChainContext()
