@@ -23,6 +23,9 @@ import { textStyles } from '../constants/text-styles'
 import { fetchEnsName } from '../apis/ens'
 import { CHAIN_CONFIG } from '../chain-configs'
 import { PAGE_BUTTONS } from '../chain-configs/page-button'
+import { TriangleDownSvg } from '../components/svg/triangle-down-svg'
+import useDropdown from '../hooks/useDropdown'
+import { PageSelector } from '../components/selector/page-selector'
 
 const WrongNetwork = ({
   openChainModal,
@@ -32,10 +35,14 @@ const WrongNetwork = ({
 
 const PageButtons = () => {
   const router = useRouter()
+  const { showDropdown, setShowDropdown } = useDropdown()
+  const isMoreSelected = PAGE_BUTTONS.filter((page) => page.isHiddenMenu).some(
+    (page) => router.pathname.includes(page.path),
+  )
 
   return (
     <>
-      {PAGE_BUTTONS.map((page) => (
+      {PAGE_BUTTONS.filter((page) => !page.isHiddenMenu).map((page) => (
         <div key={page.path}>
           <PageButton
             disabled={router.pathname.includes(page.path)}
@@ -46,6 +53,35 @@ const PageButtons = () => {
           </PageButton>
         </div>
       ))}
+
+      <button
+        className="flex flex-row gap-2 items-center text-gray-500 font-semibold disabled:text-white stroke-gray-500 fill-gray-500 disabled:stroke-blue-500 disabled:fill-blue-500"
+        disabled={false}
+        onClick={() => {
+          setShowDropdown((prev) => !prev)
+        }}
+      >
+        <span className={isMoreSelected ? 'text-white' : ''}>More</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="10"
+          height="6"
+          viewBox="0 0 10 6"
+          fill="none"
+          className={showDropdown ? 'rotate-180' : ''}
+        >
+          <path
+            d="M9 5L5 1L1 5"
+            stroke={isMoreSelected ? '#60A5FA' : '#9CA3AF'}
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        <div className="relative">
+          {showDropdown ? <PageSelector /> : <></>}
+        </div>
+      </button>
     </>
   )
 }
