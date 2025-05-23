@@ -211,7 +211,7 @@ export const SwapForm = ({
                 )
                 setIsCopyToast(true)
               }}
-              className="cursor-pointer h-5 px-1.5 py-0.5 bg-gray-800 rounded-md justify-center items-center gap-0.5 flex"
+              className="cursor-pointer h-5 px-0.5 py-0.5 bg-gray-800 rounded-md justify-center items-center gap-0.5 flex"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
