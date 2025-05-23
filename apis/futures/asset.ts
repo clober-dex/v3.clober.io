@@ -27,7 +27,7 @@ type AssetDto = {
 }
 
 const DEFAULT_COLLATERAL = {
-  address: '0xf817257fed379853cDe0fa4F97AB987181B1E5Ea',
+  address: getAddress('0xf817257fed379853cDe0fa4F97AB987181B1E5Ea'),
   name: 'USD Coin',
   symbol: 'USDC',
   decimals: 6,
@@ -55,7 +55,10 @@ export const fetchFuturesAssets = async (): Promise<Asset[]> => {
       )
       if (
         !currency ||
-        !isAddressEqual(currency.address, getAddress(asset.collateral.id))
+        !isAddressEqual(
+          DEFAULT_COLLATERAL.address,
+          getAddress(asset.collateral.id),
+        )
       ) {
         return undefined
       }
