@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { isAddressEqual, parseUnits } from 'viem'
 import BigNumber from 'bignumber.js'
 import { getQuoteToken } from '@clober/v2-sdk'
@@ -14,6 +14,9 @@ import { ExchangeSvg } from '../svg/exchange-svg'
 import CloseSvg from '../svg/close-svg'
 import { SlippageToggle } from '../toggle/slippage-toggle'
 import { Chain } from '../../model/chain'
+import { handleCopyClipBoard } from '../../utils/string'
+import { ClipboardSvg } from '../svg/clipboard-svg'
+import { Toast } from '../toast'
 
 export const SwapForm = ({
   chain,
@@ -95,7 +98,7 @@ export const SwapForm = ({
     setInputCurrencyAmount,
     setOutputCurrency,
   ])
-
+  const [isCopyToast, setIsCopyToast] = useState(false)
   const [quoteCurrency, baseCurrency] = useMemo(() => {
     if (!inputCurrency || !outputCurrency) {
       return [undefined, undefined]
@@ -185,10 +188,50 @@ export const SwapForm = ({
     />
   ) : (
     <div className="flex flex-col gap-5 h-full">
+      <Toast
+        isCopyToast={isCopyToast}
+        setIsCopyToast={setIsCopyToast}
+        durationInMs={1300}
+      >
+        <div className="w-[240px] items-center justify-center flex flex-row gap-1.5 text-white text-sm font-semibold">
+          <ClipboardSvg />
+          Swap URL copied to clipboard
+        </div>
+      </Toast>
+
       <div className="flex items-start gap-4 self-stretch">
         <div className="flex flex-row gap-1 items-center h-6 opacity-90 text-white text-base font-semibold">
           Swap {inputCurrency?.symbol ?? ''} &#8594;{' '}
           {outputCurrency?.symbol ?? ''}
+          {inputCurrency && outputCurrency ? (
+            <button
+              onClick={async () => {
+                await handleCopyClipBoard(
+                  `${window.location.origin}/trade?inputCurrency=${inputCurrency?.address}&outputCurrency=${outputCurrency?.address}`,
+                )
+                setIsCopyToast(true)
+              }}
+              className="cursor-pointer h-5 px-1.5 py-0.5 bg-gray-800 rounded-md justify-center items-center gap-0.5 flex"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+              >
+                <path
+                  d="M13.3334 6.66665V4.99998C13.3334 4.55795 13.1578 4.13403 12.8452 3.82147C12.5327 3.50891 12.1087 3.33331 11.6667 3.33331H5.00004C4.55801 3.33331 4.13409 3.50891 3.82153 3.82147C3.50897 4.13403 3.33337 4.55795 3.33337 4.99998V11.6666C3.33337 12.1087 3.50897 12.5326 3.82153 12.8452C4.13409 13.1577 4.55801 13.3333 5.00004 13.3333H6.66671M6.66671 8.33331C6.66671 7.89129 6.8423 7.46736 7.15486 7.1548C7.46742 6.84224 7.89135 6.66665 8.33337 6.66665H15C15.4421 6.66665 15.866 6.84224 16.1786 7.1548C16.4911 7.46736 16.6667 7.89129 16.6667 8.33331V15C16.6667 15.442 16.4911 15.8659 16.1786 16.1785C15.866 16.4911 15.4421 16.6666 15 16.6666H8.33337C7.89135 16.6666 7.46742 16.4911 7.15486 16.1785C6.8423 15.8659 6.66671 15.442 6.66671 15V8.33331Z"
+                  stroke="#6B7280"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          ) : (
+            <></>
+          )}
         </div>
         <button
           className="flex sm:hidden w-5 h-5 ml-auto"
