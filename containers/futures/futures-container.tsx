@@ -225,11 +225,8 @@ export const FuturesContainer = () => {
                       }}
                     />
                   ))}
-
-                {assets.length === 0 && (
-                  <Loading className="flex mt-8 sm:mt-0" />
-                )}
               </div>
+              {assets.length === 0 && <Loading className="flex mt-8 sm:mt-0" />}
             </div>
           </div>
         </div>
