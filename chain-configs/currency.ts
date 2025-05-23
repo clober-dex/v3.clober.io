@@ -1,5 +1,4 @@
 import { zeroAddress } from 'viem'
-import { getReferenceCurrency } from '@clober/v2-sdk'
 
 import { Currency } from '../model/currency'
 
@@ -207,5 +206,26 @@ export const WHITELISTED_CURRENCIES: Currency[] = [
     symbol: 'USDT',
     decimals: 6,
     icon: '/asset-icon/USDT.png',
+  },
+  {
+    address: '0x8F3A8ae1f1859636E82CA4e30DB9FB129B02d825',
+    name: 'Sumerian USD',
+    symbol: 'suUSD',
+    decimals: 18,
+    icon: '/asset-icon/su-USD.png',
+  },
+  {
+    address: '0xEB441902ac56ae1340E178fBCcb3Ce5890206FcA',
+    name: 'Sumerian WETH Deposit',
+    symbol: 'sdrWETH',
+    decimals: 18,
+    icon: '/asset-icon/su-ETH.png',
+  },
+  {
+    address: '0x4961c832469Fcbb468c0a794de32FAaa30ccD2F6',
+    name: 'Sumerian BTC',
+    symbol: 'suBTC',
+    decimals: 18,
+    icon: '/asset-icon/su-BTC.png',
   },
 ]
