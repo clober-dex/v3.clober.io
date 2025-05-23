@@ -342,6 +342,7 @@ export const TradeContainer = () => {
           outputCurrency,
           parseFloat(slippageInput),
           gasPrice,
+          prices,
           userAddress,
         )
         return { best, all }
@@ -527,7 +528,7 @@ export const TradeContainer = () => {
               <div className="flex flex-col h-full rounded-xl sm:rounded-2xl bg-[#171b24]">
                 <SwapRouteList
                   quotes={quotes.all}
-                  prices={prices}
+                  bestQuote={quotes.best}
                   outputCurrency={outputCurrency}
                   aggregatorNames={aggregators.map((a) => a.name)}
                 />
@@ -687,14 +688,7 @@ export const TradeContainer = () => {
                   slippageInput={slippageInput}
                   setSlippageInput={setSlippageInput}
                   aggregatorName={quotes.best?.aggregator?.name ?? ''}
-                  gasEstimateValue={
-                    parseFloat(
-                      formatUnits(
-                        BigInt(quotes.best?.gasLimit ?? 0n) * (gasPrice ?? 0n),
-                        selectedChain.nativeCurrency.decimals,
-                      ),
-                    ) * (prices[zeroAddress] ?? 0)
-                  }
+                  gasEstimateValue={quotes.best?.gasUsd ?? 0}
                   priceImpact={priceImpact}
                   refreshQuotesAction={() => setLatestRefreshTime(Date.now())}
                   closeSwapFormAction={() => setShowMobileModal(false)}

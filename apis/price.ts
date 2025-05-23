@@ -36,7 +36,8 @@ export const fetchPrice = async (
       parseUnits('1', baseCurrency.decimals),
       quoteCurrency,
       20,
-      1000n, // arbitrary gas price
+      0n, // arbitrary gas price
+      {}, // arbitrary prices
     )
     return new BigNumber(formatUnits(amountOut, quoteCurrency.decimals))
   } catch (e) {

@@ -27,6 +27,8 @@ export const Default: Story = {
         gasLimit: 2100000n,
         aggregator: { name: 'Uniswap' } as any,
         transaction: undefined,
+        netAmountOutUsd: 10000,
+        gasUsd: 0.2,
       },
       {
         amountIn: 1020000000000000000n,
@@ -34,11 +36,18 @@ export const Default: Story = {
         gasLimit: 21000000000n,
         aggregator: { name: 'CloberV2' } as any,
         transaction: undefined,
+        netAmountOutUsd: 12000,
+        gasUsd: 0.2,
       },
     ],
-    prices: {
-      ['0x0000000000000000000000000000000000000000']: 3000,
-      ['0x0000000000000000000000000000000000000003']: 1,
+    bestQuote: {
+      amountIn: 1020000000000000000n,
+      amountOut: 1300000000n,
+      gasLimit: 21000000000n,
+      aggregator: { name: 'CloberV2' } as any,
+      transaction: undefined,
+      netAmountOutUsd: 12000,
+      gasUsd: 0.2,
     },
     outputCurrency: {
       address: '0x0000000000000000000000000000000000000003',
@@ -53,10 +62,6 @@ export const Default: Story = {
 export const Null: Story = {
   args: {
     quotes: [],
-    prices: {
-      ['0x0000000000000000000000000000000000000000']: 3000,
-      ['0x0000000000000000000000000000000000000003']: 1,
-    },
     outputCurrency: {
       address: '0x0000000000000000000000000000000000000003',
       name: 'USDC',

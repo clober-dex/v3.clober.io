@@ -8,4 +8,6 @@ export type Quote = {
   gasLimit: bigint
   aggregator: Aggregator
   transaction: Transaction | undefined
+  gasUsd: number
+  netAmountOutUsd: number
 }

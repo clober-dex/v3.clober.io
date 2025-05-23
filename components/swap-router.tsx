@@ -1,8 +1,6 @@
 import React from 'react'
-import { getAddress, zeroAddress } from 'viem'
 
 import { Quote } from '../model/aggregator/quote'
-import { Prices } from '../model/prices'
 import { Currency } from '../model/currency'
 import { toCommaSeparated } from '../utils/number'
 import { formatUnits } from '../utils/bigint'
@@ -13,30 +11,15 @@ export const SwapRoute = ({
   quote,
   isBestQuote,
   priceDifference,
-  prices,
   outputCurrency,
   aggregatorName,
 }: {
   quote: Quote | undefined
   isBestQuote: boolean
   priceDifference: number
-  prices: Prices
   outputCurrency: Currency | undefined
   aggregatorName: string
 }) => {
-  const [gasUsd, outputUsdWithGasFees] = React.useMemo(() => {
-    if (!outputCurrency) {
-      return [0, 0]
-    }
-    const gasUsd =
-      Number(formatUnits(quote?.gasLimit ?? 0n, 18)) *
-      (prices[getAddress(zeroAddress)] ?? 0)
-    const outputUsd =
-      Number(formatUnits(quote?.amountOut ?? 0n, outputCurrency.decimals)) *
-      (prices[getAddress(outputCurrency.address)] ?? 0)
-    return [gasUsd, outputUsd - gasUsd]
-  }, [quote, prices, outputCurrency])
-
   return (
     <div
       className={`text-white w-full self-stretch px-3.5 sm:px-4 py-3 bg-[#e5eaff]/5 rounded-xl flex flex-col justify-start items-start gap-1.5 sm:gap-3 ${quote && isBestQuote ? 'outline outline-[1.20px] outline-offset-[-1.20px] outline-blue-400/80' : ''}`}
@@ -80,7 +63,7 @@ export const SwapRoute = ({
         <div className="flex justify-start items-center gap-1.5">
           {quote ? (
             <div className="justify-start text-[#838b99] text-xs sm:text-sm font-medium">
-              = ${toCommaSeparated(outputUsdWithGasFees.toFixed(4))}
+              = ${toCommaSeparated(quote.netAmountOutUsd.toFixed(4))}
             </div>
           ) : (
             <div className="w-[70px] h-4 rounded animate-pulse bg-gray-500" />
@@ -92,7 +75,7 @@ export const SwapRoute = ({
         <div className="flex justify-start items-center gap-1.5">
           {quote ? (
             <div className="flex flex-row gap-0.5 items-center justify-start text-[#838b99] text-xs sm:text-sm font-medium">
-              <GasSvg /> ${toCommaSeparated(gasUsd.toFixed(6))}
+              <GasSvg /> ${toCommaSeparated(quote.gasUsd.toFixed(6))}
             </div>
           ) : (
             <div className="w-[70px] h-4 rounded animate-pulse bg-gray-500" />

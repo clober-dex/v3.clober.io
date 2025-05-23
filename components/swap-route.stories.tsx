@@ -26,10 +26,8 @@ export const Default: Story = {
       gasLimit: 2100000n,
       aggregator: { name: 'Uniswap' } as any,
       transaction: undefined,
-    },
-    prices: {
-      ['0x0000000000000000000000000000000000000000']: 3000,
-      ['0x0000000000000000000000000000000000000003']: 1,
+      netAmountOutUsd: 10000,
+      gasUsd: 0.2,
     },
     isBestQuote: false,
     priceDifference: -1.2,
@@ -51,10 +49,8 @@ export const Best: Story = {
       gasLimit: 2100000n,
       aggregator: { name: 'Uniswap' } as any,
       transaction: undefined,
-    },
-    prices: {
-      ['0x0000000000000000000000000000000000000000']: 3000,
-      ['0x0000000000000000000000000000000000000003']: 1,
+      netAmountOutUsd: 10000,
+      gasUsd: 0.2,
     },
     isBestQuote: true,
     priceDifference: 0,
@@ -71,10 +67,6 @@ export const Best: Story = {
 export const Null: Story = {
   args: {
     quote: undefined,
-    prices: {
-      ['0x0000000000000000000000000000000000000000']: 3000,
-      ['0x0000000000000000000000000000000000000003']: 1,
-    },
     isBestQuote: false,
     priceDifference: 0,
     outputCurrency: {
