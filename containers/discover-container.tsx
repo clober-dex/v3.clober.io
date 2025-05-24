@@ -6,7 +6,7 @@ import {
   getMarketSnapshots,
   MarketSnapshot as SdkMarketSnapshot,
 } from '@clober/v2-sdk'
-import { getAddress, isAddressEqual } from 'viem'
+import { isAddressEqual } from 'viem'
 
 import { MarketDailySnapshotCard } from '../components/card/market/market-daily-snapshot-card'
 import { useChainContext } from '../contexts/chain-context'
@@ -19,7 +19,6 @@ import { Loading } from '../components/loading'
 import { CHAIN_CONFIG } from '../chain-configs'
 import { useCurrencyContext } from '../contexts/currency-context'
 import { deduplicateCurrencies, fetchCurrenciesDone } from '../utils/currency'
-import { Currency } from '../model/currency'
 
 const MOBILE_ROW_HEIGHT = 168
 
@@ -93,6 +92,53 @@ const MarketSnapshotListRow = ({
 
   return (
     <div style={style}>
+      <MarketDailySnapshotCard
+        chain={data.chain}
+        baseCurrency={marketSnapshot.base}
+        quoteCurrency={marketSnapshot.quote}
+        createAt={marketSnapshot.createdAtTimestamp}
+        price={marketSnapshot.priceUSD}
+        dailyVolume={marketSnapshot.volume24hUSD}
+        fdv={marketSnapshot.fdv}
+        dailyChange={marketSnapshot.priceChange24h * 100}
+        verified={marketSnapshot.verified}
+        isBidTaken={marketSnapshot.isBidTaken || false}
+        isAskTaken={marketSnapshot.isAskTaken || false}
+      />
+    </div>
+  )
+}
+
+const MarketSnapshotGridCell = ({
+  columnIndex,
+  rowIndex,
+  style,
+  data,
+}: {
+  columnIndex: number
+  rowIndex: number
+  style: React.CSSProperties
+  data: {
+    items: MarketSnapshot[]
+    columnCount: number
+    chain: Chain
+  }
+}) => {
+  const index = rowIndex * data.columnCount + columnIndex
+  const marketSnapshot = data.items[index]
+  if (!marketSnapshot) {
+    return null
+  }
+
+  const gapStyle =
+    columnIndex === 0
+      ? { paddingRight: 6 }
+      : columnIndex === 1
+        ? { paddingLeft: 6 }
+        : {}
+
+  return (
+    <div style={{ ...style, ...gapStyle }}>
       <MarketDailySnapshotCard
         chain={data.chain}
         baseCurrency={marketSnapshot.base}
@@ -312,31 +358,14 @@ export const DiscoverContainer = () => {
     [filteredMarketSnapshots, selectedChain],
   )
 
-  const MarketSnapshotGridCell = ({ columnIndex, rowIndex, style }: any) => {
-    const index = rowIndex + columnIndex
-    const marketSnapshot = filteredMarketSnapshots[index]
-    if (!marketSnapshot) {
-      return null
-    }
-
-    return (
-      <div style={style}>
-        <MarketDailySnapshotCard
-          chain={selectedChain}
-          baseCurrency={marketSnapshot.base}
-          quoteCurrency={marketSnapshot.quote}
-          createAt={marketSnapshot.createdAtTimestamp}
-          price={marketSnapshot.priceUSD}
-          dailyVolume={marketSnapshot.volume24hUSD}
-          fdv={marketSnapshot.fdv}
-          dailyChange={marketSnapshot.priceChange24h * 100}
-          verified={marketSnapshot.verified}
-          isBidTaken={marketSnapshot.isBidTaken || false}
-          isAskTaken={marketSnapshot.isAskTaken || false}
-        />
-      </div>
-    )
-  }
+  const gridItemData = useMemo(
+    () => ({
+      items: filteredMarketSnapshots,
+      columnCount: 2,
+      chain: selectedChain,
+    }),
+    [filteredMarketSnapshots, selectedChain],
+  )
 
   return (
     <div className="text-white mb-4 flex w-full lg:w-[1072px]  flex-col items-center mt-6 lg:mt-8 px-4 lg:px-0 gap-4 lg:gap-8">
@@ -442,9 +471,7 @@ export const DiscoverContainer = () => {
                 itemCount={filteredMarketSnapshots.length}
                 itemSize={64 + 12}
                 width={1072}
-                itemKey={(index) =>
-                  `${filteredMarketSnapshots[index].base.address}-${filteredMarketSnapshots[index].quote.address}`
-                }
+                itemKey={(index) => `desktop-${index}`}
                 itemData={listItemData}
               >
                 {MarketSnapshotListRow}
@@ -460,24 +487,12 @@ export const DiscoverContainer = () => {
                 rowCount={Math.ceil(filteredMarketSnapshots.length / 2)}
                 rowHeight={MOBILE_ROW_HEIGHT + 12}
                 width={window.innerWidth - 24 * 2}
+                itemKey={({ columnIndex, rowIndex }) =>
+                  `tablet-${rowIndex}-${columnIndex}`
+                }
+                itemData={gridItemData}
               >
-                {({ columnIndex, style }) => {
-                  const gapStyle =
-                    columnIndex === 0
-                      ? { paddingRight: 6 }
-                      : columnIndex === 1
-                        ? { paddingLeft: 6 }
-                        : {}
-                  return (
-                    <>
-                      {MarketSnapshotGridCell({
-                        columnIndex,
-                        rowIndex: columnIndex,
-                        style: { ...style, ...gapStyle },
-                      })}
-                    </>
-                  )
-                }}
+                {MarketSnapshotGridCell}
               </Grid>
             </div>
 
@@ -488,9 +503,7 @@ export const DiscoverContainer = () => {
                 itemCount={filteredMarketSnapshots.length}
                 itemSize={MOBILE_ROW_HEIGHT + 12}
                 width="100%"
-                itemKey={(index) =>
-                  `${filteredMarketSnapshots[index].base.address}-${filteredMarketSnapshots[index].quote.address}`
-                }
+                itemKey={(index) => `mobile-${index}`}
                 itemData={listItemData}
               >
                 {MarketSnapshotListRow}
