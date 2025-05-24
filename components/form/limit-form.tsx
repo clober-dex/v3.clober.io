@@ -443,7 +443,9 @@ export const LimitForm = ({
         </div>
       </div>
 
-      <ActionButton {...actionButtonProps} />
+      <div className="flex mt-auto">
+        <ActionButton {...actionButtonProps} />
+      </div>
     </div>
   )
 }

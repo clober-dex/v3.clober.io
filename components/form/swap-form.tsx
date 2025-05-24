@@ -343,7 +343,7 @@ export const SwapForm = ({
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 mb-1 md:mb-2 text-[13px] sm:text-sm font-medium">
+        <div className="flex flex-col gap-4 text-[13px] sm:text-sm font-medium">
           <div className="flex flex-col items-start gap-2 md:gap-3 self-stretch justify-end text-white text-[13px] sm:text-sm">
             <div className="flex items-center gap-2 self-stretch">
               <div className="text-gray-400">Gas Fee</div>
