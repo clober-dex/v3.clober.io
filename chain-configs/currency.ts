@@ -285,4 +285,11 @@ export const WHITELISTED_CURRENCIES: Currency[] = [
     decimals: 18,
     icon: '/asset-icon/su-BTC.png',
   },
+  {
+    address: '0x93E9CaE50424C7a4E3c5eCEb7855B6dab74Bc803',
+    name: 'Nad Poker',
+    symbol: 'NAP',
+    decimals: 18,
+    icon: '/asset-icon/NAP.png',
+  },
 ]
