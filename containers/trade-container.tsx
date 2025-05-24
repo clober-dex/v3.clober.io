@@ -911,7 +911,7 @@ export const TradeContainer = () => {
             </div>
           </>
         ) : (
-          <div className="mb-28 lg:mb-2" />
+          <div className="hidden sm:flex mb-28 lg:mb-2" />
         )}
       </div>
 

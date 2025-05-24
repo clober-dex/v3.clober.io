@@ -74,7 +74,7 @@ export const SwapForm = ({
   priceImpact: number
   aggregatorName: string
   refreshQuotesAction: () => void
-  closeSwapFormAction: () => void
+  closeSwapFormAction: (() => void) | undefined
   actionButtonProps: ActionButtonProps
 }) => {
   const isLoadingResults = useMemo(() => {
@@ -233,12 +233,14 @@ export const SwapForm = ({
             <></>
           )}
         </div>
-        <button
-          className="flex sm:hidden w-5 h-5 ml-auto"
-          onClick={closeSwapFormAction}
-        >
-          <CloseSvg />
-        </button>
+        {closeSwapFormAction && (
+          <button
+            className="flex sm:hidden w-5 h-5 ml-auto"
+            onClick={closeSwapFormAction}
+          >
+            <CloseSvg />
+          </button>
+        )}
       </div>
 
       <div className="flex flex-col gap-5 self-stretch w-full">

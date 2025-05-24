@@ -119,14 +119,14 @@ export const SlippageToggle = ({
           </div>
         </div>
       ) : (
-        <div className="h-4 sm:h-5 w-1"></div>
+        <div className="hidden sm:flex h-4 sm:h-5 w-1"></div>
       )}
       {Number(slippageInput) <= 0.05 ? (
         <div className="flex w-full text-nowrap justify-end">
           Slippage below 0.05% may result in a failed tx.
         </div>
       ) : (
-        <div className="h-4 sm:h-5 w-1"></div>
+        <div className="hidden sm:flex h-4 sm:h-5 w-1"></div>
       )}
     </div>
   )
