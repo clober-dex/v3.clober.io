@@ -785,7 +785,7 @@ export const TradeContainer = () => {
         </div>
         {tab === 'limit' && userAddress && openOrders.length > 0 ? (
           <>
-            <div className="flex flex-col lg:flex-row gap-4 lg:gap-0 mt-[20px] mb-4 lg:mt-12 text-white">
+            <div className="flex flex-col w-full lg:flex-row gap-4 lg:gap-0 mt-[20px] mb-4 lg:mt-12 text-white">
               <div className="border-b-blue-500 text-[13px] lg:text-base border-solid lg:border-0 flex w-1/2 lg:w-[161px] h-[37px] px-6 lg:px-0 lg:justify-start pt-1.5 pb-2.5 border-b-2 border-[#ffc32d] justify-center items-center gap-2">
                 <div className="text-white font-semibold">Open Order</div>
                 <div className="flex px-2 py-0.5 lg:h-7 lg:px-2.5 lg:py-0.5 bg-blue-500/20 rounded-[17.02px] flex-col justify-center items-center">
@@ -831,7 +831,7 @@ export const TradeContainer = () => {
 
             {/*pc open order card*/}
             {filteredOpenOrders.length > 0 ? (
-              <div className="hidden lg:flex flex-col justify-start items-center gap-4 bg-transparent mb-14">
+              <div className="hidden lg:flex flex-col w-full justify-start items-center gap-4 bg-transparent mb-14">
                 <div className="w-full justify-start items-end inline-flex">
                   <div className="flex text-gray-50 text-sm font-semibold">
                     <div className="flex w-[225px] ml-5">Market</div>
