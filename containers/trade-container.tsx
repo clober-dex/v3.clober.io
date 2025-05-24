@@ -420,7 +420,7 @@ export const TradeContainer = () => {
       </div>
 
       <div className="flex flex-col w-full sm:w-fit mb-4 sm:mb-6">
-        <div className="flex flex-col w-full lg:flex-row gap-4">
+        <div className="flex flex-col w-full lg:flex-row gap-4 justify-center">
           {baseCurrency && quoteCurrency && (
             <div className="flex flex-col gap-[26px] sm:gap-4 w-full lg:w-[740px]">
               <MarketInfoCard
