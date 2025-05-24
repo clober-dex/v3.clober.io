@@ -21,7 +21,7 @@ export const SwapRouteCard = ({
 }) => {
   return (
     <div
-      className={`h-[84px] text-white w-full self-stretch px-3.5 sm:px-4 py-3 bg-[#e5eaff]/5 rounded-xl flex flex-col justify-start items-start gap-1.5 sm:gap-3 ${quote && isBestQuote ? 'outline outline-[1.20px] outline-offset-[-1.20px] outline-blue-400/80' : ''}`}
+      className={`h-full sm:h-[84px] text-white w-full self-stretch px-3.5 sm:px-4 py-3 bg-[#e5eaff]/5 rounded-xl flex flex-col justify-start items-start gap-1.5 sm:gap-3 ${quote && isBestQuote ? 'outline outline-[1.20px] outline-offset-[-1.20px] outline-blue-400/80' : ''}`}
     >
       <div className="self-stretch flex justify-start items-start gap-1">
         <div className="self-stretch inline-flex justify-start items-center gap-1.5">
@@ -32,7 +32,7 @@ export const SwapRouteCard = ({
               )}
             </div>
           ) : (
-            <div className="w-[70px] h-6 rounded animate-pulse bg-gray-500" />
+            <div className="w-[70px] h-5 sm:h-6 rounded animate-pulse bg-gray-500" />
           )}
           <div className="justify-start text-gray-400 text-sm sm:text-base font-semibold">
             {outputCurrency?.symbol ?? ''}
@@ -54,7 +54,7 @@ export const SwapRouteCard = ({
               </div>
             )
           ) : (
-            <div className="w-[70px] h-6 rounded animate-pulse bg-gray-500" />
+            <div className="w-[70px] h-5 sm:h-6 rounded animate-pulse bg-gray-500" />
           )}
         </div>
       </div>
@@ -65,7 +65,7 @@ export const SwapRouteCard = ({
               = ${toCommaSeparated(quote.netAmountOutUsd.toFixed(4))}
             </div>
           ) : (
-            <div className="w-[70px] h-5 rounded animate-pulse bg-gray-500" />
+            <div className="w-[70px] h-4 sm:h-5 rounded animate-pulse bg-gray-500" />
           )}
           <div className="justify-start text-[#838b99] text-xs sm:text-sm font-medium">
             after gas fees
@@ -77,7 +77,7 @@ export const SwapRouteCard = ({
               <GasSvg /> ${toCommaSeparated(quote.gasUsd.toFixed(6))}
             </div>
           ) : (
-            <div className="w-[70px] h-5 rounded animate-pulse bg-gray-500" />
+            <div className="w-[70px] h-4 sm:h-5 rounded animate-pulse bg-gray-500" />
           )}
           <div className="justify-start text-blue-400 text-xs sm:text-sm font-medium">
             via {aggregatorName}
