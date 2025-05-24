@@ -520,7 +520,7 @@ export const TradeContainer = () => {
               )}
 
               <div className="flex flex-col h-full rounded-xl sm:rounded-2xl bg-[#171b24]">
-                {amountIn > 0 && tab === 'swap' && (
+                {tab === 'swap' && (
                   <SwapRouteList
                     quotes={quotes.all}
                     bestQuote={quotes.best}

@@ -1,23 +1,23 @@
 import React from 'react'
-import '../styles/globals.css'
+import '../../styles/globals.css'
 import { Meta, StoryObj } from '@storybook/react'
 
-import { SwapRoute } from './swap-router'
+import { SwapRouteCard } from './swap-router-card'
 
 export default {
-  title: 'Common/SwapRoute',
-  component: SwapRoute,
+  title: 'Common/SwapRouteCard',
+  component: SwapRouteCard,
   parameters: {
     layout: 'centered',
   },
   render: ({ ...args }) => (
     <div className="flex w-[359px] sm:w-[740px]">
-      <SwapRoute {...args} />
+      <SwapRouteCard {...args} />
     </div>
   ),
-} as Meta<typeof SwapRoute>
+} as Meta<typeof SwapRouteCard>
 
-type Story = StoryObj<typeof SwapRoute>
+type Story = StoryObj<typeof SwapRouteCard>
 export const Default: Story = {
   args: {
     quote: {

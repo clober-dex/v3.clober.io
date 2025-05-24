@@ -3,7 +3,7 @@ import React, { useMemo } from 'react'
 import { Quote } from '../model/aggregator/quote'
 import { Currency } from '../model/currency'
 
-import { SwapRoute } from './swap-router'
+import { SwapRouteCard } from './card/swap-router-card'
 
 export const SwapRouteList = ({
   quotes,
@@ -27,7 +27,7 @@ export const SwapRouteList = ({
     <div className="flex flex-col p-4 gap-2.5 sm:gap-3">
       {bestQuote && quotes.length > 0
         ? [bestQuote, ...quotesWithoutBestQuote].map((quote, index) => (
-            <SwapRoute
+            <SwapRouteCard
               quote={quote}
               key={index}
               isBestQuote={quote.aggregator.name === bestQuote.aggregator.name}
@@ -41,7 +41,7 @@ export const SwapRouteList = ({
             />
           ))
         : aggregatorNames.map((name) => (
-            <SwapRoute
+            <SwapRouteCard
               quote={undefined}
               key={name}
               isBestQuote={false}

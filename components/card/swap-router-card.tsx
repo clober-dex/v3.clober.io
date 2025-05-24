@@ -1,13 +1,12 @@
 import React from 'react'
 
-import { Quote } from '../model/aggregator/quote'
-import { Currency } from '../model/currency'
-import { toCommaSeparated } from '../utils/number'
-import { formatUnits } from '../utils/bigint'
+import { Quote } from '../../model/aggregator/quote'
+import { Currency } from '../../model/currency'
+import { toCommaSeparated } from '../../utils/number'
+import { formatUnits } from '../../utils/bigint'
+import { GasSvg } from '../svg/gas-svg'
 
-import { GasSvg } from './svg/gas-svg'
-
-export const SwapRoute = ({
+export const SwapRouteCard = ({
   quote,
   isBestQuote,
   priceDifference,
