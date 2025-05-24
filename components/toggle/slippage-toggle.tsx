@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from 'react'
 
 import NumberInput from '../input/number-input'
 
+const UNLIMITED_SLIPPAGE = 50
+
 export const SlippageToggle = ({
   slippageInput,
   setSlippageInput,
@@ -17,7 +19,7 @@ export const SlippageToggle = ({
       Number(slippageInput) !== 0.1 &&
       Number(slippageInput) !== 0.5 &&
       Number(slippageInput) !== 0.99 &&
-      Number(slippageInput) !== 10000
+      Number(slippageInput) !== UNLIMITED_SLIPPAGE
     ) {
       setCustomValue(slippageInput)
     }
@@ -64,9 +66,9 @@ export const SlippageToggle = ({
           0.99%
         </button>
         <button
-          disabled={Number(slippageInput) === 10000.0}
+          disabled={Number(slippageInput) === UNLIMITED_SLIPPAGE}
           onClick={() => {
-            setSlippageInput('10000')
+            setSlippageInput(UNLIMITED_SLIPPAGE.toString())
             setCustomValue('')
           }}
           className="flex flex-1 px-2 py-0 rounded-[18px] disabled:text-blue-400 disabled:bg-blue-500/25 justify-center items-center gap-1"
@@ -82,7 +84,7 @@ export const SlippageToggle = ({
               Number(slippageInput) === 0.1 &&
               Number(slippageInput) === 0.5 &&
               Number(slippageInput) === 0.99 &&
-              Number(slippageInput) === 10000.0
+              Number(slippageInput) === UNLIMITED_SLIPPAGE
             }
             value={customValue}
             onValueChange={(e) => {
@@ -114,7 +116,9 @@ export const SlippageToggle = ({
               <path d="M8.63628 11.1669C8.63628 10.8154 8.35136 10.5305 7.9999 10.5305C7.64844 10.5305 7.36353 10.8154 7.36353 11.1669C7.36353 11.5184 7.64844 11.8033 7.9999 11.8033C8.35136 11.8033 8.63628 11.5184 8.63628 11.1669Z" />
               <path d="M8.63628 7.34878C8.63628 6.99732 8.35136 6.7124 7.9999 6.7124C7.64844 6.7124 7.36353 6.99732 7.36353 7.34878V9.25791C7.36353 9.60937 7.64844 9.89429 7.9999 9.89429C8.35136 9.89429 8.63628 9.60937 8.63628 9.25791V7.34878Z" />
             </svg>
-            {Number(slippageInput) >= 10000 ? 'Unlimited' : `${slippageInput}%`}{' '}
+            {Number(slippageInput) >= UNLIMITED_SLIPPAGE
+              ? 'Unlimited'
+              : `${slippageInput}%`}{' '}
             Slippage
           </div>
         </div>
