@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 
 import NumberInput from '../input/number-input'
 
@@ -11,6 +11,17 @@ export const SlippageToggle = ({
 }) => {
   const [customValue, setCustomValue] = React.useState<string>('')
   const prevCustomValueRef = useRef<string>('')
+
+  useEffect(() => {
+    if (
+      Number(slippageInput) !== 0.1 &&
+      Number(slippageInput) !== 0.5 &&
+      Number(slippageInput) !== 0.99 &&
+      Number(slippageInput) !== 10000
+    ) {
+      setCustomValue(slippageInput)
+    }
+  }, [slippageInput])
 
   useEffect(() => {
     if (prevCustomValueRef.current !== '' && customValue === '') {
