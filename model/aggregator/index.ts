@@ -9,6 +9,8 @@ export interface Aggregator {
   baseUrl: string
   contract: `0x${string}`
   chain: Chain
+  minimumSlippage: number
+  maximumSlippage: number
   currencies(): Promise<Currency[]>
   prices(): Promise<Prices>
 

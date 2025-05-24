@@ -20,6 +20,7 @@ import {
 import { Currency } from '../currency'
 import { SUPPORTED_INTERVALS } from '../../utils/chart'
 import { getPriceDecimals } from '../../utils/prices'
+import { CHAIN_CONFIG } from '../../chain-configs'
 
 const CONFIGURATION_DATA: Partial<DatafeedConfiguration> &
   Required<
@@ -33,9 +34,9 @@ const CONFIGURATION_DATA: Partial<DatafeedConfiguration> &
   ) as ResolutionString[],
   exchanges: [
     {
-      value: 'Clober',
-      name: 'Clober',
-      desc: 'Clober',
+      value: CHAIN_CONFIG.DEX_NAME,
+      name: CHAIN_CONFIG.DEX_NAME,
+      desc: CHAIN_CONFIG.DEX_NAME,
     },
   ],
   symbols_types: [
@@ -113,10 +114,10 @@ export default class CloberDatafeed implements IBasicDataFeed {
         type: 'crypto',
         session: '24x7',
         timezone: 'Etc/UTC',
-        exchange: 'Clober',
+        exchange: CHAIN_CONFIG.DEX_NAME,
         minmov: 1,
         pricescale: 10 ** priceDecimal,
-        listed_exchange: 'Clober',
+        listed_exchange: CHAIN_CONFIG.DEX_NAME,
         has_intraday: true,
         has_daily: true,
         has_weekly_and_monthly: false, // has weekly data

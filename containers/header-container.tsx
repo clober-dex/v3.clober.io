@@ -7,7 +7,6 @@ import {
   useConnectModal,
 } from '@rainbow-me/rainbowkit'
 import { useQuery } from '@tanstack/react-query'
-import { monadTestnet } from 'viem/chains'
 import Image from 'next/image'
 
 import { useChainContext } from '../contexts/chain-context'
@@ -17,11 +16,13 @@ import { ConnectButton } from '../components/button/connect-button'
 import { UserButton } from '../components/button/user-button'
 import { UserTransactionsModal } from '../components/modal/user-transactions-modal'
 import { useTransactionContext } from '../contexts/transaction-context'
-import { UserPointButton } from '../components/button/user-point-button'
 import ChainIcon from '../components/icon/chain-icon'
-import { textStyles } from '../themes/text-styles'
-import { PAGE_BUTTONS } from '../constants/buttons'
+import { textStyles } from '../constants/text-styles'
 import { fetchEnsName } from '../apis/ens'
+import { CHAIN_CONFIG } from '../chain-configs'
+import { PAGE_BUTTONS } from '../chain-configs/page-button'
+import useDropdown from '../hooks/useDropdown'
+import { PageSelector } from '../components/selector/page-selector'
 
 const WrongNetwork = ({
   openChainModal,
@@ -31,24 +32,53 @@ const WrongNetwork = ({
 
 const PageButtons = () => {
   const router = useRouter()
-  const { selectedChain } = useChainContext()
+  const { showDropdown, setShowDropdown } = useDropdown()
+  const isMoreSelected = PAGE_BUTTONS.filter((page) => page.isHiddenMenu).some(
+    (page) => router.pathname.includes(page.path),
+  )
 
   return (
     <>
-      {PAGE_BUTTONS.map(
-        (page) =>
-          (page.chains as number[]).includes(selectedChain.id) && (
-            <div key={page.path}>
-              <PageButton
-                disabled={router.pathname.includes(page.path)}
-                onClick={() => router.push(page.path)}
-              >
-                {page.icon}
-                {page.label}
-              </PageButton>
-            </div>
-          ),
-      )}
+      {PAGE_BUTTONS.filter((page) => !page.isHiddenMenu).map((page) => (
+        <div key={page.path}>
+          <PageButton
+            disabled={router.pathname.includes(page.path)}
+            onClick={() => router.push(page.path)}
+          >
+            {page.icon}
+            {page.label}
+          </PageButton>
+        </div>
+      ))}
+
+      <button
+        className="flex flex-row gap-2 items-center text-gray-500 font-semibold disabled:text-white stroke-gray-500 fill-gray-500 disabled:stroke-blue-500 disabled:fill-blue-500"
+        disabled={false}
+        onClick={() => {
+          setShowDropdown((prev) => !prev)
+        }}
+      >
+        <span className={isMoreSelected ? 'text-white' : ''}>More</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="10"
+          height="6"
+          viewBox="0 0 10 6"
+          fill="none"
+          className="rotate-180"
+        >
+          <path
+            d="M9 5L5 1L1 5"
+            stroke={isMoreSelected ? '#60A5FA' : '#9CA3AF'}
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        <div className="relative">
+          {showDropdown ? <PageSelector /> : <></>}
+        </div>
+      </button>
     </>
   )
 }
@@ -97,7 +127,7 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
             <a
               className="flex gap-2 items-center"
               target="_blank"
-              href="https://alpha.clober.io/futures"
+              href={`${CHAIN_CONFIG.URL}/futures`}
               rel="noopener noreferrer"
             >
               <img className="h-7 sm:h-9" src="/futures-logo.svg" alt="logo" />
@@ -107,18 +137,28 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
               <a
                 className="hidden md:flex gap-2 items-center h-7"
                 target="_blank"
-                href="https://clober.io"
+                href={CHAIN_CONFIG.LANDING_PAGE_URL}
                 rel="noopener noreferrer"
               >
-                <Image width={123} height={28} src="/logo.svg" alt="logo" />
+                <Image
+                  width={123}
+                  height={28}
+                  src="/chain-configs/logo.svg"
+                  alt="logo"
+                />
               </a>
               <a
                 className="flex md:hidden gap-2 items-center h-5"
                 target="_blank"
-                href="https://clober.io"
+                href={CHAIN_CONFIG.LANDING_PAGE_URL}
                 rel="noopener noreferrer"
               >
-                <Image width={88} height={20} src="/logo.svg" alt="logo" />
+                <Image
+                  width={88}
+                  height={20}
+                  src="/chain-configs/logo.svg"
+                  alt="logo"
+                />
               </a>
             </>
           )}
@@ -137,11 +177,6 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
           </div>
 
           <div className="flex items-center flex-row gap-1 sm:gap-3">
-            {address && selectedChain.id === monadTestnet.id && (
-              <div className="relative flex w-full">
-                <UserPointButton router={router} />
-              </div>
-            )}
             {status === 'disconnected' || status === 'connecting' ? (
               <ConnectButton openConnectModal={openConnectModal} />
             ) : openAccountModal && address && connector && chainId ? (

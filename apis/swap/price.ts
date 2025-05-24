@@ -1,9 +1,9 @@
 import { getAddress } from 'viem'
 
 import { Prices } from '../../model/prices'
-import { Aggregator } from '../../model/aggregator'
+import { aggregators } from '../../chain-configs/aggregators'
 
-export async function fetchPrices(aggregators: Aggregator[]): Promise<Prices> {
+export async function fetchPrices(): Promise<Prices> {
   const prices = await Promise.all(
     aggregators.map((aggregator) => aggregator.prices()),
   )

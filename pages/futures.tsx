@@ -1,12 +1,12 @@
 import React from 'react'
 
 import { FuturesContainer } from '../containers/futures/futures-container'
-import RedirectIfNotMonadTestnetContainer from '../containers/redirect-if-not-monad-testnet-container'
+import RestrictedPageGuard from '../containers/restricted-page-guard'
 
 export default function Futures() {
   return (
-    <RedirectIfNotMonadTestnetContainer>
+    <RestrictedPageGuard>
       <FuturesContainer />
-    </RedirectIfNotMonadTestnetContainer>
+    </RestrictedPageGuard>
   )
 }

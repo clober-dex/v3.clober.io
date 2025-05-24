@@ -1,12 +1,12 @@
 import React from 'react'
 
-import RedirectIfNotMonadTestnetContainer from '../containers/redirect-if-not-monad-testnet-container'
 import { LeaderboardContainer } from '../containers/leaderboard-container'
+import RestrictedPageGuard from '../containers/restricted-page-guard'
 
 export default function Leaderboard() {
   return (
-    <RedirectIfNotMonadTestnetContainer>
+    <RestrictedPageGuard>
       <LeaderboardContainer />
-    </RedirectIfNotMonadTestnetContainer>
+    </RestrictedPageGuard>
   )
 }

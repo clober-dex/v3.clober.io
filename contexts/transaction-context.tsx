@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { CHAIN_IDS, getSubgraphBlockNumber } from '@clober/v2-sdk'
 
 import ConfirmationModal from '../components/modal/confirmation-modal'
-import { Currency } from '../model/currency'
+import { Currency, LpCurrency } from '../model/currency'
 import { Chain } from '../model/chain'
 import { currentTimestampInSeconds } from '../utils/date'
 import { TransactionType } from '../model/transaction-type'
@@ -17,7 +17,7 @@ export type Confirmation = {
   chain: Chain
   fields: {
     direction?: 'in' | 'out'
-    currency?: Currency
+    currency?: Currency | LpCurrency
     label: string
     value: string
   }[]

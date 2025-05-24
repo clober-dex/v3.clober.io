@@ -2,11 +2,11 @@ import { CHAIN_IDS } from '@clober/v2-sdk'
 import { getAddress, isAddressEqual } from 'viem'
 
 import { Subgraph } from '../model/subgraph'
-import { FUTURES_SUBGRAPH_ENDPOINT } from '../constants/subgraph-endpoint'
 import { Prices } from '../model/prices'
 import { formatUnits } from '../utils/bigint'
 import { TradingCompetitionPnl } from '../model/trading-competition-pnl'
 import { currentTimestampInSeconds } from '../utils/date'
+import { CHAIN_CONFIG } from '../chain-configs'
 
 const BLACKLISTED_USER_ADDRESSES = [
   '0x5F79EE8f8fA862E98201120d83c4eC39D9468D49',
@@ -15,12 +15,7 @@ const BLACKLISTED_USER_ADDRESSES = [
   '0x255EC4A7dfefeed4889DbEB03d7aC06ADcCc2D24',
 ].map((address) => getAddress(address))
 
-export const fetchTotalRegisteredUsers = async (
-  chainId: CHAIN_IDS,
-): Promise<number> => {
-  if (!FUTURES_SUBGRAPH_ENDPOINT[chainId]) {
-    return 0
-  }
+export const fetchTotalRegisteredUsers = async (): Promise<number> => {
   const {
     data: {
       globalState: { totalRegisteredUsers },
@@ -30,7 +25,7 @@ export const fetchTotalRegisteredUsers = async (
       globalState: { totalRegisteredUsers: string }
     }
   }>(
-    FUTURES_SUBGRAPH_ENDPOINT[chainId]!,
+    CHAIN_CONFIG.EXTERNAL_SUBGRAPH_ENDPOINTS.FUTURES,
     '',
     '{ globalState(id: "state") { totalRegisteredUsers } }',
     {},
@@ -43,10 +38,6 @@ export const fetchUserPnL = async (
   prices: Prices,
   userAddress: `0x${string}`,
 ): Promise<TradingCompetitionPnl> => {
-  if (!FUTURES_SUBGRAPH_ENDPOINT[chainId]) {
-    return { totalPnl: 0, trades: [] }
-  }
-
   const {
     data: { users, myTrades },
   } = await Subgraph.get<{
@@ -62,7 +53,7 @@ export const fetchUserPnL = async (
       }>
     }
   }>(
-    FUTURES_SUBGRAPH_ENDPOINT[chainId]!,
+    CHAIN_CONFIG.EXTERNAL_SUBGRAPH_ENDPOINTS.FUTURES,
     'getTrades',
     'query getTrades($userAddress: String!) { users: users(where: {id: $userAddress, isRegistered: true}) { pnl } myTrades: trades(where: {user: $userAddress}) { user { id } token { id decimals name symbol } realizedPnL estimatedHolding } }',
     {
@@ -112,9 +103,6 @@ export const fetchTradingCompetitionLeaderboard = async (
 ): Promise<{
   [user: `0x${string}`]: TradingCompetitionPnl
 }> => {
-  if (!FUTURES_SUBGRAPH_ENDPOINT[chainId]) {
-    return {}
-  }
   const cacheKey = `${chainId}`
   const cachedData = cache.get(cacheKey)
   if (
@@ -139,7 +127,7 @@ export const fetchTradingCompetitionLeaderboard = async (
       }>
     }
   }>(
-    FUTURES_SUBGRAPH_ENDPOINT[chainId]!,
+    CHAIN_CONFIG.EXTERNAL_SUBGRAPH_ENDPOINTS.FUTURES,
     'getUsersPnL',
     '{ users( first: 100 orderBy: pnl orderDirection: desc where: {isRegistered: true} ) { id pnl trades { token { id decimals symbol } realizedPnL estimatedHolding } } }',
     {},

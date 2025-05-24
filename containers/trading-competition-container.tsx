@@ -7,12 +7,10 @@ import { useRouter } from 'next/router'
 
 import { ActionButton } from '../components/button/action-button'
 import { toCommaSeparated } from '../utils/number'
-import { RPC_URL } from '../constants/rpc-url'
 import { useChainContext } from '../contexts/chain-context'
 import { buildTransaction, sendTransaction } from '../utils/transaction'
 import { useTransactionContext } from '../contexts/transaction-context'
 import { currentTimestampInSeconds } from '../utils/date'
-import { FUTURES_CONTRACT_ADDRESSES } from '../constants/futures/contract-addresses'
 import { LeaderBoard } from '../components/leader-board'
 import {
   fetchTotalRegisteredUsers,
@@ -27,6 +25,7 @@ import { Countdown } from '../components/countdown'
 import { Currency } from '../model/currency'
 import { Loading } from '../components/loading'
 import { TradingCompetitionPnlCard } from '../components/card/trading-competition-pnl-card'
+import { CHAIN_CONFIG } from '../chain-configs'
 
 const ASSETS: Currency[] = [
   {
@@ -167,7 +166,7 @@ export const TradingCompetitionContainer = () => {
   const publicClient = useMemo(() => {
     return createPublicClient({
       chain: selectedChain,
-      transport: http(RPC_URL[selectedChain.id]),
+      transport: http(CHAIN_CONFIG.RPC_URL),
     })
   }, [selectedChain])
 
@@ -214,7 +213,7 @@ export const TradingCompetitionContainer = () => {
   const { data: totalRegisteredUsers } = useQuery({
     queryKey: ['total-registered-users', selectedChain.id],
     queryFn: async () => {
-      return fetchTotalRegisteredUsers(selectedChain.id)
+      return fetchTotalRegisteredUsers()
     },
   })
 
@@ -230,7 +229,7 @@ export const TradingCompetitionContainer = () => {
       }
       return publicClient.readContract({
         address:
-          FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!
+          CHAIN_CONFIG.EXTERNAL_CONTRACT_ADDRESSES
             .TradingCompetitionRegistration,
         abi: [
           {
@@ -267,7 +266,7 @@ export const TradingCompetitionContainer = () => {
         {
           chain: selectedChain,
           address:
-            FUTURES_CONTRACT_ADDRESSES[selectedChain.id]!
+            CHAIN_CONFIG.EXTERNAL_CONTRACT_ADDRESSES
               .TradingCompetitionRegistration,
           abi: [
             {
@@ -582,7 +581,7 @@ export const TradingCompetitionContainer = () => {
             </linearGradient>
           </defs>
         </svg>
-        Clober Trading Competition
+        {CHAIN_CONFIG.DEX_NAME} Trading Competition
         <div className="text-sm sm:text-xl">Season 1 ends in</div>
       </div>
 

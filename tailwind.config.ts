@@ -1,5 +1,7 @@
 import type { Config } from 'tailwindcss'
 
+import { CHAIN_CONFIG } from './chain-configs'
+
 const config: Config = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -12,6 +14,9 @@ const config: Config = {
       sans: ['Inter', 'sans-serif'],
     },
     extend: {
+      colors: {
+        blue: CHAIN_CONFIG.COLOR, // all blue colors are replaced with something else
+      },
       animation: {
         shake: 'shake 1.0s infinite cubic-bezier(0.36, 0.07, 0.19, 0.97)',
         'infinite-scroll': 'infinite-scroll 6s linear infinite',

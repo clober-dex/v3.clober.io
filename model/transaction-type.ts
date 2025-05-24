@@ -1,7 +1,7 @@
 export type TransactionType =
   | 'approve' // approve erc20 token
-  | 'mint' // add liquidity into the vault
-  | 'burn' // remove liquidity from the vault
+  | 'mint' // add liquidity into the pool
+  | 'burn' // remove liquidity from the pool
   | 'register' // register for trading competition
   | 'borrow' // borrow a futures asset
   | 'repay' // repay a futures asset

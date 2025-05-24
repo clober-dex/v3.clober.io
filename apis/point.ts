@@ -3,26 +3,26 @@ import BigNumber from 'bignumber.js'
 import { getAddress, isAddressEqual } from 'viem'
 
 import { Subgraph } from '../model/subgraph'
-import {
-  LIQUIDITY_VAULT_POINT_PER_SECOND,
-  LIQUIDITY_VAULT_POINT_START_AT,
-} from '../constants/point'
 import { currentTimestampInSeconds } from '../utils/date'
-import { LIQUIDITY_VAULT_POINT_SUBGRAPH_ENDPOINT } from '../constants/subgraph-endpoint'
 import { formatUnits } from '../utils/bigint'
+import { CHAIN_CONFIG } from '../chain-configs'
 
-const BLACKLISTED_USER_ADDRESSES = [
-  '0x5F79EE8f8fA862E98201120d83c4eC39D9468D49',
-  '0xCcd0964F534c4583C35e07E47AbE8984A6bB1534',
-].map((address) => getAddress(address))
+const CONSTANTS: {
+  [key: string]: {
+    START_AT: number
+    POINT_PER_SECOND: number
+  }
+} = {
+  ['0xad46920833ad7a1ba8e74cc241faf9ae4fd3dc4616ad9648b13160f8453e444f']: {
+    START_AT: 1743465600,
+    POINT_PER_SECOND: 0.000001,
+  },
+}
 
 export async function fetchLiquidVaultPoint(
   chainId: CHAIN_IDS,
   userAddress: `0x${string}`,
 ): Promise<number> {
-  if (!LIQUIDITY_VAULT_POINT_SUBGRAPH_ENDPOINT[chainId]) {
-    return 0
-  }
   const {
     data: { user: liquidityVaultPoint },
   } = await Subgraph.get<{
@@ -38,7 +38,7 @@ export async function fetchLiquidVaultPoint(
       }
     }
   }>(
-    LIQUIDITY_VAULT_POINT_SUBGRAPH_ENDPOINT[chainId]!,
+    CHAIN_CONFIG.EXTERNAL_SUBGRAPH_ENDPOINTS.LIQUIDITY_VAULT_POINT,
     'getPoint',
     'query getPointByUserAddress($userAddress: ID!) { user(id: $userAddress) { id vaultBalances { amount pool { id } updatedAt } accumulatedPoints } }',
     {
@@ -47,10 +47,9 @@ export async function fetchLiquidVaultPoint(
   )
   const now = currentTimestampInSeconds()
   return liquidityVaultPoint.vaultBalances.reduce((acc, vaultBalance) => {
-    const startedAt =
-      LIQUIDITY_VAULT_POINT_START_AT?.[chainId]?.[vaultBalance.pool.id] ?? 0
+    const startedAt = CONSTANTS?.[vaultBalance.pool.id].START_AT ?? 0
     const pointsPerSecond =
-      LIQUIDITY_VAULT_POINT_PER_SECOND?.[chainId]?.[vaultBalance.pool.id] ?? 0
+      CONSTANTS?.[vaultBalance.pool.id].POINT_PER_SECOND ?? 0
     if (startedAt === 0 || pointsPerSecond === 0 || startedAt > now) {
       return acc
     }
@@ -64,18 +63,12 @@ export async function fetchLiquidVaultPoint(
   }, Number(liquidityVaultPoint.accumulatedPoints))
 }
 
-export async function fetchLiquidVaultBalanceLeaderboard(
-  chainId: CHAIN_IDS,
-): Promise<
+export async function fetchLiquidVaultBalanceLeaderboard(): Promise<
   {
     address: `0x${string}`
     balance: number
   }[]
 > {
-  if (!LIQUIDITY_VAULT_POINT_SUBGRAPH_ENDPOINT[chainId]) {
-    return []
-  }
-
   const {
     data: { vaultBalances },
   } = await Subgraph.get<{
@@ -88,7 +81,7 @@ export async function fetchLiquidVaultBalanceLeaderboard(
       }[]
     }
   }>(
-    LIQUIDITY_VAULT_POINT_SUBGRAPH_ENDPOINT[chainId]!,
+    CHAIN_CONFIG.EXTERNAL_SUBGRAPH_ENDPOINTS.LIQUIDITY_VAULT_POINT,
     '',
     '{ vaultBalances(first: 1000, where: {pool: "0xad46920833ad7a1ba8e74cc241faf9ae4fd3dc4616ad9648b13160f8453e444f"} orderBy: amount orderDirection: desc) { user { id } amount } }',
     {},
@@ -97,7 +90,7 @@ export async function fetchLiquidVaultBalanceLeaderboard(
   return vaultBalances
     .filter(
       (vaultBalance) =>
-        !BLACKLISTED_USER_ADDRESSES.some((address) =>
+        !CHAIN_CONFIG.BLACKLISTED_USERS.some((address) =>
           isAddressEqual(getAddress(vaultBalance.user.id), address),
         ),
     )

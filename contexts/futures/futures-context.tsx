@@ -29,7 +29,7 @@ export const FuturesProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { data: assets } = useQuery({
     queryKey: ['futures-assets', selectedChain.id],
     queryFn: async () => {
-      return fetchFuturesAssets(selectedChain.id)
+      return fetchFuturesAssets()
     },
     initialData: [],
   }) as {
@@ -64,7 +64,6 @@ export const FuturesProvider = ({ children }: React.PropsWithChildren<{}>) => {
   useEffect(() => {
     setCurrencies(
       deduplicateCurrencies([
-        ...whitelistCurrencies,
         ...assets.map((asset) => asset.currency),
         ...assets.map((asset) => asset.collateral),
       ]),

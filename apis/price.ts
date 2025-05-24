@@ -3,11 +3,11 @@ import { getAddress, isAddressEqual, parseUnits } from 'viem'
 import BigNumber from 'bignumber.js'
 import { EvmPriceServiceConnection, PriceFeed } from '@pythnetwork/pyth-evm-js'
 
-import { AGGREGATORS } from '../constants/aggregators'
+import { aggregators } from '../chain-configs/aggregators'
 import { formatUnits } from '../utils/bigint'
 import { Currency } from '../model/currency'
 import { Prices } from '../model/prices'
-import { PYTH_HERMES_ENDPOINT } from '../constants/pyth'
+import { CHAIN_CONFIG } from '../chain-configs'
 
 import { fetchQuotes } from './swap/quote'
 
@@ -28,13 +28,16 @@ export const fetchPrice = async (
     ? [currency0, currency1]
     : [currency1, currency0]
   try {
-    const { amountOut } = await fetchQuotes(
-      AGGREGATORS[chainId],
+    const {
+      best: { amountOut },
+    } = await fetchQuotes(
+      aggregators,
       baseCurrency,
       parseUnits('1', baseCurrency.decimals),
       quoteCurrency,
       20,
-      1000n, // arbitrary gas price
+      0n, // arbitrary gas price
+      {}, // arbitrary prices
     )
     return new BigNumber(formatUnits(amountOut, quoteCurrency.decimals))
   } catch (e) {
@@ -61,7 +64,7 @@ export const fetchPricesFromPyth = async (
     return {} as Prices
   }
   const pythPriceService = new EvmPriceServiceConnection(
-    PYTH_HERMES_ENDPOINT[chainId],
+    CHAIN_CONFIG.PYTH_HERMES_ENDPOINT,
   )
   const prices: PriceFeed[] | undefined =
     await pythPriceService.getLatestPriceFeeds(

@@ -1,11 +1,8 @@
 import { getAddress, isAddressEqual } from 'viem'
-import { CHAIN_IDS } from '@clober/v2-sdk'
 
 import { Asset } from '../../model/futures/asset'
 import { Subgraph } from '../../model/subgraph'
-import { FUTURES_COLLATERALS } from '../../constants/futures/collaterals'
-import { FUTURES_SUBGRAPH_ENDPOINT } from '../../constants/subgraph-endpoint'
-import { WHITELISTED_CURRENCIES } from '../../constants/currency'
+import { CHAIN_CONFIG } from '../../chain-configs'
 
 type AssetDto = {
   id: string
@@ -29,12 +26,16 @@ type AssetDto = {
   settlePrice: string
 }
 
-export const fetchFuturesAssets = async (
-  chainId: CHAIN_IDS,
-): Promise<Asset[]> => {
-  if (!FUTURES_SUBGRAPH_ENDPOINT[chainId]) {
-    return []
-  }
+const DEFAULT_COLLATERAL = {
+  address: getAddress('0xf817257fed379853cDe0fa4F97AB987181B1E5Ea'),
+  name: 'USD Coin',
+  symbol: 'USDC',
+  decimals: 6,
+  priceFeedId:
+    '0x41f3625971ca2ed2263e78573fe5ce23e13d2558ed3f2e47ab0f84fb9e7ae722',
+}
+
+export const fetchFuturesAssets = async (): Promise<Asset[]> => {
   const {
     data: { assets },
   } = await Subgraph.get<{
@@ -42,20 +43,23 @@ export const fetchFuturesAssets = async (
       assets: AssetDto[]
     }
   }>(
-    FUTURES_SUBGRAPH_ENDPOINT[chainId]!,
+    CHAIN_CONFIG.EXTERNAL_SUBGRAPH_ENDPOINTS.FUTURES,
     'getAssets',
     'query getAssets { assets { id assetId currency { id name symbol decimals } collateral { id name symbol decimals } expiration maxLTV liquidationThreshold minDebt settlePrice } }',
     {},
   )
   return assets
     .map((asset) => {
-      const collateral = FUTURES_COLLATERALS.find((collateral) =>
-        isAddressEqual(collateral.address, getAddress(asset.collateral.id)),
-      )
-      const currency = WHITELISTED_CURRENCIES[chainId].find((currency) =>
+      const currency = CHAIN_CONFIG.WHITELISTED_CURRENCIES.find((currency) =>
         isAddressEqual(currency.address, getAddress(asset.currency.id)),
       )
-      if (!collateral || !currency) {
+      if (
+        !currency ||
+        !isAddressEqual(
+          DEFAULT_COLLATERAL.address,
+          getAddress(asset.collateral.id),
+        )
+      ) {
         return undefined
       }
       return {
@@ -68,7 +72,7 @@ export const fetchFuturesAssets = async (
           priceFeedId: asset.assetId as `0x${string}`,
           icon: currency.icon,
         },
-        collateral,
+        collateral: DEFAULT_COLLATERAL,
         expiration: Number(asset.expiration),
         maxLTV: BigInt(asset.maxLTV),
         liquidationThreshold: BigInt(asset.liquidationThreshold),

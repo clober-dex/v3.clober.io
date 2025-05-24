@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { Chain } from '../model/chain'
-import { getChain } from '../constants/chain'
+import { CHAIN_CONFIG } from '../chain-configs'
 
 type ChainContext = {
   selectedChain: Chain
@@ -10,10 +10,11 @@ type ChainContext = {
 const Context = React.createContext<ChainContext | null>(null)
 
 export const ChainProvider = ({ children }: React.PropsWithChildren<{}>) => {
+  // intentionally kept for future support of multi-chain context
   return (
     <Context.Provider
       value={{
-        selectedChain: getChain(),
+        selectedChain: CHAIN_CONFIG.CHAIN,
       }}
     >
       {children}

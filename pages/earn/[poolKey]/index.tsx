@@ -2,39 +2,49 @@ import React from 'react'
 import { useRouter } from 'next/router'
 import { useQuery } from '@tanstack/react-query'
 
-import { VaultManagerContainer } from '../../../containers/vault/vault-manager-container'
-import { WHITELISTED_VAULTS } from '../../../constants/vault'
-import { fetchOnChainVault } from '../../../apis/vault'
+import { PoolManagerContainer } from '../../../containers/pool/pool-manager-container'
 import { useChainContext } from '../../../contexts/chain-context'
 import { useCurrencyContext } from '../../../contexts/currency-context'
 import { Loading } from '../../../components/loading'
+import { CHAIN_CONFIG } from '../../../chain-configs'
+import { fetchPool } from '../../../apis/pool'
+import { Pool, PoolSnapshot } from '../../../model/pool'
 
 export default function PoolManage() {
   const router = useRouter()
   const { selectedChain } = useChainContext()
   const { prices } = useCurrencyContext()
 
-  const { data: vault } = useQuery({
+  const { data } = useQuery({
     queryKey: [
-      'vault',
+      'pool',
       selectedChain.id,
       router.query.poolKey,
       Object.keys(prices).length !== 0,
     ],
     queryFn: async () => {
-      const vaultImmutableInfo = WHITELISTED_VAULTS[selectedChain.id].find(
-        (info) => info.key === router.query.poolKey,
-      )
-      if (!vaultImmutableInfo) {
+      if (
+        !CHAIN_CONFIG.WHITELISTED_POOL_KEYS.find(
+          (key) => key === router.query.poolKey,
+        )
+      ) {
         return null
       }
-      return fetchOnChainVault(selectedChain, prices, vaultImmutableInfo)
+      return fetchPool(
+        selectedChain,
+        prices,
+        router.query.poolKey as `0x${string}`,
+      )
     },
-    initialData: null,
-  })
+  }) as {
+    data: {
+      pool: Pool | null
+      poolSnapshot: PoolSnapshot | null
+    }
+  }
 
-  return vault ? (
-    <VaultManagerContainer vault={vault} showDashboard={false} />
+  return data && data.pool && data.poolSnapshot ? (
+    <PoolManagerContainer pool={data.pool} poolSnapshot={data.poolSnapshot} />
   ) : (
     <Loading />
   )

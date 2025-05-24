@@ -1,12 +1,12 @@
 import React from 'react'
 
 import { TradingCompetitionContainer } from '../containers/trading-competition-container'
-import RedirectIfNotMonadTestnetContainer from '../containers/redirect-if-not-monad-testnet-container'
+import RestrictedPageGuard from '../containers/restricted-page-guard'
 
 export default function TradingCompetition() {
   return (
-    <RedirectIfNotMonadTestnetContainer>
+    <RestrictedPageGuard>
       <TradingCompetitionContainer />
-    </RedirectIfNotMonadTestnetContainer>
+    </RestrictedPageGuard>
   )
 }

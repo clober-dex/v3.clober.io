@@ -1,7 +1,7 @@
 import React from 'react'
 import { Connector } from 'wagmi'
 
-import { textStyles } from '../../themes/text-styles'
+import { textStyles } from '../../constants/text-styles'
 import { formatAddress } from '../../utils/string'
 import ChainIcon from '../icon/chain-icon'
 import UserIcon from '../icon/user-icon'

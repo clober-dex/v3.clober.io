@@ -3,18 +3,19 @@ import { useRouter } from 'next/router'
 import { useAccount } from 'wagmi'
 import { isAddressEqual, parseUnits } from 'viem'
 
-import { FuturesAssetCard } from '../../components/card/futures-asset-card'
+import { FuturesAssetCard } from '../../components/card/futures/futures-asset-card'
 import { FuturesPosition } from '../../model/futures/futures-position'
-import { FuturesPositionCard } from '../../components/card/futures-position-card'
+import { FuturesPositionCard } from '../../components/card/futures/futures-position-card'
 import { useCurrencyContext } from '../../contexts/currency-context'
 import { currentTimestampInSeconds } from '../../utils/date'
 import { useFuturesContext } from '../../contexts/futures/futures-context'
-import { FuturesRedeemCard } from '../../components/card/futures-redeem-card'
+import { FuturesRedeemCard } from '../../components/card/futures/futures-redeem-card'
 import { formatUnits } from '../../utils/bigint'
 import { useFuturesContractContext } from '../../contexts/futures/futures-contract-context'
-import { WHITE_LISTED_ASSETS } from '../../constants/futures/asset'
+import { WHITELISTED_FUTURES_ASSETS } from '../../constants/futures'
 import { useChainContext } from '../../contexts/chain-context'
 import { Loading } from '../../components/loading'
+import { CHAIN_CONFIG } from '../../chain-configs'
 
 import { FuturesPositionAdjustModalContainer } from './futures-position-adjust-modal-container'
 import { FuturesPositionEditCollateralModalContainer } from './futures-position-edit-collateral-modal-container'
@@ -94,7 +95,7 @@ export const FuturesContainer = () => {
               Futures
             </div>
             <div className="self-stretch text-center text-gray-400 text-xs sm:text-sm font-bold">
-              Mint & Trade Synthetic Assets on Clober
+              Mint & Trade Synthetic Assets on {CHAIN_CONFIG.DEX_NAME}
             </div>
           </div>
 
@@ -155,7 +156,7 @@ export const FuturesContainer = () => {
                 {assets
                   .filter((asset) => asset.expiration > now)
                   .filter((asset) =>
-                    WHITE_LISTED_ASSETS.includes(asset.currency.address),
+                    WHITELISTED_FUTURES_ASSETS.includes(asset.currency.address),
                   )
                   .sort((a, b) =>
                     a.currency.symbol.localeCompare(b.currency.symbol),
@@ -168,11 +169,10 @@ export const FuturesContainer = () => {
                       router={router}
                     />
                   ))}
-
-                {assets.length === 0 && (
-                  <Loading className="flex mt-8 sm:mt-0" />
-                )}
               </div>
+              {assets.length === 0 && (
+                <Loading className="flex items-center justify-center mt-8 sm:mt-0" />
+              )}
             </div>
           </div>
         </div>
@@ -186,7 +186,9 @@ export const FuturesContainer = () => {
                     (asset) =>
                       asset.expiration < now &&
                       balances[asset.currency.address] > 0n &&
-                      WHITE_LISTED_ASSETS.includes(asset.currency.address),
+                      WHITELISTED_FUTURES_ASSETS.includes(
+                        asset.currency.address,
+                      ),
                   )
                   .map((asset, index) => (
                     <FuturesRedeemCard
@@ -223,11 +225,8 @@ export const FuturesContainer = () => {
                       }}
                     />
                   ))}
-
-                {assets.length === 0 && (
-                  <Loading className="flex mt-8 sm:mt-0" />
-                )}
               </div>
+              {assets.length === 0 && <Loading className="flex mt-8 sm:mt-0" />}
             </div>
           </div>
         </div>

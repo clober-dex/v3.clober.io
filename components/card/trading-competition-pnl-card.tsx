@@ -198,7 +198,7 @@ export const TradingCompetitionPnlCard = ({
         <h1 className="font-bold text-sm sm:text-xl">My Rank</h1>
         <div
           id="pnl-capture-target"
-          className="relative flex flex-col bg-black/30 p-8 bg-[url('../public/trading-competition-pnl-card-background.png')] bg-top w-full h-full bg-no-repeat bg-cover"
+          className="relative flex flex-col bg-black/30 p-8 bg-[url('../public/chain-configs/background/trading-competition-pnl-card-background.png')] bg-top w-full h-full bg-no-repeat bg-cover"
         >
           <div className="absolute inset-0 bg-black/40 z-0" />
 

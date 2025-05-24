@@ -1,7 +1,8 @@
 import React from 'react'
 import { Meta, StoryObj } from '@storybook/react'
-
 import '../../styles/globals.css'
+import { mainnet } from 'viem/chains'
+
 import { CurrencyIcon } from './currency-icon'
 
 export default {
@@ -21,6 +22,7 @@ type Story = StoryObj<typeof CurrencyIcon>
 
 export const Default: Story = {
   args: {
+    chain: mainnet,
     currency: {
       address: '0x0000000000000000000000000000000000000001',
       name: 'USDC',
@@ -32,6 +34,7 @@ export const Default: Story = {
 
 export const Unknown: Story = {
   args: {
+    chain: mainnet,
     currency: {
       address: '0x0000000000000000000000000000000000000001',
       name: 'USDK',

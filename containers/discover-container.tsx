@@ -1,21 +1,24 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { createPublicClient, http } from 'viem'
 import { useQuery } from '@tanstack/react-query'
 import { Tooltip } from 'react-tooltip'
 import { FixedSizeGrid as Grid, FixedSizeList as List } from 'react-window'
+import {
+  getMarketSnapshots,
+  MarketSnapshot as SdkMarketSnapshot,
+} from '@clober/v2-sdk'
+import { isAddressEqual } from 'viem'
 
-import { MarketCard } from '../components/card/market-card'
+import { MarketDailySnapshotCard } from '../components/card/market/market-daily-snapshot-card'
 import { useChainContext } from '../contexts/chain-context'
 import { SearchSvg } from '../components/svg/search-svg'
-import { fetchAllMarkets } from '../apis/market'
-import { useCurrencyContext } from '../contexts/currency-context'
-import { RPC_URL } from '../constants/rpc-url'
 import { QuestionMarkSvg } from '../components/svg/question-mark-svg'
 import { TriangleDownSvg } from '../components/svg/triangle-down-svg'
-import { Market } from '../model/market'
 import { useTransactionContext } from '../contexts/transaction-context'
 import { Chain } from '../model/chain'
 import { Loading } from '../components/loading'
+import { CHAIN_CONFIG } from '../chain-configs'
+import { useCurrencyContext } from '../contexts/currency-context'
+import { currentTimestampInSeconds } from '../utils/date'
 
 const MOBILE_ROW_HEIGHT = 168
 
@@ -45,6 +48,12 @@ type SortOption =
   | 'verified-desc'
   | 'verified-asc'
 
+type MarketSnapshot = SdkMarketSnapshot & {
+  isBidTaken: boolean
+  isAskTaken: boolean
+  verified: boolean
+}
+
 const TriangleDown = ({
   column,
   sortOption,
@@ -61,122 +70,258 @@ const TriangleDown = ({
   )
 }
 
-const LOCAL_STORAGE_MARKET_KEY = (chain: Chain) => `markets-${chain.id}`
+const LOCAL_STORAGE_MARKET_SNAPSHOTS_KEY = (chain: Chain) =>
+  `market-snapshots-${chain.id}`
+
+const MarketSnapshotListRow = ({
+  index,
+  style,
+  data,
+}: {
+  index: number
+  style: React.CSSProperties
+  data: {
+    items: MarketSnapshot[]
+    chain: Chain
+  }
+}) => {
+  const marketSnapshot = data.items[index]
+  if (!marketSnapshot) {
+    return null
+  }
+
+  return (
+    <div style={style}>
+      <MarketDailySnapshotCard
+        chain={data.chain}
+        baseCurrency={marketSnapshot.base}
+        quoteCurrency={marketSnapshot.quote}
+        createAt={marketSnapshot.createdAtTimestamp}
+        price={marketSnapshot.priceUSD}
+        dailyVolume={marketSnapshot.volume24hUSD}
+        fdv={marketSnapshot.fdv}
+        dailyChange={marketSnapshot.priceChange24h * 100}
+        verified={marketSnapshot.verified}
+        isBidTaken={marketSnapshot.isBidTaken || false}
+        isAskTaken={marketSnapshot.isAskTaken || false}
+      />
+    </div>
+  )
+}
+
+const MarketSnapshotGridCell = ({
+  columnIndex,
+  rowIndex,
+  style,
+  data,
+}: {
+  columnIndex: number
+  rowIndex: number
+  style: React.CSSProperties
+  data: {
+    items: MarketSnapshot[]
+    columnCount: number
+    chain: Chain
+  }
+}) => {
+  const index = rowIndex * data.columnCount + columnIndex
+  const marketSnapshot = data.items[index]
+  if (!marketSnapshot) {
+    return null
+  }
+
+  const gapStyle =
+    columnIndex === 0
+      ? { paddingRight: 6 }
+      : columnIndex === 1
+        ? { paddingLeft: 6 }
+        : {}
+
+  return (
+    <div style={{ ...style, ...gapStyle }}>
+      <MarketDailySnapshotCard
+        chain={data.chain}
+        baseCurrency={marketSnapshot.base}
+        quoteCurrency={marketSnapshot.quote}
+        createAt={marketSnapshot.createdAtTimestamp}
+        price={marketSnapshot.priceUSD}
+        dailyVolume={marketSnapshot.volume24hUSD}
+        fdv={marketSnapshot.fdv}
+        dailyChange={marketSnapshot.priceChange24h * 100}
+        verified={marketSnapshot.verified}
+        isBidTaken={marketSnapshot.isBidTaken || false}
+        isAskTaken={marketSnapshot.isAskTaken || false}
+      />
+    </div>
+  )
+}
 
 export const DiscoverContainer = () => {
   const { selectedChain } = useChainContext()
-  const { whitelistCurrencies, prices } = useCurrencyContext()
+  const { currencies } = useCurrencyContext()
   const { latestSubgraphBlockNumber } = useTransactionContext()
-  const publicClient = useMemo(() => {
-    return createPublicClient({
-      chain: selectedChain,
-      transport: http(RPC_URL[selectedChain.id]),
-    })
-  }, [selectedChain])
-  const prevMarkets = useRef<Market[]>([])
+  const prevMarketSnapshots = useRef<MarketSnapshot[]>([])
   const prevSubgraphBlockNumber = useRef<number>(0)
 
   const [searchValue, setSearchValue] = React.useState('')
   const [sortOption, setSortOption] = useState<SortOption>('none')
 
   useEffect(() => {
-    const storedMarkets = localStorage.getItem(
-      LOCAL_STORAGE_MARKET_KEY(selectedChain),
+    const storedMarketSnapshots = localStorage.getItem(
+      LOCAL_STORAGE_MARKET_SNAPSHOTS_KEY(selectedChain),
     )
-    if (storedMarkets) {
-      prevMarkets.current = JSON.parse(storedMarkets)
+    if (storedMarketSnapshots) {
+      const now = currentTimestampInSeconds()
+      prevMarketSnapshots.current = (
+        JSON.parse(storedMarketSnapshots) as MarketSnapshot[]
+      ).map((marketSnapshot) => ({
+        ...marketSnapshot,
+        askBookUpdatedAt: now,
+        bidBookUpdatedAt: now,
+        isBidTaken: false,
+        isAskTaken: false,
+        verified: false,
+      }))
     }
   }, [selectedChain])
 
-  const { data: markets } = useQuery({
-    queryKey: ['markets', selectedChain.id],
+  const isVerifiedMarket = useCallback(
+    (marketSnapshot: SdkMarketSnapshot) => {
+      return !!(
+        currencies.find((currency) =>
+          isAddressEqual(currency.address, marketSnapshot.base.address),
+        ) &&
+        currencies.find((currency) =>
+          isAddressEqual(currency.address, marketSnapshot.quote.address),
+        )
+      )
+    },
+    [currencies],
+  )
+
+  const { data: marketSnapshots } = useQuery({
+    queryKey: ['market-snapshots', selectedChain.id],
     queryFn: async () => {
       if (latestSubgraphBlockNumber.blockNumber === 0) {
-        return [] as Market[]
+        return [] as MarketSnapshot[]
       }
       if (
         prevSubgraphBlockNumber.current !==
         latestSubgraphBlockNumber.blockNumber
       ) {
-        const markets = await fetchAllMarkets(
-          publicClient,
-          selectedChain,
-          prices,
-          whitelistCurrencies.map((currency) => currency.address),
-          prevMarkets.current,
+        const marketSnapshots = await getMarketSnapshots({
+          chainId: selectedChain.id,
+          options: {
+            rpcUrl: CHAIN_CONFIG.RPC_URL,
+          },
+        })
+        const newMarketSnapshots: MarketSnapshot[] = marketSnapshots.map(
+          (marketSnapshot) => {
+            const prevMarketSnapshot = prevMarketSnapshots.current.find(
+              (snapshot) =>
+                isAddressEqual(
+                  snapshot.base.address,
+                  marketSnapshot.base.address,
+                ) &&
+                isAddressEqual(
+                  snapshot.quote.address,
+                  marketSnapshot.quote.address,
+                ),
+            )
+            return {
+              ...marketSnapshot,
+              isBidTaken:
+                (prevMarketSnapshot &&
+                  prevMarketSnapshot.bidBookUpdatedAt <
+                    marketSnapshot.bidBookUpdatedAt) ||
+                false,
+              isAskTaken:
+                (prevMarketSnapshot &&
+                  prevMarketSnapshot.askBookUpdatedAt <
+                    marketSnapshot.askBookUpdatedAt) ||
+                false,
+              verified: isVerifiedMarket(marketSnapshot),
+            }
+          },
         )
-        prevMarkets.current = markets
+        prevMarketSnapshots.current = marketSnapshots.map((marketSnapshot) => ({
+          ...marketSnapshot,
+          isBidTaken: false,
+          isAskTaken: false,
+          verified: isVerifiedMarket(marketSnapshot),
+        }))
         prevSubgraphBlockNumber.current = latestSubgraphBlockNumber.blockNumber
         localStorage.setItem(
-          LOCAL_STORAGE_MARKET_KEY(selectedChain),
-          JSON.stringify(markets),
+          LOCAL_STORAGE_MARKET_SNAPSHOTS_KEY(selectedChain),
+          JSON.stringify(marketSnapshots),
         )
-        return markets
+        return newMarketSnapshots
       }
-      return prevMarkets.current
+      return prevMarketSnapshots.current
     },
     refetchInterval: 1000, // checked
     refetchIntervalInBackground: true,
   })
 
-  const filteredMarkets = useMemo(() => {
-    return (markets ?? prevMarkets.current ?? [])
+  const filteredMarketSnapshots = useMemo(() => {
+    return (marketSnapshots ?? prevMarketSnapshots.current ?? [])
       .filter(
-        (market) =>
-          market.baseCurrency.symbol
+        (marketSnapshot) =>
+          marketSnapshot.base.symbol
             .toLowerCase()
             .includes(searchValue.toLowerCase()) ||
-          market.quoteCurrency.symbol
+          marketSnapshot.quote.symbol
             .toLowerCase()
             .includes(searchValue.toLowerCase()) ||
-          market.baseCurrency.name
+          marketSnapshot.base.name
             .toLowerCase()
             .includes(searchValue.toLowerCase()) ||
-          market.quoteCurrency.name
+          marketSnapshot.quote.name
             .toLowerCase()
             .includes(searchValue.toLowerCase()) ||
-          market.baseCurrency.address
+          marketSnapshot.base.address
             .toLowerCase()
             .includes(searchValue.toLowerCase()) ||
-          market.quoteCurrency.address
+          marketSnapshot.quote.address
             .toLowerCase()
             .includes(searchValue.toLowerCase()) ||
-          `${market.baseCurrency.name}${market.quoteCurrency.name}`
+          `${marketSnapshot.base.name}${marketSnapshot.quote.name}`
             .toLowerCase()
             .includes(searchValue.toLowerCase()) ||
-          `${market.baseCurrency.symbol}${market.quoteCurrency.symbol}`
+          `${marketSnapshot.base.symbol}${marketSnapshot.quote.symbol}`
             .toLowerCase()
             .includes(searchValue.toLowerCase()),
       )
       .sort((a, b) => {
         if (sortOption === 'none') {
           return (
-            b.dailyVolume - a.dailyVolume || b.liquidityUsd - a.liquidityUsd
+            b.volume24hUSD - a.volume24hUSD ||
+            b.totalValueLockedUSD - a.totalValueLockedUSD
           )
         } else if (sortOption === 'market-asc') {
-          return a.baseCurrency.symbol.localeCompare(b.baseCurrency.symbol)
+          return a.base.symbol.localeCompare(b.base.symbol)
         } else if (sortOption === 'market-desc') {
-          return b.baseCurrency.symbol.localeCompare(a.baseCurrency.symbol)
+          return b.base.symbol.localeCompare(a.base.symbol)
         } else if (sortOption === 'age-asc') {
-          return a.createAt - b.createAt
+          return a.createdAtTimestamp - b.createdAtTimestamp
         } else if (sortOption === 'age-desc') {
-          return b.createAt - a.createAt
+          return b.createdAtTimestamp - a.createdAtTimestamp
         } else if (sortOption === 'price-asc') {
           return a.price - b.price
         } else if (sortOption === 'price-desc') {
           return b.price - a.price
         } else if (sortOption === 'daily-volume-asc') {
-          return a.dailyVolume - b.dailyVolume
+          return a.volume24hUSD - b.volume24hUSD
         } else if (sortOption === 'daily-volume-desc') {
-          return b.dailyVolume - a.dailyVolume
+          return b.volume24hUSD - a.volume24hUSD
         } else if (sortOption === 'fdv-asc') {
           return a.fdv - b.fdv
         } else if (sortOption === 'fdv-desc') {
           return b.fdv - a.fdv
         } else if (sortOption === 'daily-change-asc') {
-          return a.dailyChange - b.dailyChange
+          return a.priceChange24h - b.priceChange24h
         } else if (sortOption === 'daily-change-desc') {
-          return b.dailyChange - a.dailyChange
+          return b.priceChange24h - a.priceChange24h
         } else if (sortOption === 'verified-asc') {
           return a.verified ? -1 : 1
         } else if (sortOption === 'verified-desc') {
@@ -184,7 +329,7 @@ export const DiscoverContainer = () => {
         }
         return 0
       })
-  }, [markets, searchValue, sortOption])
+  }, [marketSnapshots, searchValue, sortOption])
 
   const sort = useCallback(
     (column: Column) => {
@@ -201,38 +346,22 @@ export const DiscoverContainer = () => {
     [sortOption],
   )
 
-  const MarketGridCell = ({ columnIndex, rowIndex, style }: any) => {
-    const index = rowIndex + columnIndex
-    const market = filteredMarkets[index]
-    if (!market) {
-      return null
-    }
+  const listItemData = useMemo(
+    () => ({
+      items: filteredMarketSnapshots,
+      chain: selectedChain,
+    }),
+    [filteredMarketSnapshots, selectedChain],
+  )
 
-    return (
-      <div style={style}>
-        <MarketCard {...market} chain={selectedChain} />
-      </div>
-    )
-  }
-
-  const MarketListRow = ({
-    index,
-    style,
-  }: {
-    index: number
-    style: React.CSSProperties
-  }) => {
-    const market = filteredMarkets[index]
-    if (!market) {
-      return null
-    }
-
-    return (
-      <div style={style}>
-        <MarketCard {...market} chain={selectedChain} />
-      </div>
-    )
-  }
+  const gridItemData = useMemo(
+    () => ({
+      items: filteredMarketSnapshots,
+      columnCount: 2,
+      chain: selectedChain,
+    }),
+    [filteredMarketSnapshots, selectedChain],
+  )
 
   return (
     <div className="text-white mb-4 flex w-full lg:w-[1072px]  flex-col items-center mt-6 lg:mt-8 px-4 lg:px-0 gap-4 lg:gap-8">
@@ -325,7 +454,9 @@ export const DiscoverContainer = () => {
           </button>
         </div>
 
-        {filteredMarkets.length === 0 && <Loading className="mt-36 sm:mt-24" />}
+        {filteredMarketSnapshots.length === 0 && (
+          <Loading className="mt-36 sm:mt-24" />
+        )}
 
         <div className="relative flex justify-center w-full lg:w-[1072px] h-full lg:h-[680px] mb-6">
           <div className="relative flex justify-center w-full h-full lg:h-[680px] mb-6">
@@ -333,14 +464,13 @@ export const DiscoverContainer = () => {
             <div className="hidden lg:block w-full overflow-hidden">
               <List
                 height={680}
-                itemCount={filteredMarkets.length}
+                itemCount={filteredMarketSnapshots.length}
                 itemSize={64 + 12}
                 width={1072}
-                itemKey={(index) =>
-                  `${filteredMarkets[index].baseCurrency.address}-${filteredMarkets[index].quoteCurrency.address}`
-                }
+                itemKey={(index) => `desktop-${index}`}
+                itemData={listItemData}
               >
-                {MarketListRow}
+                {MarketSnapshotListRow}
               </List>
             </div>
 
@@ -350,27 +480,15 @@ export const DiscoverContainer = () => {
                 columnCount={2}
                 columnWidth={Math.floor((window.innerWidth - 24 * 2) / 2)}
                 height={680}
-                rowCount={Math.ceil(filteredMarkets.length / 2)}
+                rowCount={Math.ceil(filteredMarketSnapshots.length / 2)}
                 rowHeight={MOBILE_ROW_HEIGHT + 12}
                 width={window.innerWidth - 24 * 2}
+                itemKey={({ columnIndex, rowIndex }) =>
+                  `tablet-${rowIndex}-${columnIndex}`
+                }
+                itemData={gridItemData}
               >
-                {({ columnIndex, style }) => {
-                  const gapStyle =
-                    columnIndex === 0
-                      ? { paddingRight: 6 }
-                      : columnIndex === 1
-                        ? { paddingLeft: 6 }
-                        : {}
-                  return (
-                    <>
-                      {MarketGridCell({
-                        columnIndex,
-                        rowIndex: columnIndex,
-                        style: { ...style, ...gapStyle },
-                      })}
-                    </>
-                  )
-                }}
+                {MarketSnapshotGridCell}
               </Grid>
             </div>
 
@@ -378,14 +496,13 @@ export const DiscoverContainer = () => {
             <div className="block md:hidden w-full overflow-hidden">
               <List
                 height={680}
-                itemCount={filteredMarkets.length}
+                itemCount={filteredMarketSnapshots.length}
                 itemSize={MOBILE_ROW_HEIGHT + 12}
                 width="100%"
-                itemKey={(index) =>
-                  `${filteredMarkets[index].baseCurrency.address}-${filteredMarkets[index].quoteCurrency.address}`
-                }
+                itemKey={(index) => `mobile-${index}`}
+                itemData={listItemData}
               >
-                {MarketListRow}
+                {MarketSnapshotListRow}
               </List>
             </div>
           </div>

@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { CHAIN_CONFIG } from '../chain-configs'
+
 import { BlockNumberWidget } from './block-number-widget'
 
 const Footer = ({
@@ -22,7 +24,7 @@ const Footer = ({
         <a
           className="flex w-auto ml-auto"
           target="_blank"
-          href="https://clober.io/?utm_source=app_page&utm_medium=app_page"
+          href={`${CHAIN_CONFIG.LANDING_PAGE_URL}/?utm_source=app_page&utm_medium=app_page`}
           rel="noopener"
         >
           Powered by Clober (v

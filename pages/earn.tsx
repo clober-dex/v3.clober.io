@@ -1,7 +1,12 @@
 import React from 'react'
 
-import { VaultContainer } from '../containers/vault/vault-container'
+import { PoolContainer } from '../containers/pool/pool-container'
+import RestrictedPageGuard from '../containers/restricted-page-guard'
 
 export default function Earn() {
-  return <VaultContainer />
+  return (
+    <RestrictedPageGuard>
+      <PoolContainer />
+    </RestrictedPageGuard>
+  )
 }

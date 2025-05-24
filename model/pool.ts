@@ -1,16 +1,8 @@
-import { Currency } from './currency'
+import {
+  Pool as SdkPool,
+  PoolSnapshot as SdkPoolSnapshot,
+} from '@clober/v2-sdk'
 
-export type Pool = {
-  address: `0x${string}`
-  lpCurrency: Currency
-  currency0: Currency
-  currency1: Currency
-  apy: number
-  tvl: number
-  volume24h: number
-  reserve0: number
-  reserve1: number
-  lpUsdValue: number
-  totalSupply: number
-  createdAtTimestamp: number
-}
+export type Pool = { lpPriceUSD: number; apy: number; tvl: number } & SdkPool
+
+export type PoolSnapshot = { apy: number } & SdkPoolSnapshot

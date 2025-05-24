@@ -63,6 +63,7 @@ export const Deposit: Story = {
 
 export const Withdraw: Story = {
   args: {
+    chain: mainnet,
     asset: {
       id: '0x',
       currency: {

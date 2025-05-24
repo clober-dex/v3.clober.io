@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import '../styles/globals.css'
 import '@rainbow-me/rainbowkit/styles.css'
 import { darkTheme, RainbowKitProvider } from '@rainbow-me/rainbowkit'
@@ -15,9 +15,8 @@ import { useRouter } from 'next/router'
 import Script from 'next/script'
 
 import HeaderContainer from '../containers/header-container'
-import { ChainProvider, useChainContext } from '../contexts/chain-context'
+import { ChainProvider } from '../contexts/chain-context'
 import { MarketProvider } from '../contexts/trade/market-context'
-import { getChain, getClientConfig } from '../constants/chain'
 import {
   TransactionProvider,
   useTransactionContext,
@@ -30,11 +29,11 @@ import { CurrencyProvider } from '../contexts/currency-context'
 import Footer from '../components/footer'
 import { TradeProvider } from '../contexts/trade/trade-context'
 import { SwapContractProvider } from '../contexts/trade/swap-contract-context'
-import { VaultProvider } from '../contexts/vault/vault-context'
-import { VaultContractProvider } from '../contexts/vault/vault-contract-context'
+import { PoolProvider } from '../contexts/pool/pool-context'
+import { PoolContractProvider } from '../contexts/pool/pool-contract-context'
 import { FuturesProvider } from '../contexts/futures/futures-context'
 import { FuturesContractProvider } from '../contexts/futures/futures-contract-context'
-import { GOOGLE_ANALYTICS_TRACKING_ID } from '../constants/google-analytics'
+import { CHAIN_CONFIG, getClientConfig } from '../chain-configs'
 
 const CacheProvider = ({ children }: React.PropsWithChildren) => {
   const queryClient = useQueryClient()
@@ -88,11 +87,11 @@ const TradeProvidersWrapper = ({ children }: React.PropsWithChildren) => {
   )
 }
 
-const VaultProvidersWrapper = ({ children }: React.PropsWithChildren) => {
+const PoolProvidersWrapper = ({ children }: React.PropsWithChildren) => {
   return (
-    <VaultProvider>
-      <VaultContractProvider>{children}</VaultContractProvider>
-    </VaultProvider>
+    <PoolProvider>
+      <PoolContractProvider>{children}</PoolContractProvider>
+    </PoolProvider>
   )
 }
 
@@ -113,15 +112,9 @@ const PanelWrapper = ({
   setOpen: (open: boolean) => void
 } & React.PropsWithChildren) => {
   const router = useRouter()
-  const { selectedChain } = useChainContext()
 
   return (
-    <Panel
-      chainId={selectedChain.id}
-      open={open}
-      setOpen={setOpen}
-      router={router}
-    >
+    <Panel open={open} setOpen={setOpen} router={router}>
       {children}
     </Panel>
   )
@@ -156,48 +149,33 @@ function App({ Component, pageProps }: AppProps) {
     return () => window.removeEventListener('popstate', handlePopState)
   }, [handlePopState])
 
-  const chain = useMemo(() => getChain(), [])
-
   const getBackground = (pathname: string) => {
     if (pathname.includes('/trade')) {
-      return "lg:bg-[url('../public/trade-background.png')] lg:bg-top"
+      return "lg:bg-[url('../public/chain-configs/background/trade-background.png')] lg:bg-top"
     } else if (pathname.includes('/earn')) {
-      return "bg-[url('../public/base-background.png')] bg-top"
+      return "bg-[url('../public/chain-configs/background/base-background.png')] bg-top"
     } else if (pathname.includes('/futures')) {
-      return "bg-[url('../public/base-background.png')] bg-top"
+      return "bg-[url('../public/chain-configs/background/base-background.png')] bg-top"
     } else if (pathname.includes('/discover')) {
-      return "lg:bg-[url('../public/base-background.png')] bg-top"
+      return "lg:bg-[url('../public/chain-configs/background/base-background.png')] bg-top"
     } else if (pathname.includes('/point')) {
-      return "sm:bg-[url('../public/base-background.png')] bg-top"
+      return "sm:bg-[url('../public/chain-configs/background/base-background.png')] bg-top"
     } else if (pathname.includes('/trading-competition')) {
-      return "sm:bg-[url('../public/trading-competition-background.png')] bg-top"
+      return "sm:bg-[url('../public/chain-configs/background/trading-competition-background.png')] bg-top"
     } else if (pathname.includes('/leaderboard')) {
-      return "sm:bg-[url('../public/trading-competition-background.png')] bg-top"
+      return "sm:bg-[url('../public/chain-configs/background/trading-competition-background.png')] bg-top"
     }
   }
 
   useEffect(() => {
-    if (!GOOGLE_ANALYTICS_TRACKING_ID[chain.id]) {
-      return
-    }
-
-    const id = GOOGLE_ANALYTICS_TRACKING_ID[chain.id]
-
     const sendPageView = (pathname: string, search: string) => {
       const urlParams = new URLSearchParams(search || '')
       const utm_source = urlParams.get('utm_source') || undefined
       const utm_medium = urlParams.get('utm_medium') || undefined
       const utm_campaign = urlParams.get('utm_campaign') || undefined
 
-      console.log('config', id, {
-        page_path: pathname,
-        campaign_source: utm_source,
-        campaign_medium: utm_medium,
-        campaign_name: utm_campaign,
-      })
-
       // @ts-ignore
-      window.gtag?.('config', id, {
+      window.gtag?.('config', CHAIN_CONFIG.GOOGLE_ANALYTICS_TRACKING_ID, {
         page_path: pathname,
         campaign_source: utm_source,
         campaign_medium: utm_medium,
@@ -230,7 +208,6 @@ function App({ Component, pageProps }: AppProps) {
 
     const handleRouteChange = (url: string) => {
       const [pathname, search] = url.split('?')
-      // 중복 호출 방지: 현재 pathname과 같은 경우 skip
       if (pathname === initialPathname && !search) {
         return
       }
@@ -242,31 +219,29 @@ function App({ Component, pageProps }: AppProps) {
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [chain.id, router])
+  }, [router])
 
   return (
     <>
-      {GOOGLE_ANALYTICS_TRACKING_ID[chain.id] && (
-        <>
-          <Script
-            src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_TRACKING_ID[chain.id]}`}
-            strategy="afterInteractive"
-          />
-          <Script id="google-analytics" strategy="afterInteractive">
-            {`
+      <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=${CHAIN_CONFIG.GOOGLE_ANALYTICS_TRACKING_ID}`}
+        strategy="afterInteractive"
+      />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
     `}
-          </Script>
-        </>
-      )}
+      </Script>
 
       <ErrorBoundary>
         <Head>
-          <title>Clober | Fully On-chain Order Book</title>
-          <link rel="apple-touch-icon" href="/favicon.png" />
-          <link rel="icon" type="image/png" href="/favicon.png" />
+          <title>
+            {CHAIN_CONFIG.DEX_NAME} | {CHAIN_CONFIG.TITLE}
+          </title>
+          <link rel="apple-touch-icon" href="/chain-configs/favicon.png" />
+          <link rel="icon" type="image/png" href="/chain-configs/favicon.png" />
         </Head>
         <WalletProvider>
           <ChainProvider>
@@ -283,19 +258,19 @@ function App({ Component, pageProps }: AppProps) {
                   {router.pathname.includes('/trade') ? (
                     <TradeProvidersWrapper>
                       <div className="flex flex-1 relative justify-center">
-                        <div className="flex w-full flex-col items-center gap-6 md:gap-11 px-2 pb-0 mt-[30px] md:mt-[56px]">
+                        <div className="flex w-full flex-col items-center gap-7 md:gap-11 px-2 pb-0 mt-[20px] md:mt-[56px]">
                           <Component {...pageProps} />
                         </div>
                       </div>
                     </TradeProvidersWrapper>
                   ) : router.pathname.includes('/earn') ? (
-                    <VaultProvidersWrapper>
+                    <PoolProvidersWrapper>
                       <div className="flex flex-1 relative justify-center">
-                        <div className="flex w-full flex-col items-center gap-6 md:gap-11 px-2 pb-0">
+                        <div className="flex w-full flex-col items-center gap-7 md:gap-11 px-2 pb-0">
                           <Component {...pageProps} />
                         </div>
                       </div>
-                    </VaultProvidersWrapper>
+                    </PoolProvidersWrapper>
                   ) : router.pathname.includes('/futures') ? (
                     <FuturesProvidersWrapper>
                       <div className="flex flex-1 relative justify-center">

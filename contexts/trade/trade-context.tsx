@@ -12,9 +12,9 @@ import {
   LOCAL_STORAGE_OUTPUT_CURRENCY_KEY,
 } from '../../utils/currency'
 import { getQueryParams } from '../../utils/url'
-import { DEFAULT_INPUT_CURRENCY } from '../../constants/currency'
 import { useChainContext } from '../chain-context'
 import { useCurrencyContext } from '../currency-context'
+import { CHAIN_CONFIG } from '../../chain-configs'
 
 type TradeContext = {
   isBid: boolean
@@ -84,7 +84,7 @@ export const TradeProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const [outputCurrencyAmount, setOutputCurrencyAmount] = useState('')
 
   const [priceInput, setPriceInput] = useState('')
-  const [slippageInput, _setSlippageInput] = useState('1')
+  const [slippageInput, _setSlippageInput] = useState('0.5')
 
   const setInputCurrency = useCallback(
     (currency: Currency | undefined) => {
@@ -164,7 +164,7 @@ export const TradeProvider = ({ children }: React.PropsWithChildren<{}>) => {
               console.error('disconnectAsync error', e)
             }
           }
-        } else if (!fetchCurrenciesDone(whitelistCurrencies, selectedChain)) {
+        } else if (!fetchCurrenciesDone(whitelistCurrencies)) {
           return
         }
         const _inputCurrency = inputCurrencyAddress
@@ -178,7 +178,7 @@ export const TradeProvider = ({ children }: React.PropsWithChildren<{}>) => {
               selectedChain,
               getAddress(inputCurrencyAddress),
             )))
-          : DEFAULT_INPUT_CURRENCY[selectedChain.id]
+          : CHAIN_CONFIG.DEFAULT_INPUT_CURRENCY
         const _outputCurrency = outputCurrencyAddress
           ? (whitelistCurrencies.find((currency) =>
               isAddressEqual(
@@ -190,21 +190,10 @@ export const TradeProvider = ({ children }: React.PropsWithChildren<{}>) => {
               selectedChain,
               getAddress(outputCurrencyAddress),
             )))
-          : undefined
+          : CHAIN_CONFIG.DEFAULT_OUTPUT_CURRENCY
 
         if (previousChain.current.chain.id !== selectedChain.id) {
           return
-        }
-
-        if (whitelistCurrencies.length > 0) {
-          setCurrencies(
-            deduplicateCurrencies(
-              [...whitelistCurrencies].concat(
-                _inputCurrency ? [_inputCurrency] : [],
-                _outputCurrency ? [_outputCurrency] : [],
-              ),
-            ),
-          )
         }
 
         if (_inputCurrency) {

@@ -1,12 +1,12 @@
 import React from 'react'
 
 import { DiscoverContainer } from '../containers/discover-container'
-import RedirectIfNotMonadTestnetContainer from '../containers/redirect-if-not-monad-testnet-container'
+import RestrictedPageGuard from '../containers/restricted-page-guard'
 
 export default function Discover() {
   return (
-    <RedirectIfNotMonadTestnetContainer>
+    <RestrictedPageGuard>
       <DiscoverContainer />
-    </RedirectIfNotMonadTestnetContainer>
+    </RestrictedPageGuard>
   )
 }
