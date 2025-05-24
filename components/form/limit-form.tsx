@@ -86,8 +86,8 @@ export const LimitForm = ({
         action: () => Promise<void>
       }
     | undefined
-  closeLimitFormAction: () => void
-  actionButtonProps: ActionButtonProps
+  closeLimitFormAction?: () => void
+  actionButtonProps?: ActionButtonProps
 }) => {
   minimumDecimalPlaces = minimumDecimalPlaces
     ? minimumDecimalPlaces
@@ -192,12 +192,14 @@ export const LimitForm = ({
               <></>
             )}
           </div>
-          <button
-            className="flex sm:hidden w-5 h-5 ml-auto"
-            onClick={closeLimitFormAction}
-          >
-            <CloseSvg />
-          </button>
+          {closeLimitFormAction && (
+            <button
+              className="flex sm:hidden w-5 h-5 ml-auto"
+              onClick={closeLimitFormAction}
+            >
+              <CloseSvg />
+            </button>
+          )}
         </div>
 
         <div className="flex flex-col gap-5 self-stretch w-full">
@@ -443,9 +445,11 @@ export const LimitForm = ({
         </div>
       </div>
 
-      <div className="flex mt-auto">
-        <ActionButton {...actionButtonProps} />
-      </div>
+      {actionButtonProps && (
+        <div className="flex mt-auto">
+          <ActionButton {...actionButtonProps} />
+        </div>
+      )}
     </div>
   )
 }

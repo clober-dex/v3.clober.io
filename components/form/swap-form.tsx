@@ -74,8 +74,8 @@ export const SwapForm = ({
   priceImpact: number
   aggregatorName: string
   refreshQuotesAction: () => void
-  closeSwapFormAction: (() => void) | undefined
-  actionButtonProps: ActionButtonProps
+  closeSwapFormAction?: () => void
+  actionButtonProps?: ActionButtonProps
 }) => {
   const isLoadingResults = useMemo(() => {
     return !!(
@@ -422,9 +422,11 @@ export const SwapForm = ({
         </div>
       </div>
 
-      <div className="flex mt-auto">
-        <ActionButton {...actionButtonProps} />
-      </div>
+      {actionButtonProps && (
+        <div className="flex mt-auto">
+          <ActionButton {...actionButtonProps} />
+        </div>
+      )}
     </div>
   )
 }
