@@ -449,7 +449,9 @@ export const TradeContainer = () => {
           </button>
         </div>
 
-        <div className="flex flex-col w-full lg:flex-row gap-4 justify-center">
+        <div
+          className={`flex flex-col w-full lg:flex-row gap-4 justify-center ${tab === 'swap' ? 'sm:flex-col-reverse' : ''}`}
+        >
           <div className="flex flex-col gap-[26px] sm:gap-4 w-full lg:w-[740px]">
             {tab === 'limit' && (
               <>
