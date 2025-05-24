@@ -417,20 +417,37 @@ export const TradeContainer = () => {
         <button
           disabled={tab === 'swap'}
           onClick={() => setTab('swap')}
-          className="text-sm flex flex-1 px-6 py-1.5 h-full rounded-[20px] text-gray-400 disabled:text-blue-400 disabled:bg-blue-500/25 justify-center items-center gap-1"
+          className="text-sm flex flex-1 px-6 py-1.5 h-full rounded-[20px] text-gray-400 disabled:text-white disabled:bg-blue-500 justify-center items-center gap-1"
         >
           Swap
         </button>
         <button
           disabled={tab === 'limit'}
           onClick={() => setTab('limit')}
-          className="text-sm flex flex-1 px-6 py-1.5 h-full rounded-[20px] text-gray-400 disabled:text-blue-400 disabled:bg-blue-500/25 justify-center items-center gap-1"
+          className="text-sm flex flex-1 px-6 py-1.5 h-full rounded-[20px] text-gray-400 disabled:text-white disabled:bg-blue-500 justify-center items-center gap-1"
         >
           Limit
         </button>
       </div>
 
-      <div className="flex flex-col w-full sm:w-fit mb-4 sm:mb-6">
+      <div className="flex flex-col w-full sm:w-fit mb-4 sm:mb-6 items-center">
+        <div className="w-full max-w-[482px] items-center justify-center mb-10 hidden sm:flex bg-[#191d25] rounded-[22px] py-1 h-12 flex-row relative text-gray-400 text-base font-bold">
+          <button
+            disabled={tab === 'swap'}
+            onClick={() => setTab('swap')}
+            className="flex flex-1 px-6 py-2 rounded-[18px] text-gray-400 disabled:text-white disabled:bg-blue-500 justify-center items-center gap-1"
+          >
+            Swap
+          </button>
+          <button
+            disabled={tab === 'limit'}
+            onClick={() => setTab('limit')}
+            className="flex flex-1 px-6 py-2 rounded-[18px] text-gray-400 disabled:text-white disabled:bg-blue-500 justify-center items-center gap-1"
+          >
+            Limit
+          </button>
+        </div>
+
         <div className="flex flex-col w-full lg:flex-row gap-4 justify-center">
           {baseCurrency && quoteCurrency && (
             <div className="flex flex-col gap-[26px] sm:gap-4 w-full lg:w-[740px]">
@@ -550,22 +567,6 @@ export const TradeContainer = () => {
           )}
 
           <div className="flex flex-col items-start gap-3">
-            <div className="bg-[#191d25] rounded-[22px] py-1 w-full h-10 hidden sm:flex flex-row relative text-gray-400 text-base font-bold">
-              <button
-                disabled={tab === 'swap'}
-                onClick={() => setTab('swap')}
-                className="flex flex-1 px-6 py-2 rounded-[18px] text-gray-400 disabled:text-blue-400 disabled:bg-blue-500/25 justify-center items-center gap-1"
-              >
-                Swap
-              </button>
-              <button
-                disabled={tab === 'limit'}
-                onClick={() => setTab('limit')}
-                className="flex flex-1 px-6 py-2 rounded-[18px] text-gray-400 disabled:text-blue-400 disabled:bg-blue-500/25 justify-center items-center gap-1"
-              >
-                Limit
-              </button>
-            </div>
             <div className="hidden sm:flex flex-col rounded-2xl bg-[#171b24] p-6 w-fit sm:w-[480px] h-[626px]">
               {tab === 'limit' ? (
                 <LimitForm
@@ -913,6 +914,8 @@ export const TradeContainer = () => {
           <div className="mb-28 lg:mb-2" />
         )}
       </div>
+
+      {/*mobile fixed bottom modal*/}
       <div className="fixed flex w-full overflow-y-scroll sm:hidden bottom-0 z-[1000]">
         <div
           className={`${
