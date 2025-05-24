@@ -28,7 +28,7 @@ export const SwapRouteList = ({
     [quotes, bestQuote],
   )
   return (
-    <div className="flex flex-col p-4 gap-2.5 sm:gap-3">
+    <div className="flex flex-col sm:p-4 gap-4 md:gap-2.5 sm:gap-3">
       {bestQuote && quotes.length > 0
         ? [bestQuote, ...quotesWithoutBestQuote].map((quote, index) => (
             <SwapRouteCard

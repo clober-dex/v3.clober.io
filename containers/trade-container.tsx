@@ -1078,21 +1078,24 @@ export const TradeContainer = () => {
                 }}
               />
             ) : (
-              <div className="flex flex-col">
+              <div className="flex flex-col gap-4">
                 <button
                   className="flex sm:hidden w-5 h-5 ml-auto"
                   onClick={() => setShowMobileModal(false)}
                 >
                   <CloseSvg />
                 </button>
-                <SwapRouteList
-                  quotes={quotes.all}
-                  bestQuote={quotes.best}
-                  outputCurrency={outputCurrency}
-                  aggregatorNames={aggregators.map((a) => a.name)}
-                  selectedQuote={selectedQuote}
-                  setSelectedQuote={setSelectedQuote}
-                />
+
+                <div className="flex flex-col w-full mb-4">
+                  <SwapRouteList
+                    quotes={quotes.all}
+                    bestQuote={quotes.best}
+                    outputCurrency={outputCurrency}
+                    aggregatorNames={aggregators.map((a) => a.name)}
+                    selectedQuote={selectedQuote}
+                    setSelectedQuote={setSelectedQuote}
+                  />
+                </div>
 
                 <ActionButton
                   disabled={
