@@ -51,11 +51,11 @@ export const MarketDailySnapshotCard = ({
       }, 500)
       return () => clearTimeout(greenTimeout)
     } else if (isBidTaken) {
-      setFlashState('green')
+      setFlashState('red')
       const bidTimeout = setTimeout(() => setFlashState(null), 500)
       return () => clearTimeout(bidTimeout)
     } else if (isAskTaken) {
-      setFlashState('red')
+      setFlashState('green')
       const askTimeout = setTimeout(() => setFlashState(null), 500)
       return () => clearTimeout(askTimeout)
     }
