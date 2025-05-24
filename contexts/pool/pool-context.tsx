@@ -1,14 +1,10 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getContractAddresses } from '@clober/v2-sdk'
 import { useAccount } from 'wagmi'
 import { createPublicClient, http } from 'viem'
 
 import { Balances } from '../../model/balances'
-import {
-  deduplicateCurrencies,
-  fetchCurrenciesDone,
-} from '../../utils/currency'
 import { useChainContext } from '../chain-context'
 import { useCurrencyContext } from '../currency-context'
 import { CHAIN_CONFIG } from '../../chain-configs'
@@ -44,7 +40,7 @@ const Context = React.createContext<PoolContext>({
 export const PoolProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const { selectedChain } = useChainContext()
   const { address: userAddress } = useAccount()
-  const { prices, setCurrencies, whitelistCurrencies } = useCurrencyContext()
+  const { prices } = useCurrencyContext()
   const [lpCurrencyAmount, setLpCurrencyAmount] = React.useState('')
   const [currency0Amount, setCurrency0Amount] = React.useState('')
   const [currency1Amount, setCurrency1Amount] = React.useState('')
@@ -115,19 +111,6 @@ export const PoolProvider = ({ children }: React.PropsWithChildren<{}>) => {
   }) as {
     data: Balances
   }
-
-  useEffect(() => {
-    const action = () => {
-      if (!fetchCurrenciesDone(whitelistCurrencies)) {
-        return
-      }
-
-      setCurrencies(deduplicateCurrencies(whitelistCurrencies))
-    }
-    if (window.location.href.includes('/earn')) {
-      action()
-    }
-  }, [selectedChain, setCurrencies, whitelistCurrencies])
 
   return (
     <Context.Provider

@@ -18,7 +18,6 @@ import { Chain } from '../model/chain'
 import { Loading } from '../components/loading'
 import { CHAIN_CONFIG } from '../chain-configs'
 import { useCurrencyContext } from '../contexts/currency-context'
-import { deduplicateCurrencies, fetchCurrenciesDone } from '../utils/currency'
 import { currentTimestampInSeconds } from '../utils/date'
 
 const MOBILE_ROW_HEIGHT = 168
@@ -159,8 +158,7 @@ const MarketSnapshotGridCell = ({
 
 export const DiscoverContainer = () => {
   const { selectedChain } = useChainContext()
-  const { currencies, setCurrencies, whitelistCurrencies } =
-    useCurrencyContext()
+  const { currencies } = useCurrencyContext()
   const { latestSubgraphBlockNumber } = useTransactionContext()
   const prevMarketSnapshots = useRef<MarketSnapshot[]>([])
   const prevSubgraphBlockNumber = useRef<number>(0)
@@ -186,19 +184,6 @@ export const DiscoverContainer = () => {
       }))
     }
   }, [selectedChain])
-
-  useEffect(() => {
-    const action = () => {
-      if (!fetchCurrenciesDone(whitelistCurrencies)) {
-        return
-      }
-
-      setCurrencies(deduplicateCurrencies(whitelistCurrencies))
-    }
-    if (window.location.href.includes('/discover')) {
-      action()
-    }
-  }, [selectedChain, setCurrencies, whitelistCurrencies])
 
   const isVerifiedMarket = useCallback(
     (marketSnapshot: SdkMarketSnapshot) => {

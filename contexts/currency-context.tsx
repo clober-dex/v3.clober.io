@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAccount } from 'wagmi'
 import { useQuery } from '@tanstack/react-query'
 import {
@@ -91,7 +91,25 @@ export const CurrencyProvider = ({ children }: React.PropsWithChildren<{}>) => {
   }) as {
     data: Currency[]
   }
-  const [currencies, setCurrencies] = useState<Currency[]>([])
+  const [currencies, _setCurrencies] = useState<Currency[]>([])
+  const setCurrencies = useCallback((newCurrencies: Currency[]) => {
+    _setCurrencies((prev) => {
+      const existingAddresses = new Set(
+        prev.map((c) => c.address.toLowerCase()),
+      )
+      const deduped = newCurrencies.filter(
+        (c) => !existingAddresses.has(c.address.toLowerCase()),
+      )
+      return [...prev, ...deduped]
+    })
+  }, [])
+
+  useEffect(() => {
+    if (whitelistCurrencies.length === 0) {
+      return
+    }
+    setCurrencies(whitelistCurrencies)
+  }, [setCurrencies, whitelistCurrencies])
 
   const { data: balances } = useQuery({
     queryKey: [

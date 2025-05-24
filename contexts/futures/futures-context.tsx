@@ -64,7 +64,6 @@ export const FuturesProvider = ({ children }: React.PropsWithChildren<{}>) => {
   useEffect(() => {
     setCurrencies(
       deduplicateCurrencies([
-        ...whitelistCurrencies,
         ...assets.map((asset) => asset.currency),
         ...assets.map((asset) => asset.collateral),
       ]),
