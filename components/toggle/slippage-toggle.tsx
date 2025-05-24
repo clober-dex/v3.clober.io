@@ -74,7 +74,7 @@ export const SlippageToggle = ({
           Unlimited
         </button>
         <div
-          className={`flex flex-row items-center pr-2 ${Number(slippageInput) >= 2 || Number(slippageInput) <= 0.05 ? 'text-yellow-500' : 'text-white'}`}
+          className={`flex flex-row items-center pr-2 ${Number(slippageInput) >= 2 || Number(slippageInput) <= 0.05 ? 'text-yellow-500' : 'text-white'} ${customValue.length !== 0 ? 'outline outline-1 outline-blue-500 rounded-full' : ''}`}
         >
           <NumberInput
             placeholder="Custom"
