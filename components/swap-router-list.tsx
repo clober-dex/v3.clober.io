@@ -10,11 +10,15 @@ export const SwapRouteList = ({
   bestQuote,
   outputCurrency,
   aggregatorNames,
+  selectedQuote,
+  setSelectedQuote,
 }: {
   quotes: Quote[]
   bestQuote: Quote | null
   outputCurrency: Currency | undefined
   aggregatorNames: string[]
+  selectedQuote: Quote | null
+  setSelectedQuote: (quote: Quote | null) => void
 }) => {
   const quotesWithoutBestQuote = useMemo(
     () =>
@@ -38,6 +42,10 @@ export const SwapRouteList = ({
               }
               outputCurrency={outputCurrency}
               aggregatorName={quote.aggregator.name}
+              isSelected={
+                selectedQuote?.aggregator.name === quote.aggregator.name
+              }
+              setSelectedQuote={setSelectedQuote}
             />
           ))
         : aggregatorNames.map((name) => (
@@ -48,6 +56,8 @@ export const SwapRouteList = ({
               priceDifference={0}
               outputCurrency={outputCurrency}
               aggregatorName={name}
+              isSelected={false}
+              setSelectedQuote={undefined}
             />
           ))}
     </div>

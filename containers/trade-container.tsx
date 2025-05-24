@@ -32,6 +32,7 @@ import { SearchSvg } from '../components/svg/search-svg'
 import CheckIcon from '../components/icon/check-icon'
 import { CHAIN_CONFIG } from '../chain-configs'
 import { SwapRouteList } from '../components/swap-router-list'
+import { Quote } from '../model/aggregator/quote'
 
 import { IframeChartContainer } from './chart/iframe-chart-container'
 import { NativeChartContainer } from './chart/native-chart-container'
@@ -88,6 +89,7 @@ export const TradeContainer = () => {
   const [tab, setTab] = useState<'limit' | 'swap'>('swap')
   const [searchValue, _setSearchValue] = useState('')
   const [searchInCurrentMarket, _setSearchInCurrentMarket] = useState(false)
+  const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null)
 
   const setSearchInCurrentMarket = useCallback((value: boolean) => {
     _setSearchInCurrentMarket(value)
@@ -351,21 +353,30 @@ export const TradeContainer = () => {
     },
     initialData: { best: null, all: [] },
   })
+
+  useEffect(() => {
+    if (quotes.best) {
+      setSelectedQuote(quotes.best)
+    } else {
+      setSelectedQuote(null)
+    }
+  }, [quotes.best])
+
   const priceImpact = useMemo(() => {
     if (
-      quotes.best &&
-      quotes.best.amountIn > 0n &&
-      quotes.best.amountOut > 0n &&
+      selectedQuote &&
+      selectedQuote.amountIn > 0n &&
+      selectedQuote.amountOut > 0n &&
       inputCurrency &&
       outputCurrency &&
       prices[getAddress(inputCurrency.address)] &&
       prices[getAddress(outputCurrency.address)]
     ) {
       const amountIn = Number(
-        formatUnits(quotes.best.amountIn, inputCurrency.decimals),
+        formatUnits(selectedQuote.amountIn, inputCurrency.decimals),
       )
       const amountOut = Number(
-        formatUnits(quotes.best.amountOut, outputCurrency.decimals),
+        formatUnits(selectedQuote.amountOut, outputCurrency.decimals),
       )
       const inputValue = amountIn * prices[getAddress(inputCurrency.address)]
       const outputValue = amountOut * prices[getAddress(outputCurrency.address)]
@@ -374,7 +385,7 @@ export const TradeContainer = () => {
         : 0
     }
     return Number.NaN
-  }, [inputCurrency, outputCurrency, prices, quotes])
+  }, [inputCurrency, outputCurrency, prices, selectedQuote])
 
   return (
     <>
@@ -530,6 +541,8 @@ export const TradeContainer = () => {
                     bestQuote={quotes.best}
                     outputCurrency={outputCurrency}
                     aggregatorNames={aggregators.map((a) => a.name)}
+                    selectedQuote={selectedQuote}
+                    setSelectedQuote={setSelectedQuote}
                   />
                 </div>
               )}
@@ -682,20 +695,20 @@ export const TradeContainer = () => {
                   outputCurrency={outputCurrency}
                   setOutputCurrency={setOutputCurrency}
                   outputCurrencyAmount={formatUnits(
-                    quotes.best?.amountOut ?? 0n,
+                    selectedQuote?.amountOut ?? 0n,
                     outputCurrency?.decimals ?? 18,
                   )}
                   slippageInput={slippageInput}
                   setSlippageInput={setSlippageInput}
-                  aggregatorName={quotes.best?.aggregator?.name ?? ''}
-                  gasEstimateValue={quotes.best?.gasUsd ?? 0}
+                  aggregatorName={selectedQuote?.aggregator?.name ?? ''}
+                  gasEstimateValue={selectedQuote?.gasUsd ?? 0}
                   priceImpact={priceImpact}
                   refreshQuotesAction={() => setLatestRefreshTime(Date.now())}
                   closeSwapFormAction={() => setShowMobileModal(false)}
                   actionButtonProps={{
                     disabled:
                       (Number(inputCurrencyAmount) > 0 &&
-                        (quotes.best?.amountOut ?? 0n) === 0n) ||
+                        (selectedQuote?.amountOut ?? 0n) === 0n) ||
                       !inputCurrency ||
                       !outputCurrency ||
                       amount === 0n ||
@@ -711,9 +724,9 @@ export const TradeContainer = () => {
                         !inputCurrency ||
                         !outputCurrency ||
                         !inputCurrencyAmount ||
-                        !quotes.best ||
-                        amountIn !== quotes.best.amountIn ||
-                        !quotes.best.transaction
+                        !selectedQuote ||
+                        amountIn !== selectedQuote.amountIn ||
+                        !selectedQuote.transaction
                       ) {
                         return
                       }
@@ -721,17 +734,17 @@ export const TradeContainer = () => {
                         inputCurrency,
                         amountIn,
                         outputCurrency,
-                        quotes.best.amountOut,
+                        selectedQuote.amountOut,
                         aggregators.find(
                           (aggregator) =>
-                            aggregator.name === quotes.best.aggregator.name,
+                            aggregator.name === selectedQuote.aggregator.name,
                         )!,
-                        quotes.best.transaction,
+                        selectedQuote.transaction,
                       )
                     },
                     text:
                       Number(inputCurrencyAmount) > 0 &&
-                      (quotes.best?.amountOut ?? 0n) === 0n
+                      (selectedQuote?.amountOut ?? 0n) === 0n
                         ? 'Fetching...'
                         : !walletClient
                           ? 'Connect wallet'
@@ -1034,16 +1047,16 @@ export const TradeContainer = () => {
                 outputCurrency={outputCurrency}
                 setOutputCurrency={setOutputCurrency}
                 outputCurrencyAmount={formatUnits(
-                  quotes.best?.amountOut ?? 0n,
+                  selectedQuote?.amountOut ?? 0n,
                   outputCurrency?.decimals ?? 18,
                 )}
                 slippageInput={slippageInput}
                 setSlippageInput={setSlippageInput}
-                aggregatorName={quotes.best?.aggregator?.name ?? ''}
+                aggregatorName={selectedQuote?.aggregator?.name ?? ''}
                 gasEstimateValue={
                   parseFloat(
                     formatUnits(
-                      BigInt(quotes.best?.gasLimit ?? 0n) * (gasPrice ?? 0n),
+                      BigInt(selectedQuote?.gasLimit ?? 0n) * (gasPrice ?? 0n),
                       selectedChain.nativeCurrency.decimals,
                     ),
                   ) * (prices[zeroAddress] ?? 0)
@@ -1054,7 +1067,7 @@ export const TradeContainer = () => {
                 actionButtonProps={{
                   disabled:
                     (Number(inputCurrencyAmount) > 0 &&
-                      (quotes.best?.amountOut ?? 0n) === 0n) ||
+                      (selectedQuote?.amountOut ?? 0n) === 0n) ||
                     !inputCurrency ||
                     !outputCurrency ||
                     amount === 0n ||
@@ -1070,9 +1083,9 @@ export const TradeContainer = () => {
                       !inputCurrency ||
                       !outputCurrency ||
                       !inputCurrencyAmount ||
-                      !quotes.best ||
-                      amountIn !== quotes.best.amountIn ||
-                      !quotes.best.transaction
+                      !selectedQuote ||
+                      amountIn !== selectedQuote.amountIn ||
+                      !selectedQuote.transaction
                     ) {
                       return
                     }
@@ -1080,17 +1093,17 @@ export const TradeContainer = () => {
                       inputCurrency,
                       amountIn,
                       outputCurrency,
-                      quotes.best.amountOut,
+                      selectedQuote.amountOut,
                       aggregators.find(
                         (aggregator) =>
-                          aggregator.name === quotes.best.aggregator.name,
+                          aggregator.name === selectedQuote.aggregator.name,
                       )!,
-                      quotes.best.transaction,
+                      selectedQuote.transaction,
                     )
                   },
                   text:
                     Number(inputCurrencyAmount) > 0 &&
-                    (quotes.best?.amountOut ?? 0n) === 0n
+                    (selectedQuote?.amountOut ?? 0n) === 0n
                       ? 'Fetching...'
                       : !walletClient
                         ? 'Connect wallet'
