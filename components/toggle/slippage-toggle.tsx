@@ -73,28 +73,33 @@ export const SlippageToggle = ({
         >
           Unlimited
         </button>
-        <NumberInput
-          placeholder="Custom"
-          disabled={
-            Number(slippageInput) === 0.1 &&
-            Number(slippageInput) === 0.5 &&
-            Number(slippageInput) === 0.99 &&
-            Number(slippageInput) === 10000.0
-          }
-          value={customValue}
-          onValueChange={(e) => {
-            const decimals = e.split('.')[1]
-            if (decimals && decimals.length > 2) {
-              return
+        <div
+          className={`flex flex-row items-center pr-2 ${Number(slippageInput) >= 2 || Number(slippageInput) <= 0.05 ? 'text-yellow-500' : 'text-white'}`}
+        >
+          <NumberInput
+            placeholder="Custom"
+            disabled={
+              Number(slippageInput) === 0.1 &&
+              Number(slippageInput) === 0.5 &&
+              Number(slippageInput) === 0.99 &&
+              Number(slippageInput) === 10000.0
             }
-            if (Number(e) < 0 || Number(e) > 50) {
-              return
-            }
-            setSlippageInput(e)
-            setCustomValue(e)
-          }}
-          className={`bg-gray-600 text-center ${Number(slippageInput) >= 2 || Number(slippageInput) <= 0.05 ? 'text-yellow-500' : 'text-white'} w-[70px] flex flex-1 pl-2 pr-4 py-0 rounded-[18px] disabled:text-blue-400 disabled:bg-blue-500/25 justify-center items-center gap-1`}
-        />
+            value={customValue}
+            onValueChange={(e) => {
+              const decimals = e.split('.')[1]
+              if (decimals && decimals.length > 2) {
+                return
+              }
+              if (Number(e) < 0 || Number(e) > 50) {
+                return
+              }
+              setSlippageInput(e)
+              setCustomValue(e)
+            }}
+            className={`bg-gray-600 text-center w-[60px] flex flex-1 pl-2 py-0 rounded-[18px] disabled:text-blue-400 disabled:bg-blue-500/25 justify-center items-center gap-1`}
+          />
+          %
+        </div>
       </div>
 
       {Number(slippageInput) >= 2 ? (
