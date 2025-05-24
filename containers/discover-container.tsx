@@ -19,6 +19,7 @@ import { Loading } from '../components/loading'
 import { CHAIN_CONFIG } from '../chain-configs'
 import { useCurrencyContext } from '../contexts/currency-context'
 import { deduplicateCurrencies, fetchCurrenciesDone } from '../utils/currency'
+import { currentTimestampInSeconds } from '../utils/date'
 
 const MOBILE_ROW_HEIGHT = 168
 
@@ -172,7 +173,17 @@ export const DiscoverContainer = () => {
       LOCAL_STORAGE_MARKET_SNAPSHOTS_KEY(selectedChain),
     )
     if (storedMarketSnapshots) {
-      prevMarketSnapshots.current = JSON.parse(storedMarketSnapshots)
+      const now = currentTimestampInSeconds()
+      prevMarketSnapshots.current = (
+        JSON.parse(storedMarketSnapshots) as MarketSnapshot[]
+      ).map((marketSnapshot) => ({
+        ...marketSnapshot,
+        askBookUpdatedAt: now,
+        bidBookUpdatedAt: now,
+        isBidTaken: false,
+        isAskTaken: false,
+        verified: false,
+      }))
     }
   }, [selectedChain])
 
