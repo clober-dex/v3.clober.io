@@ -25,6 +25,7 @@ export class CloberV2Aggregator implements Aggregator {
   public readonly name = CHAIN_CONFIG.DEX_NAME
   public readonly baseUrl = ''
   public readonly contract: `0x${string}`
+  public readonly minimumSlippage = 0 // 0% slippage
   private readonly nativeTokenAddress = zeroAddress
   public readonly chain: Chain
   public readonly weth: `0x${string}`
@@ -200,7 +201,7 @@ export class CloberV2Aggregator implements Aggregator {
       options: {
         rpcUrl: CHAIN_CONFIG.RPC_URL,
         useSubgraph: false,
-        slippage: slippageLimitPercent,
+        slippage: Math.max(slippageLimitPercent, this.minimumSlippage),
         gasLimit: this.defaultGasLimit,
       },
     })

@@ -11,6 +11,7 @@ export class AggregatorRouterGateway implements Aggregator {
   public readonly name: string
   public readonly baseUrl: string = ''
   public readonly contract: `0x${string}`
+  public readonly minimumSlippage = 0 // 0% slippage
   public readonly chain: Chain
   private readonly aggregator: Aggregator
 

@@ -12,6 +12,7 @@ export class OpenOceanAggregator implements Aggregator {
   public readonly name = 'OpenOcean'
   public readonly baseUrl = 'https://open-api.openocean.finance'
   public readonly contract: `0x${string}`
+  public readonly minimumSlippage = 0.01 // 0.01% slippage
   public readonly chain: Chain
   private readonly TIMEOUT = 4000
   private readonly nativeTokenAddress = zeroAddress
@@ -143,7 +144,9 @@ export class OpenOceanAggregator implements Aggregator {
           : getAddress(outputCurrency.address),
         amount: formatUnits(amountIn, inputCurrency.decimals),
         gasPrice: formatUnits(gasPrice, 9),
-        slippage: slippageLimitPercent.toString(),
+        slippage: (
+          Math.max(slippageLimitPercent, this.minimumSlippage) * 100
+        ).toString(),
         account: userAddress,
         referrer: '0x331fa4a4f7b906491f37bdc8b042b894234e101f' as `0x${string}`,
       },
