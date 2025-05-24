@@ -782,7 +782,7 @@ export const TradeContainer = () => {
             </div>
           </div>
         </div>
-        {userAddress && openOrders.length > 0 ? (
+        {tab === 'limit' && userAddress && openOrders.length > 0 ? (
           <>
             <div className="flex flex-col lg:flex-row gap-4 lg:gap-0 mt-[20px] mb-4 lg:mt-12 text-white">
               <div className="border-b-blue-500 text-[13px] lg:text-base border-solid lg:border-0 flex w-1/2 lg:w-[161px] h-[37px] px-6 lg:px-0 lg:justify-start pt-1.5 pb-2.5 border-b-2 border-[#ffc32d] justify-center items-center gap-2">
