@@ -6,7 +6,7 @@ import {
   getMarketSnapshots,
   MarketSnapshot as SdkMarketSnapshot,
 } from '@clober/v2-sdk'
-import { isAddressEqual } from 'viem'
+import { getAddress, isAddressEqual } from 'viem'
 
 import { MarketDailySnapshotCard } from '../components/card/market/market-daily-snapshot-card'
 import { useChainContext } from '../contexts/chain-context'
@@ -18,6 +18,8 @@ import { Chain } from '../model/chain'
 import { Loading } from '../components/loading'
 import { CHAIN_CONFIG } from '../chain-configs'
 import { useCurrencyContext } from '../contexts/currency-context'
+import { deduplicateCurrencies, fetchCurrenciesDone } from '../utils/currency'
+import { Currency } from '../model/currency'
 
 const MOBILE_ROW_HEIGHT = 168
 
@@ -72,9 +74,46 @@ const TriangleDown = ({
 const LOCAL_STORAGE_MARKET_SNAPSHOTS_KEY = (chain: Chain) =>
   `market-snapshots-${chain.id}`
 
+const MarketSnapshotListRow = ({
+  index,
+  style,
+  data,
+}: {
+  index: number
+  style: React.CSSProperties
+  data: {
+    items: MarketSnapshot[]
+    chain: Chain
+  }
+}) => {
+  const marketSnapshot = data.items[index]
+  if (!marketSnapshot) {
+    return null
+  }
+
+  return (
+    <div style={style}>
+      <MarketDailySnapshotCard
+        chain={data.chain}
+        baseCurrency={marketSnapshot.base}
+        quoteCurrency={marketSnapshot.quote}
+        createAt={marketSnapshot.createdAtTimestamp}
+        price={marketSnapshot.priceUSD}
+        dailyVolume={marketSnapshot.volume24hUSD}
+        fdv={marketSnapshot.fdv}
+        dailyChange={marketSnapshot.priceChange24h * 100}
+        verified={marketSnapshot.verified}
+        isBidTaken={marketSnapshot.isBidTaken || false}
+        isAskTaken={marketSnapshot.isAskTaken || false}
+      />
+    </div>
+  )
+}
+
 export const DiscoverContainer = () => {
   const { selectedChain } = useChainContext()
-  const { currencies } = useCurrencyContext()
+  const { currencies, setCurrencies, whitelistCurrencies } =
+    useCurrencyContext()
   const { latestSubgraphBlockNumber } = useTransactionContext()
   const prevMarketSnapshots = useRef<MarketSnapshot[]>([])
   const prevSubgraphBlockNumber = useRef<number>(0)
@@ -90,6 +129,33 @@ export const DiscoverContainer = () => {
       prevMarketSnapshots.current = JSON.parse(storedMarketSnapshots)
     }
   }, [selectedChain])
+
+  useEffect(() => {
+    const action = () => {
+      if (!fetchCurrenciesDone(whitelistCurrencies)) {
+        return
+      }
+
+      setCurrencies(deduplicateCurrencies(whitelistCurrencies))
+    }
+    if (window.location.href.includes('/discover')) {
+      action()
+    }
+  }, [selectedChain, setCurrencies, whitelistCurrencies])
+
+  const isVerifiedMarket = useCallback(
+    (marketSnapshot: SdkMarketSnapshot) => {
+      return !!(
+        currencies.find((currency) =>
+          isAddressEqual(currency.address, marketSnapshot.base.address),
+        ) &&
+        currencies.find((currency) =>
+          isAddressEqual(currency.address, marketSnapshot.quote.address),
+        )
+      )
+    },
+    [currencies],
+  )
 
   const { data: marketSnapshots } = useQuery({
     queryKey: ['market-snapshots', selectedChain.id],
@@ -132,17 +198,7 @@ export const DiscoverContainer = () => {
                   prevMarketSnapshot.askBookUpdatedAt <
                     marketSnapshot.askBookUpdatedAt) ||
                 false,
-              verified: currencies.some(
-                (currency) =>
-                  isAddressEqual(
-                    currency.address,
-                    marketSnapshot.base.address,
-                  ) &&
-                  isAddressEqual(
-                    currency.address,
-                    marketSnapshot.quote.address,
-                  ),
-              ),
+              verified: isVerifiedMarket(marketSnapshot),
             }
           },
         )
@@ -150,7 +206,7 @@ export const DiscoverContainer = () => {
           ...marketSnapshot,
           isBidTaken: false,
           isAskTaken: false,
-          verified: false,
+          verified: isVerifiedMarket(marketSnapshot),
         }))
         prevSubgraphBlockNumber.current = latestSubgraphBlockNumber.blockNumber
         localStorage.setItem(
@@ -248,39 +304,16 @@ export const DiscoverContainer = () => {
     [sortOption],
   )
 
+  const listItemData = useMemo(
+    () => ({
+      items: filteredMarketSnapshots,
+      chain: selectedChain,
+    }),
+    [filteredMarketSnapshots, selectedChain],
+  )
+
   const MarketSnapshotGridCell = ({ columnIndex, rowIndex, style }: any) => {
     const index = rowIndex + columnIndex
-    const marketSnapshot = filteredMarketSnapshots[index]
-    if (!marketSnapshot) {
-      return null
-    }
-
-    return (
-      <div style={style}>
-        <MarketDailySnapshotCard
-          chain={selectedChain}
-          baseCurrency={marketSnapshot.base}
-          quoteCurrency={marketSnapshot.quote}
-          createAt={marketSnapshot.createdAtTimestamp}
-          price={marketSnapshot.priceUSD}
-          dailyVolume={marketSnapshot.volume24hUSD}
-          fdv={marketSnapshot.fdv}
-          dailyChange={marketSnapshot.priceChange24h * 100}
-          verified={marketSnapshot.verified}
-          isBidTaken={marketSnapshot.isBidTaken || false}
-          isAskTaken={marketSnapshot.isAskTaken || false}
-        />
-      </div>
-    )
-  }
-
-  const MarketSnapshotListRow = ({
-    index,
-    style,
-  }: {
-    index: number
-    style: React.CSSProperties
-  }) => {
     const marketSnapshot = filteredMarketSnapshots[index]
     if (!marketSnapshot) {
       return null
@@ -412,6 +445,7 @@ export const DiscoverContainer = () => {
                 itemKey={(index) =>
                   `${filteredMarketSnapshots[index].base.address}-${filteredMarketSnapshots[index].quote.address}`
                 }
+                itemData={listItemData}
               >
                 {MarketSnapshotListRow}
               </List>
@@ -457,6 +491,7 @@ export const DiscoverContainer = () => {
                 itemKey={(index) =>
                   `${filteredMarketSnapshots[index].base.address}-${filteredMarketSnapshots[index].quote.address}`
                 }
+                itemData={listItemData}
               >
                 {MarketSnapshotListRow}
               </List>
