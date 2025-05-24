@@ -33,5 +33,6 @@ export type ChainConfig = {
   WHITELISTED_POOL_KEYS: `0x${string}`[]
   REFERENCE_CURRENCY: Currency
   DEFAULT_INPUT_CURRENCY: Currency
+  DEFAULT_OUTPUT_CURRENCY: Currency
   WHITELISTED_CURRENCIES: Currency[]
 }

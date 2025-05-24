@@ -190,7 +190,7 @@ export const TradeProvider = ({ children }: React.PropsWithChildren<{}>) => {
               selectedChain,
               getAddress(outputCurrencyAddress),
             )))
-          : undefined
+          : CHAIN_CONFIG.DEFAULT_OUTPUT_CURRENCY
 
         if (previousChain.current.chain.id !== selectedChain.id) {
           return
