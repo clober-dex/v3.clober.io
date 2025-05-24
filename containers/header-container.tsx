@@ -68,7 +68,7 @@ const PageButtons = () => {
           height="6"
           viewBox="0 0 10 6"
           fill="none"
-          className={showDropdown ? 'rotate-180' : ''}
+          className="rotate-180"
         >
           <path
             d="M9 5L5 1L1 5"

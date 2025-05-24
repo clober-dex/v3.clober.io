@@ -43,7 +43,7 @@ export const PAGE_BUTTONS: PageButton[] = [
     path: '/futures',
     label: 'Futures',
     icon: <LimitPageSvg className="w-4 h-4" />,
-    isHiddenMenu: true,
+    isHiddenMenu: false,
   },
   {
     path: '/analytics',
