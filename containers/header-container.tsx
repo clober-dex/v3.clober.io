@@ -7,7 +7,6 @@ import {
   useConnectModal,
 } from '@rainbow-me/rainbowkit'
 import { useQuery } from '@tanstack/react-query'
-import { monadTestnet } from 'viem/chains'
 import Image from 'next/image'
 
 import { useChainContext } from '../contexts/chain-context'
@@ -17,13 +16,11 @@ import { ConnectButton } from '../components/button/connect-button'
 import { UserButton } from '../components/button/user-button'
 import { UserTransactionsModal } from '../components/modal/user-transactions-modal'
 import { useTransactionContext } from '../contexts/transaction-context'
-import { UserPointButton } from '../components/button/user-point-button'
 import ChainIcon from '../components/icon/chain-icon'
 import { textStyles } from '../constants/text-styles'
 import { fetchEnsName } from '../apis/ens'
 import { CHAIN_CONFIG } from '../chain-configs'
 import { PAGE_BUTTONS } from '../chain-configs/page-button'
-import { TriangleDownSvg } from '../components/svg/triangle-down-svg'
 import useDropdown from '../hooks/useDropdown'
 import { PageSelector } from '../components/selector/page-selector'
 
@@ -180,11 +177,6 @@ const HeaderContainer = ({ onMenuClick }: { onMenuClick: () => void }) => {
           </div>
 
           <div className="flex items-center flex-row gap-1 sm:gap-3">
-            {address && selectedChain.id === monadTestnet.id && (
-              <div className="relative flex w-full">
-                <UserPointButton router={router} />
-              </div>
-            )}
             {status === 'disconnected' || status === 'connecting' ? (
               <ConnectButton openConnectModal={openConnectModal} />
             ) : openAccountModal && address && connector && chainId ? (
