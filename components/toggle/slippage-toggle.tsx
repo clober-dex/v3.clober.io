@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 
 import NumberInput from '../input/number-input'
 
@@ -10,6 +10,14 @@ export const SlippageToggle = ({
   setSlippageInput: (slippageInput: string) => void
 }) => {
   const [customValue, setCustomValue] = React.useState<string>('')
+  const prevCustomValueRef = useRef<string>('')
+
+  useEffect(() => {
+    if (prevCustomValueRef.current !== '' && customValue === '') {
+      setSlippageInput('0.5')
+    }
+    prevCustomValueRef.current = customValue
+  }, [customValue, setSlippageInput])
 
   return (
     <div className="flex h-full w-full flex-col gap-2 text-xs sm:text-sm text-white">
