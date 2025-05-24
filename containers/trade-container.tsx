@@ -33,6 +33,7 @@ import CheckIcon from '../components/icon/check-icon'
 import { CHAIN_CONFIG } from '../chain-configs'
 import { SwapRouteList } from '../components/swap-router-list'
 import { Quote } from '../model/aggregator/quote'
+import CloseSvg from '../components/svg/close-svg'
 
 import { IframeChartContainer } from './chart/iframe-chart-container'
 import { NativeChartContainer } from './chart/native-chart-container'
@@ -449,10 +450,10 @@ export const TradeContainer = () => {
         </div>
 
         <div className="flex flex-col w-full lg:flex-row gap-4 justify-center">
-          {baseCurrency && quoteCurrency && (
-            <div className="flex flex-col gap-[26px] sm:gap-4 w-full lg:w-[740px]">
-              {tab === 'limit' && (
-                <>
+          <div className="flex flex-col gap-[26px] sm:gap-4 w-full lg:w-[740px]">
+            {tab === 'limit' && (
+              <>
+                {baseCurrency && quoteCurrency && (
                   <MarketInfoCard
                     chain={selectedChain}
                     router={router}
@@ -484,75 +485,77 @@ export const TradeContainer = () => {
                     twitterUrl={''}
                     telegramUrl={''}
                   />
+                )}
 
-                  <div className="flex flex-col h-full rounded-xl sm:rounded-2xl bg-[#171b24]">
-                    <div className="flex lg:hidden w-full h-10">
-                      <button
-                        disabled={showOrderBook}
-                        onClick={() => setShowOrderBook(true)}
-                        className="flex-1 h-full px-6 py-2.5 text-gray-500 disabled:text-blue-500 disabled:border-b-2 disabled:border-solid disabled:border-b-blue-500 justify-center items-center gap-1 inline-flex"
-                      >
-                        <div className="text-[13px] font-semibold">
-                          Order Book
-                        </div>
-                      </button>
-                      <button
-                        disabled={!showOrderBook}
-                        onClick={() => setShowOrderBook(false)}
-                        className="flex-1 h-full px-6 py-2.5 text-gray-500 disabled:text-blue-500 disabled:border-b-2 disabled:border-solid disabled:border-b-blue-500 justify-center items-center gap-1 inline-flex"
-                      >
-                        <div className="text-[13px] font-semibold">Chart</div>
-                      </button>
-                    </div>
+                <div className="flex flex-col h-full rounded-xl sm:rounded-2xl bg-[#171b24]">
+                  <div className="flex lg:hidden w-full h-10">
+                    <button
+                      disabled={showOrderBook}
+                      onClick={() => setShowOrderBook(true)}
+                      className="flex-1 h-full px-6 py-2.5 text-gray-500 disabled:text-blue-500 disabled:border-b-2 disabled:border-solid disabled:border-b-blue-500 justify-center items-center gap-1 inline-flex"
+                    >
+                      <div className="text-[13px] font-semibold">
+                        Order Book
+                      </div>
+                    </button>
+                    <button
+                      disabled={!showOrderBook}
+                      onClick={() => setShowOrderBook(false)}
+                      className="flex-1 h-full px-6 py-2.5 text-gray-500 disabled:text-blue-500 disabled:border-b-2 disabled:border-solid disabled:border-b-blue-500 justify-center items-center gap-1 inline-flex"
+                    >
+                      <div className="text-[13px] font-semibold">Chart</div>
+                    </button>
+                  </div>
 
-                    {!showOrderBook && baseCurrency ? (
-                      !selectedChain.testnet ? (
-                        <IframeChartContainer
-                          setShowOrderBook={setShowOrderBook}
-                          baseCurrency={
-                            isAddressEqual(zeroAddress, baseCurrency.address)
-                              ? CHAIN_CONFIG.REFERENCE_CURRENCY
-                              : baseCurrency
-                          }
-                          chainName={selectedChain.name.toLowerCase()}
-                        />
-                      ) : (
-                        <NativeChartContainer
-                          baseCurrency={baseCurrency}
-                          quoteCurrency={quoteCurrency}
-                          setShowOrderBook={setShowOrderBook}
-                        />
-                      )
-                    ) : (
-                      <></>
-                    )}
-
-                    {showOrderBook ? (
-                      <OrderBook
-                        market={selectedMarket}
-                        bids={bids}
-                        asks={asks}
-                        availableDecimalPlacesGroups={
-                          availableDecimalPlacesGroups ?? []
-                        }
-                        selectedDecimalPlaces={selectedDecimalPlaces}
-                        setSelectedDecimalPlaces={setSelectedDecimalPlaces}
-                        setDepthClickedIndex={
-                          isFetchingQuotes ? () => {} : setDepthClickedIndex
-                        }
+                  {!showOrderBook && baseCurrency ? (
+                    !selectedChain.testnet ? (
+                      <IframeChartContainer
                         setShowOrderBook={setShowOrderBook}
-                        setTab={setTab}
-                        className="flex flex-col px-0.5 lg:px-4 pb-4 pt-2 sm:pb-6 bg-[#171b24] rounded-b-xl sm:rounded-2xl gap-[20px] h-[300px] lg:h-full w-full"
+                        baseCurrency={
+                          isAddressEqual(zeroAddress, baseCurrency.address)
+                            ? CHAIN_CONFIG.REFERENCE_CURRENCY
+                            : baseCurrency
+                        }
+                        chainName={selectedChain.name.toLowerCase()}
                       />
                     ) : (
-                      <></>
-                    )}
-                  </div>
-                </>
-              )}
+                      <NativeChartContainer
+                        baseCurrency={baseCurrency}
+                        quoteCurrency={quoteCurrency}
+                        setShowOrderBook={setShowOrderBook}
+                      />
+                    )
+                  ) : (
+                    <></>
+                  )}
 
-              {tab === 'swap' && (
-                <div className="flex flex-col h-full rounded-xl sm:rounded-2xl bg-[#171b24]">
+                  {showOrderBook ? (
+                    <OrderBook
+                      market={selectedMarket}
+                      bids={bids}
+                      asks={asks}
+                      availableDecimalPlacesGroups={
+                        availableDecimalPlacesGroups ?? []
+                      }
+                      selectedDecimalPlaces={selectedDecimalPlaces}
+                      setSelectedDecimalPlaces={setSelectedDecimalPlaces}
+                      setDepthClickedIndex={
+                        isFetchingQuotes ? () => {} : setDepthClickedIndex
+                      }
+                      setShowOrderBook={setShowOrderBook}
+                      setTab={setTab}
+                      className="flex flex-col px-0.5 lg:px-4 pb-4 pt-2 sm:pb-6 bg-[#171b24] rounded-b-xl sm:rounded-2xl gap-[20px] h-[300px] lg:h-full w-full"
+                    />
+                  ) : (
+                    <></>
+                  )}
+                </div>
+              </>
+            )}
+
+            {tab === 'swap' && (
+              <>
+                <div className="hidden sm:flex flex-col h-full rounded-xl sm:rounded-2xl bg-[#171b24]">
                   <SwapRouteList
                     quotes={quotes.all}
                     bestQuote={quotes.best}
@@ -562,9 +565,131 @@ export const TradeContainer = () => {
                     setSelectedQuote={setSelectedQuote}
                   />
                 </div>
-              )}
-            </div>
-          )}
+
+                <div className="flex sm:hidden rounded-2xl bg-[#171b24] p-5">
+                  <SwapForm
+                    chain={selectedChain}
+                    explorerUrl={
+                      selectedChain.blockExplorers?.default?.url ?? ''
+                    }
+                    currencies={currencies}
+                    setCurrencies={setCurrencies}
+                    balances={balances}
+                    prices={prices}
+                    showInputCurrencySelect={showInputCurrencySelect}
+                    setShowInputCurrencySelect={setShowInputCurrencySelect}
+                    inputCurrency={inputCurrency}
+                    setInputCurrency={setInputCurrency}
+                    inputCurrencyAmount={inputCurrencyAmount}
+                    setInputCurrencyAmount={setInputCurrencyAmount}
+                    availableInputCurrencyBalance={
+                      inputCurrency
+                        ? (balances[inputCurrency.address] ?? 0n)
+                        : 0n
+                    }
+                    showOutputCurrencySelect={showOutputCurrencySelect}
+                    setShowOutputCurrencySelect={setShowOutputCurrencySelect}
+                    outputCurrency={outputCurrency}
+                    setOutputCurrency={setOutputCurrency}
+                    outputCurrencyAmount={formatUnits(
+                      selectedQuote?.amountOut ?? 0n,
+                      outputCurrency?.decimals ?? 18,
+                    )}
+                    slippageInput={slippageInput}
+                    setSlippageInput={setSlippageInput}
+                    aggregatorName={selectedQuote?.aggregator?.name ?? ''}
+                    gasEstimateValue={
+                      parseFloat(
+                        formatUnits(
+                          BigInt(selectedQuote?.gasLimit ?? 0n) *
+                            (gasPrice ?? 0n),
+                          selectedChain.nativeCurrency.decimals,
+                        ),
+                      ) * (prices[zeroAddress] ?? 0)
+                    }
+                    priceImpact={priceImpact}
+                    refreshQuotesAction={() => setLatestRefreshTime(Date.now())}
+                    closeSwapFormAction={undefined}
+                    actionButtonProps={undefined}
+                    // actionButtonProps={{
+                    //   disabled:
+                    //     (Number(inputCurrencyAmount) > 0 &&
+                    //       (selectedQuote?.amountOut ?? 0n) === 0n) ||
+                    //     !inputCurrency ||
+                    //     !outputCurrency ||
+                    //     amount === 0n ||
+                    //     amount > balances[inputCurrency.address],
+                    //   onClick: async () => {
+                    //     if (!userAddress && openConnectModal) {
+                    //       openConnectModal()
+                    //     }
+                    //
+                    //     if (
+                    //       !gasPrice ||
+                    //       !userAddress ||
+                    //       !inputCurrency ||
+                    //       !outputCurrency ||
+                    //       !inputCurrencyAmount ||
+                    //       !selectedQuote ||
+                    //       amountIn !== selectedQuote.amountIn ||
+                    //       !selectedQuote.transaction
+                    //     ) {
+                    //       return
+                    //     }
+                    //     await swap(
+                    //       inputCurrency,
+                    //       amountIn,
+                    //       outputCurrency,
+                    //       selectedQuote.amountOut,
+                    //       aggregators.find(
+                    //         (aggregator) =>
+                    //           aggregator.name ===
+                    //           selectedQuote.aggregator.name,
+                    //       )!,
+                    //       selectedQuote.transaction,
+                    //     )
+                    //   },
+                    //   text:
+                    //     Number(inputCurrencyAmount) > 0 &&
+                    //     (selectedQuote?.amountOut ?? 0n) === 0n
+                    //       ? 'Fetching...'
+                    //       : !walletClient
+                    //         ? 'Connect wallet'
+                    //         : !inputCurrency
+                    //           ? 'Select input currency'
+                    //           : !outputCurrency
+                    //             ? 'Select output currency'
+                    //             : amount === 0n
+                    //               ? 'Enter amount'
+                    //               : amount > balances[inputCurrency.address]
+                    //                 ? 'Insufficient balance'
+                    //                 : isAddressEqual(
+                    //                       inputCurrency.address,
+                    //                       zeroAddress,
+                    //                     ) &&
+                    //                     isAddressEqual(
+                    //                       outputCurrency.address,
+                    //                       CHAIN_CONFIG.REFERENCE_CURRENCY
+                    //                         .address,
+                    //                     )
+                    //                   ? 'Wrap'
+                    //                   : isAddressEqual(
+                    //                         inputCurrency.address,
+                    //                         CHAIN_CONFIG.REFERENCE_CURRENCY
+                    //                           .address,
+                    //                       ) &&
+                    //                       isAddressEqual(
+                    //                         outputCurrency.address,
+                    //                         zeroAddress,
+                    //                       )
+                    //                     ? 'Unwrap'
+                    //                     : `Swap`,
+                    // }}
+                  />
+                </div>
+              </>
+            )}
+          </div>
 
           <div className="flex flex-col items-start gap-3">
             <div className="hidden sm:flex flex-col rounded-2xl bg-[#171b24] p-6 w-fit sm:w-[480px] h-[626px]">
@@ -1029,53 +1154,32 @@ export const TradeContainer = () => {
                 }}
               />
             ) : (
-              <SwapForm
-                chain={selectedChain}
-                explorerUrl={selectedChain.blockExplorers?.default?.url ?? ''}
-                currencies={currencies}
-                setCurrencies={setCurrencies}
-                balances={balances}
-                prices={prices}
-                showInputCurrencySelect={showInputCurrencySelect}
-                setShowInputCurrencySelect={setShowInputCurrencySelect}
-                inputCurrency={inputCurrency}
-                setInputCurrency={setInputCurrency}
-                inputCurrencyAmount={inputCurrencyAmount}
-                setInputCurrencyAmount={setInputCurrencyAmount}
-                availableInputCurrencyBalance={
-                  inputCurrency ? (balances[inputCurrency.address] ?? 0n) : 0n
-                }
-                showOutputCurrencySelect={showOutputCurrencySelect}
-                setShowOutputCurrencySelect={setShowOutputCurrencySelect}
-                outputCurrency={outputCurrency}
-                setOutputCurrency={setOutputCurrency}
-                outputCurrencyAmount={formatUnits(
-                  selectedQuote?.amountOut ?? 0n,
-                  outputCurrency?.decimals ?? 18,
-                )}
-                slippageInput={slippageInput}
-                setSlippageInput={setSlippageInput}
-                aggregatorName={selectedQuote?.aggregator?.name ?? ''}
-                gasEstimateValue={
-                  parseFloat(
-                    formatUnits(
-                      BigInt(selectedQuote?.gasLimit ?? 0n) * (gasPrice ?? 0n),
-                      selectedChain.nativeCurrency.decimals,
-                    ),
-                  ) * (prices[zeroAddress] ?? 0)
-                }
-                priceImpact={priceImpact}
-                refreshQuotesAction={() => setLatestRefreshTime(Date.now())}
-                closeSwapFormAction={() => setShowMobileModal(false)}
-                actionButtonProps={{
-                  disabled:
+              <div className="flex flex-col">
+                <button
+                  className="flex sm:hidden w-5 h-5 ml-auto"
+                  onClick={() => setShowMobileModal(false)}
+                >
+                  <CloseSvg />
+                </button>
+                <SwapRouteList
+                  quotes={quotes.all}
+                  bestQuote={quotes.best}
+                  outputCurrency={outputCurrency}
+                  aggregatorNames={aggregators.map((a) => a.name)}
+                  selectedQuote={selectedQuote}
+                  setSelectedQuote={setSelectedQuote}
+                />
+
+                <ActionButton
+                  disabled={
                     (Number(inputCurrencyAmount) > 0 &&
                       (selectedQuote?.amountOut ?? 0n) === 0n) ||
                     !inputCurrency ||
                     !outputCurrency ||
                     amount === 0n ||
-                    amount > balances[inputCurrency.address],
-                  onClick: async () => {
+                    amount > balances[inputCurrency.address]
+                  }
+                  onClick={async () => {
                     if (!userAddress && openConnectModal) {
                       openConnectModal()
                     }
@@ -1103,8 +1207,8 @@ export const TradeContainer = () => {
                       )!,
                       selectedQuote.transaction,
                     )
-                  },
-                  text:
+                  }}
+                  text={
                     Number(inputCurrencyAmount) > 0 &&
                     (selectedQuote?.amountOut ?? 0n) === 0n
                       ? 'Fetching...'
@@ -1136,20 +1240,22 @@ export const TradeContainer = () => {
                                         zeroAddress,
                                       )
                                     ? 'Unwrap'
-                                    : `Swap`,
-                }}
-              />
+                                    : `Swap`
+                  }
+                />
+              </div>
             )}
           </div>
 
           <button
             onClick={() => setShowMobileModal(true)}
-            className={`w-full ${
+            disabled={tab === 'swap' && amountIn === 0n}
+            className={`disabled:bg-[#2b3544] disabled:text-gray-400 text-white w-full ${
               showMobileModal ? 'hidden' : 'flex'
             } h-12 bg-blue-500 rounded-xl justify-center items-center mb-5`}
           >
-            <div className="grow shrink basis-0 opacity-90 text-center text-white text-base font-semibold">
-              {tab === 'limit' ? 'Make order' : 'Swap'}
+            <div className="grow shrink basis-0 opacity-90 text-center text-base font-semibold">
+              {tab === 'limit' ? 'Make order' : 'Quotes'}
             </div>
           </button>
         </div>
