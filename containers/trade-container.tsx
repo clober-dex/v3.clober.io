@@ -519,16 +519,16 @@ export const TradeContainer = () => {
                 </div>
               )}
 
-              <div className="flex flex-col h-full rounded-xl sm:rounded-2xl bg-[#171b24]">
-                {tab === 'swap' && (
+              {tab === 'swap' && (
+                <div className="flex flex-col h-full rounded-xl sm:rounded-2xl bg-[#171b24]">
                   <SwapRouteList
                     quotes={quotes.all}
                     bestQuote={quotes.best}
                     outputCurrency={outputCurrency}
                     aggregatorNames={aggregators.map((a) => a.name)}
                   />
-                )}
-              </div>
+                </div>
+              )}
             </div>
           )}
 
