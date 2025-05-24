@@ -167,7 +167,7 @@ export const LimitForm = ({
       defaultBlacklistedCurrency={inputCurrency}
     />
   ) : (
-    <div className="flex flex-col gap-5 h-full">
+    <div className="flex flex-col gap-5 h-full w-full">
       <div className="flex flex-col gap-6 self-stretch w-full">
         <div className="flex items-start gap-4 self-stretch">
           <div className="flex flex-row gap-1 items-center h-6 opacity-90 text-white text-base font-semibold">

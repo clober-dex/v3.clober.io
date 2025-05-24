@@ -566,7 +566,7 @@ export const TradeContainer = () => {
                   />
                 </div>
 
-                <div className="flex sm:hidden rounded-2xl bg-[#171b24] p-5">
+                <div className="flex sm:hidden w-full justify-center rounded-2xl bg-[#171b24] p-5">
                   <SwapForm
                     chain={selectedChain}
                     explorerUrl={
@@ -609,82 +609,6 @@ export const TradeContainer = () => {
                     }
                     priceImpact={priceImpact}
                     refreshQuotesAction={() => setLatestRefreshTime(Date.now())}
-                    closeSwapFormAction={undefined}
-                    actionButtonProps={undefined}
-                    // actionButtonProps={{
-                    //   disabled:
-                    //     (Number(inputCurrencyAmount) > 0 &&
-                    //       (selectedQuote?.amountOut ?? 0n) === 0n) ||
-                    //     !inputCurrency ||
-                    //     !outputCurrency ||
-                    //     amount === 0n ||
-                    //     amount > balances[inputCurrency.address],
-                    //   onClick: async () => {
-                    //     if (!userAddress && openConnectModal) {
-                    //       openConnectModal()
-                    //     }
-                    //
-                    //     if (
-                    //       !gasPrice ||
-                    //       !userAddress ||
-                    //       !inputCurrency ||
-                    //       !outputCurrency ||
-                    //       !inputCurrencyAmount ||
-                    //       !selectedQuote ||
-                    //       amountIn !== selectedQuote.amountIn ||
-                    //       !selectedQuote.transaction
-                    //     ) {
-                    //       return
-                    //     }
-                    //     await swap(
-                    //       inputCurrency,
-                    //       amountIn,
-                    //       outputCurrency,
-                    //       selectedQuote.amountOut,
-                    //       aggregators.find(
-                    //         (aggregator) =>
-                    //           aggregator.name ===
-                    //           selectedQuote.aggregator.name,
-                    //       )!,
-                    //       selectedQuote.transaction,
-                    //     )
-                    //   },
-                    //   text:
-                    //     Number(inputCurrencyAmount) > 0 &&
-                    //     (selectedQuote?.amountOut ?? 0n) === 0n
-                    //       ? 'Fetching...'
-                    //       : !walletClient
-                    //         ? 'Connect wallet'
-                    //         : !inputCurrency
-                    //           ? 'Select input currency'
-                    //           : !outputCurrency
-                    //             ? 'Select output currency'
-                    //             : amount === 0n
-                    //               ? 'Enter amount'
-                    //               : amount > balances[inputCurrency.address]
-                    //                 ? 'Insufficient balance'
-                    //                 : isAddressEqual(
-                    //                       inputCurrency.address,
-                    //                       zeroAddress,
-                    //                     ) &&
-                    //                     isAddressEqual(
-                    //                       outputCurrency.address,
-                    //                       CHAIN_CONFIG.REFERENCE_CURRENCY
-                    //                         .address,
-                    //                     )
-                    //                   ? 'Wrap'
-                    //                   : isAddressEqual(
-                    //                         inputCurrency.address,
-                    //                         CHAIN_CONFIG.REFERENCE_CURRENCY
-                    //                           .address,
-                    //                       ) &&
-                    //                       isAddressEqual(
-                    //                         outputCurrency.address,
-                    //                         zeroAddress,
-                    //                       )
-                    //                     ? 'Unwrap'
-                    //                     : `Swap`,
-                    // }}
                   />
                 </div>
               </>

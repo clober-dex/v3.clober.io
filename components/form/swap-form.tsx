@@ -187,7 +187,7 @@ export const SwapForm = ({
       defaultBlacklistedCurrency={inputCurrency}
     />
   ) : (
-    <div className="flex flex-col gap-5 h-full">
+    <div className="flex flex-col gap-5 h-full w-full">
       <Toast
         isCopyToast={isCopyToast}
         setIsCopyToast={setIsCopyToast}
