@@ -84,7 +84,7 @@ export const TradeProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const [outputCurrencyAmount, setOutputCurrencyAmount] = useState('')
 
   const [priceInput, setPriceInput] = useState('')
-  const [slippageInput, _setSlippageInput] = useState('1')
+  const [slippageInput, _setSlippageInput] = useState('0.5')
 
   const setInputCurrency = useCallback(
     (currency: Currency | undefined) => {
