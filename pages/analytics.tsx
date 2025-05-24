@@ -13,6 +13,7 @@ import { HistogramChart } from '../components/chart/histogram-chart'
 import { Loading } from '../components/loading'
 import { CHAIN_CONFIG } from '../chain-configs'
 import RestrictedPageGuard from '../containers/restricted-page-guard'
+import { getStartOfTodayTimestampInSeconds } from '../utils/date'
 
 const buildCurrencyLabel = (currency: Currency): string =>
   `${currency.symbol}(${currency.address.slice(2, 6)})`
@@ -26,57 +27,60 @@ export default function Analytics() {
       const protocolAnalytics = await getProtocolAnalytics({
         chainId: selectedChain.id,
       })
+      const startOfTodayTimestampInSeconds = getStartOfTodayTimestampInSeconds()
       const analyticsSnapshots: AnalyticsSnapshot[] =
-        protocolAnalytics.analyticsSnapshots.map((item) => {
-          const volume24hUSDMap = Object.fromEntries(
-            Object.entries(item.volume24hUSDMap).filter(
-              ([address]) =>
-                !CHAIN_CONFIG.ANALYTICS_VOLUME_BLACKLIST.some(
-                  (blacklist) =>
-                    blacklist.timestamp === item.timestamp &&
-                    isAddressEqual(blacklist.address, getAddress(address)),
-                ),
-            ),
-          )
-          const protocolFees24hUSDMap = Object.fromEntries(
-            Object.entries(item.protocolFees24hUSDMap).filter(
-              ([address]) =>
-                !CHAIN_CONFIG.ANALYTICS_VOLUME_BLACKLIST.some(
-                  (blacklist) =>
-                    blacklist.timestamp === item.timestamp &&
-                    isAddressEqual(blacklist.address, getAddress(address)),
-                ),
-            ),
-          )
-          const totalValueLockedUSDMap = Object.fromEntries(
-            Object.entries(item.totalValueLockedUSDMap).filter(
-              ([address]) =>
-                !CHAIN_CONFIG.ANALYTICS_VOLUME_BLACKLIST.some(
-                  (blacklist) =>
-                    blacklist.timestamp === item.timestamp &&
-                    isAddressEqual(blacklist.address, getAddress(address)),
-                ),
-            ),
-          )
-          return {
-            ...item,
-            volume24hUSD: Object.values(volume24hUSDMap).reduce(
-              (acc, { usd }) => acc + usd,
-              0,
-            ),
-            volume24hUSDMap,
-            protocolFees24hUSD: Object.values(protocolFees24hUSDMap).reduce(
-              (acc, { usd }) => acc + usd,
-              0,
-            ),
-            protocolFees24hUSDMap,
-            totalValueLockedUSD: Object.values(totalValueLockedUSDMap).reduce(
-              (acc, { usd }) => acc + usd,
-              0,
-            ),
-            totalValueLockedUSDMap,
-          }
-        })
+        protocolAnalytics.analyticsSnapshots
+          .filter((item) => item.timestamp !== startOfTodayTimestampInSeconds)
+          .map((item) => {
+            const volume24hUSDMap = Object.fromEntries(
+              Object.entries(item.volume24hUSDMap).filter(
+                ([address]) =>
+                  !CHAIN_CONFIG.ANALYTICS_VOLUME_BLACKLIST.some(
+                    (blacklist) =>
+                      blacklist.timestamp === item.timestamp &&
+                      isAddressEqual(blacklist.address, getAddress(address)),
+                  ),
+              ),
+            )
+            const protocolFees24hUSDMap = Object.fromEntries(
+              Object.entries(item.protocolFees24hUSDMap).filter(
+                ([address]) =>
+                  !CHAIN_CONFIG.ANALYTICS_VOLUME_BLACKLIST.some(
+                    (blacklist) =>
+                      blacklist.timestamp === item.timestamp &&
+                      isAddressEqual(blacklist.address, getAddress(address)),
+                  ),
+              ),
+            )
+            const totalValueLockedUSDMap = Object.fromEntries(
+              Object.entries(item.totalValueLockedUSDMap).filter(
+                ([address]) =>
+                  !CHAIN_CONFIG.ANALYTICS_VOLUME_BLACKLIST.some(
+                    (blacklist) =>
+                      blacklist.timestamp === item.timestamp &&
+                      isAddressEqual(blacklist.address, getAddress(address)),
+                  ),
+              ),
+            )
+            return {
+              ...item,
+              volume24hUSD: Object.values(volume24hUSDMap).reduce(
+                (acc, { usd }) => acc + usd,
+                0,
+              ),
+              volume24hUSDMap,
+              protocolFees24hUSD: Object.values(protocolFees24hUSDMap).reduce(
+                (acc, { usd }) => acc + usd,
+                0,
+              ),
+              protocolFees24hUSDMap,
+              totalValueLockedUSD: Object.values(totalValueLockedUSDMap).reduce(
+                (acc, { usd }) => acc + usd,
+                0,
+              ),
+              totalValueLockedUSDMap,
+            }
+          })
       return {
         accumulatedUniqueUsers: protocolAnalytics.accumulatedUniqueUsers,
         accumulatedUniqueTransactions:
@@ -362,7 +366,7 @@ export default function Analytics() {
                   defaultValue={
                     analytics && analytics.analyticsSnapshots
                       ? analytics.analyticsSnapshots[
-                          analytics.analyticsSnapshots.length - 2
+                          analytics.analyticsSnapshots.length - 1
                         ].totalValueLockedUSD
                       : 0
                   }
@@ -425,7 +429,7 @@ export default function Analytics() {
                   defaultValue={
                     analytics && analytics.analyticsSnapshots
                       ? analytics.analyticsSnapshots[
-                          analytics.analyticsSnapshots.length - 2
+                          analytics.analyticsSnapshots.length - 1
                         ].poolTotalValueLockedUSD
                       : 0
                   }
