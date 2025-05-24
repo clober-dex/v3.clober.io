@@ -51,4 +51,10 @@ export const PAGE_BUTTONS: PageButton[] = [
     icon: <AnalyticsPageSvg className="w-4 h-4" />,
     isHiddenMenu: true,
   },
+  {
+    path: '/leaderboard',
+    label: 'Leaderboard',
+    icon: <TradingCompetitionPageSvg className="w-4 h-4" />,
+    isHiddenMenu: true,
+  },
 ]

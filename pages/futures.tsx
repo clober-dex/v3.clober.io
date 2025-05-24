@@ -1,7 +1,12 @@
 import React from 'react'
 
 import { FuturesContainer } from '../containers/futures/futures-container'
+import RestrictedPageGuard from '../containers/restricted-page-guard'
 
 export default function Futures() {
-  return <FuturesContainer />
+  return (
+    <RestrictedPageGuard>
+      <FuturesContainer />
+    </RestrictedPageGuard>
+  )
 }
