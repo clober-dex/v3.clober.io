@@ -45,6 +45,7 @@ export const Default: Story = {
     websiteUrl: '',
     twitterUrl: '',
     telegramUrl: '',
+    isFetchingMarketSnapshot: false,
   },
 }
 
@@ -72,6 +73,7 @@ export const Social: Story = {
     websiteUrl: 'https://www.google.com',
     twitterUrl: 'https://www.google.com',
     telegramUrl: 'https://www.google.com',
+    isFetchingMarketSnapshot: false,
   },
 }
 
@@ -99,6 +101,7 @@ export const Loading: Story = {
     websiteUrl: '',
     twitterUrl: '',
     telegramUrl: '',
+    isFetchingMarketSnapshot: true,
   },
 }
 

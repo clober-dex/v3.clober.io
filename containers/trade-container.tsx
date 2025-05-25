@@ -486,6 +486,9 @@ export const TradeContainer = () => {
                     websiteUrl={''}
                     twitterUrl={''}
                     telegramUrl={''}
+                    isFetchingMarketSnapshot={
+                      selectedMarketSnapshot === undefined
+                    }
                   />
                 )}
 
